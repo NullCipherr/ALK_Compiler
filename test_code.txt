@@ -1,10 +1,10 @@
-// Declarações com sintaxe mais amigável
+// Declarações
 create int numero as 42;
 create float pi as 3.14159;
 create char letra as 'A';
 create string mensagem as "Ola, mundo!";
 
-// Arrays com sintaxe mais clara
+// Arrays
 create int numeros[10] as array;
 create float valores[5] as array;
 create char letras[3] as array;
@@ -17,12 +17,12 @@ check (numero > 0) then {
     numero = 0;
 }
 
-// Loop mais intuitivo
+// Loop
 repeat while (numero < 10) {
     numero += 1;
 }
 
-// Funções com sintaxe mais clara
+// Funções
 function int soma(int a, int b) {
     give back a + b;
 }
@@ -40,7 +40,7 @@ function void processaNumeros(int x, float y) {
     give back;
 }
 
-// Operadores mais intuitivos
+// Operadores
 create int a as 10;
 create int b as 20;
 create int soma as a plus b;
@@ -48,7 +48,7 @@ create int subtracao as a minus b;
 create int multiplicacao as a times b;
 create int divisao as b divided_by a;
 
-// Comparações mais legíveis
+// Comparações 
 check (a equals b) then {
     give back 1;
 }
@@ -67,7 +67,7 @@ int contador123;
 float temperatura_maxima;
 string nomeCompleto;
 
-// Teste de valores diversos
+// Teste de valores n
 int numeroGrande = 123456;
 float numeroDecimal = 0.123;
 char simbolo = '#';
