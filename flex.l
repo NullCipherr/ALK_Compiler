@@ -2,16 +2,17 @@
  * Analisador Léxico - Compilador
  * 
  * Estrutura do Analisador:
- * 1. TOKENS (000-030):
- *    - Tipos (000-003):        T_INT, T_FLT, T_CHR, T_STR
- *    - Controle (004-008):     JMP_CND, JMP_ELS, LOOP, RET, VOID
- *    - Operadores (009-017):   ADD, SUB, MUL, DIV, MOV, CMP_EQ, CMP_NE, CMP_LT, CMP_GT
- *    - Delimitadores (018-025): PAREN_L/R, ARR_L/R, BLK_L/R, END, SEP
- *    - Identificadores (026-030): ID, INT, FLT, CHR, STR
+ * 1. CATEGORIAS DE TOKENS:
+ *    - Tipos (TYPE):           TYPE_INT, TYPE_FLT, TYPE_CHR, TYPE_STR
+ *    - Controle (CTRL):        CTRL_IF, CTRL_ELSE, CTRL_WHILE, CTRL_RETURN, CTRL_VOID
+ *    - Operadores (OP):        OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_ASSIGN, OP_EQ, OP_NE, OP_LT, OP_GT
+ *    - Delimitadores (DELIM):  DELIM_PAREN_OPEN/CLOSE, DELIM_BRACKET_OPEN/CLOSE, 
+ *                              DELIM_BLOCK_OPEN/CLOSE, DELIM_END_STATEMENT, DELIM_SEPARATOR
+ *    - Identificadores/Literais: IDENTIFIER, LITERAL_INT, LITERAL_FLT, LITERAL_CHR, LITERAL_STR
  *
  * 2. PADRÕES REGEX:
  *    DIGITO:  [0-9]
- *    LETRA:   [a-zA-Z]
+ *    LETRA:   [a-zA-Z_]
  *    ID:      {LETRA}({LETRA}|{DIGITO})*
  *    INTEIRO: {DIGITO}+
  *    FLOAT:   {DIGITO}+"."{DIGITO}+
@@ -19,8 +20,8 @@
  *    STRING:  "[^"]*"
  *
  * 3. FORMATO DOS TOKENS:
- *    CATEGORIA_SUBCATEGORIA_NUM
- *    Exemplo: T_INT_000, JMP_CND_004, ADD_009
+ *    CATEGORIA_SUBTIPO
+ *    Exemplo: TYPE_INT, CTRL_IF, OP_ADD, DELIM_PAREN_OPEN, LITERAL_INT
  ******************************************************************************/
 
 %{
