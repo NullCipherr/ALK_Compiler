@@ -20,7 +20,11 @@ make
 ## Teste
 
 ```bash
-make test
+make test-lex
+```
+
+```bash
+make test-bison
 ```
 
 ## Limpeza
