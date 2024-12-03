@@ -1,25 +1,32 @@
-# Compilador e flags
-CC = gcc
-CFLAGS = -Wall
+CC=gcc
+CFLAGS=-Wall
 
-# Arquivos
-FLEX_SOURCE = flex.l
-COMPILER = compilador
-GENERATED_C = lex.yy.c
+COMPILER=compilador
+BISON_FILE=bison.y
+FLEX_FILE=flex.l
 
-# Regras
 all: $(COMPILER)
 
-$(COMPILER): $(GENERATED_C)
-	$(CC) $(CFLAGS) -o $(COMPILER) $(GENERATED_C)
+$(COMPILER): lex.yy.c bison.tab.c types.h
+	$(CC) $(CFLAGS) -o $(COMPILER) lex.yy.c bison.tab.c
 
-$(GENERATED_C): $(FLEX_SOURCE)
-	flex $(FLEX_SOURCE)
+lex.yy.c: $(FLEX_FILE) bison.tab.h
+	flex $(FLEX_FILE)
+
+bison.tab.c bison.tab.h: $(BISON_FILE)
+	bison -d $(BISON_FILE)
+
+test-lex: $(COMPILER)
+	@echo "\n=== Executando teste léxico ==="
+	@echo "Arquivo de entrada: test_code.txt"
+	@echo "----------------------------------------"
+	ANALISE_LEXICA=1 ./$(COMPILER) < test_code.txt
+
+test-bison: $(COMPILER)
+	@echo "\n=== Executando teste sintático ==="
+	@echo "Arquivo de entrada: test_code.txt"
+	@echo "----------------------------------------"
+	./$(COMPILER) < test_code.txt
 
 clean:
-	rm -f $(COMPILER) $(GENERATED_C)
-
-test: $(COMPILER)
-	./$(COMPILER) < test_compilador.txt
-
-.PHONY: all clean test
+	rm -f $(COMPILER) lex.yy.c bison.tab.c bison.tab.h

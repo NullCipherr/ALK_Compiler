@@ -1,0 +1,74 @@
+// Declarações com sintaxe mais amigável
+create int numero as 42;
+create float pi as 3.14159;
+create char letra as 'A';
+create string mensagem as "Ola, mundo!";
+
+// Arrays com sintaxe mais clara
+create int numeros[10] as array;
+create float valores[5] as array;
+create char letras[3] as array;
+create string nomes[2] as array;
+
+// Estrutura de decisão mais expressiva
+check (numero > 0) then {
+    numero += 1;
+} otherwise {
+    numero = 0;
+}
+
+// Loop mais intuitivo
+repeat while (numero < 10) {
+    numero += 1;
+}
+
+// Funções com sintaxe mais clara
+function int soma(int a, int b) {
+    give back a + b;
+}
+
+// Função com múltiplos comandos
+function void processaNumeros(int x, float y) {
+    create int temp;
+    temp = x * 2;
+    
+    check (temp > 10) then {
+        temp += 1;
+    } otherwise {
+        temp = 0;
+    }
+    give back;
+}
+
+// Operadores mais intuitivos
+create int a as 10;
+create int b as 20;
+create int soma as a plus b;
+create int subtracao as a minus b;
+create int multiplicacao as a times b;
+create int divisao as b divided_by a;
+
+// Comparações mais legíveis
+check (a equals b) then {
+    give back 1;
+}
+check (a not_equals b) then {
+    give back 0;
+}
+check (a is_less_than b) then {
+    give back -1;
+}
+check (a is_greater_than b) then {
+    give back 2;
+}
+
+// Teste de identificadores complexos
+int contador123;
+float temperatura_maxima;
+string nomeCompleto;
+
+// Teste de valores diversos
+int numeroGrande = 123456;
+float numeroDecimal = 0.123;
+char simbolo = '#';
+string textoLongo = "Este eh um texto mais longo para teste";
