@@ -51,41 +51,41 @@ COMENTARIO  "//"[^\n]*
 \n          { linha++; coluna = 1; }
 {COMENTARIO} { /* Ignora comentários */ }
 
-"int"       { emitToken("T_INT_000", yytext); }
-"float"     { emitToken("T_FLT_001", yytext); }
-"char"      { emitToken("T_CHR_002", yytext); }
-"string"    { emitToken("T_STR_003", yytext); }
+"int"       { emitToken("TYPE_INT", yytext); }
+"float"     { emitToken("TYPE_FLT", yytext); }
+"char"      { emitToken("TYPE_CHR", yytext); }
+"string"    { emitToken("TYPE_STR", yytext); }
 
-"if"        { emitToken("JMP_CND_004", yytext); }
-"else"      { emitToken("JMP_ELS_005", yytext); }
-"while"     { emitToken("LOOP_006", yytext); }
-"return"    { emitToken("RET_007", yytext); }
-"void"      { emitToken("VOID_008", yytext); }
+"if"        { emitToken("CTRL_IF", yytext); }
+"else"      { emitToken("CTRL_ELSE", yytext); }
+"while"     { emitToken("CTRL_WHILE", yytext); }
+"return"    { emitToken("CTRL_RETURN", yytext); }
+"void"      { emitToken("CTRL_VOID", yytext); }
 
-"+"         { emitToken("ADD_009", yytext); }
-"-"         { emitToken("SUB_010", yytext); }
-"*"         { emitToken("MUL_011", yytext); }
-"/"         { emitToken("DIV_012", yytext); }
-"="         { emitToken("MOV_013", yytext); }
-"=="        { emitToken("CMP_EQ_014", yytext); }
-"!="        { emitToken("CMP_NE_015", yytext); }
-"<"         { emitToken("CMP_LT_016", yytext); }
-">"         { emitToken("CMP_GT_017", yytext); }
+"+"         { emitToken("OP_ADD", yytext); }
+"-"         { emitToken("OP_SUB", yytext); }
+"*"         { emitToken("OP_MUL", yytext); }
+"/"         { emitToken("OP_DIV", yytext); }
+"="         { emitToken("OP_ASSIGN", yytext); }
+"=="        { emitToken("OP_EQ", yytext); }
+"!="        { emitToken("OP_NE", yytext); }
+"<"         { emitToken("OP_LT", yytext); }
+">"         { emitToken("OP_GT", yytext); }
 
-"("         { emitToken("PAREN_L_018", yytext); }
-")"         { emitToken("PAREN_R_019", yytext); }
-"["         { emitToken("ARR_L_020", yytext); }
-"]"         { emitToken("ARR_R_021", yytext); }
-"{"         { emitToken("BLK_L_022", yytext); }
-"}"         { emitToken("BLK_R_023", yytext); }
-";"         { emitToken("END_024", yytext); }
-","         { emitToken("SEP_025", yytext); }
+"("         { emitToken("DELIM_PAREN_OPEN", yytext); }
+")"         { emitToken("DELIM_PAREN_CLOSE", yytext); }
+"["         { emitToken("DELIM_BRACKET_OPEN", yytext); }
+"]"         { emitToken("DELIM_BRACKET_CLOSE", yytext); }
+"{"         { emitToken("DELIM_BLOCK_OPEN", yytext); }
+"}"         { emitToken("DELIM_BLOCK_CLOSE", yytext); }
+";"         { emitToken("DELIM_END_STATEMENT", yytext); }
+","         { emitToken("DELIM_SEPARATOR", yytext); }
 
-{ID}        { emitToken("ID_026", yytext); }
-{INTEIRO}   { emitToken("INT_027", yytext); }
-{FLOAT}     { emitToken("FLT_028", yytext); }
-{CHAR}      { emitToken("CHR_029", yytext); }
-{STRING}    { emitToken("STR_030", yytext); }
+{ID}        { emitToken("IDENTIFIER", yytext); }
+{INTEIRO}   { emitToken("LITERAL_INT", yytext); }
+{FLOAT}     { emitToken("LITERAL_FLT", yytext); }
+{CHAR}      { emitToken("LITERAL_CHR", yytext); }
+{STRING}    { emitToken("LITERAL_STR", yytext); }
 
 .           { printf("ERRO LEXICO: caractere invalido '%s' na linha %d\n", yytext, linha); }
 

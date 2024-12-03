@@ -823,159 +823,159 @@ YY_RULE_SETUP
 case 4:
 YY_RULE_SETUP
 #line 54 "flex.l"
-{ emitToken("T_INT_000", yytext); }
+{ emitToken("TYPE_INT", yytext); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 55 "flex.l"
-{ emitToken("T_FLT_001", yytext); }
+{ emitToken("TYPE_FLT", yytext); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 56 "flex.l"
-{ emitToken("T_CHR_002", yytext); }
+{ emitToken("TYPE_CHR", yytext); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 57 "flex.l"
-{ emitToken("T_STR_003", yytext); }
+{ emitToken("TYPE_STR", yytext); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 59 "flex.l"
-{ emitToken("JMP_CND_004", yytext); }
+{ emitToken("CTRL_IF", yytext); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 60 "flex.l"
-{ emitToken("JMP_ELS_005", yytext); }
+{ emitToken("CTRL_ELSE", yytext); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 61 "flex.l"
-{ emitToken("LOOP_006", yytext); }
+{ emitToken("CTRL_WHILE", yytext); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 62 "flex.l"
-{ emitToken("RET_007", yytext); }
+{ emitToken("CTRL_RETURN", yytext); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 63 "flex.l"
-{ emitToken("VOID_008", yytext); }
+{ emitToken("CTRL_VOID", yytext); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 65 "flex.l"
-{ emitToken("ADD_009", yytext); }
+{ emitToken("OP_ADD", yytext); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 66 "flex.l"
-{ emitToken("SUB_010", yytext); }
+{ emitToken("OP_SUB", yytext); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 67 "flex.l"
-{ emitToken("MUL_011", yytext); }
+{ emitToken("OP_MUL", yytext); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 68 "flex.l"
-{ emitToken("DIV_012", yytext); }
+{ emitToken("OP_DIV", yytext); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 69 "flex.l"
-{ emitToken("MOV_013", yytext); }
+{ emitToken("OP_ASSIGN", yytext); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 70 "flex.l"
-{ emitToken("CMP_EQ_014", yytext); }
+{ emitToken("OP_EQ", yytext); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 71 "flex.l"
-{ emitToken("CMP_NE_015", yytext); }
+{ emitToken("OP_NE", yytext); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 72 "flex.l"
-{ emitToken("CMP_LT_016", yytext); }
+{ emitToken("OP_LT", yytext); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 73 "flex.l"
-{ emitToken("CMP_GT_017", yytext); }
+{ emitToken("OP_GT", yytext); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 75 "flex.l"
-{ emitToken("PAREN_L_018", yytext); }
+{ emitToken("DELIM_PAREN_OPEN", yytext); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 76 "flex.l"
-{ emitToken("PAREN_R_019", yytext); }
+{ emitToken("DELIM_PAREN_CLOSE", yytext); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 77 "flex.l"
-{ emitToken("ARR_L_020", yytext); }
+{ emitToken("DELIM_BRACKET_OPEN", yytext); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 78 "flex.l"
-{ emitToken("ARR_R_021", yytext); }
+{ emitToken("DELIM_BRACKET_CLOSE", yytext); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 79 "flex.l"
-{ emitToken("BLK_L_022", yytext); }
+{ emitToken("DELIM_BLOCK_OPEN", yytext); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 80 "flex.l"
-{ emitToken("BLK_R_023", yytext); }
+{ emitToken("DELIM_BLOCK_CLOSE", yytext); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 81 "flex.l"
-{ emitToken("END_024", yytext); }
+{ emitToken("DELIM_END_STATEMENT", yytext); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 82 "flex.l"
-{ emitToken("SEP_025", yytext); }
+{ emitToken("DELIM_SEPARATOR", yytext); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 84 "flex.l"
-{ emitToken("ID_026", yytext); }
+{ emitToken("IDENTIFIER", yytext); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 85 "flex.l"
-{ emitToken("INT_027", yytext); }
+{ emitToken("LITERAL_INT", yytext); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 86 "flex.l"
-{ emitToken("FLT_028", yytext); }
+{ emitToken("LITERAL_FLT", yytext); }
 	YY_BREAK
 case 33:
 /* rule 33 can match eol */
 YY_RULE_SETUP
 #line 87 "flex.l"
-{ emitToken("CHR_029", yytext); }
+{ emitToken("LITERAL_CHR", yytext); }
 	YY_BREAK
 case 34:
 /* rule 34 can match eol */
 YY_RULE_SETUP
 #line 88 "flex.l"
-{ emitToken("STR_030", yytext); }
+{ emitToken("LITERAL_STR", yytext); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
