@@ -1,6 +1,6 @@
 # C_Compiler
 
-Um compilador simples para a linguagem C, desenvolvido para realizar análise léxica e sintática de programas, gerando e exibindo uma árvore sintática representando a estrutura do código. Este projeto é ideal para estudos de compiladores e linguagens formais.
+Um compilador simples para a linguagem C, desenvolvido para realizar análise léxica e sintática de programas, gerando e exibindo uma árvore sintática representando a estrutura do código, sendo um projeto ideal para estudos de compiladores e linguagens formais.
 
 ## Funcionalidades
 Atualmente, o compilador implementa as seguintes capacidades:
