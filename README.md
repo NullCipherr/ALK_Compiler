@@ -5,12 +5,12 @@ Um compilador simples para a linguagem C, desenvolvido para realizar análise l�
 ## Funcionalidades
 Atualmente, o compilador implementa as seguintes capacidades:
 
-- Tipos de Dados: Reconhece e manipula variáveis dos tipos int, float, char e string.
-- Vetores: Suporte ao reconhecimento e manipulação de vetores.
-- Estruturas de Decisão: Reconhecimento e manipulação de pelo menos uma estrutura de decisão (if, switch ou equivalente).
-- Estruturas de Repetição: Reconhecimento e manipulação de pelo menos uma estrutura de repetição (for, while ou equivalente).
-- Palavras Reservadas e Funções Reservadas: Identificação e manipulação de palavras-chave e funções reservadas.
-- Sub-rotinas: Suporte para chamadas de sub-rotinas, excluindo a função main.
+- **Tipos de Dados:** Reconhece e manipula variáveis dos tipos int, float, char e string.
+- **Vetores:** Suporte ao reconhecimento e manipulação de vetores.
+- **Estruturas de Decisão:** Reconhecimento e manipulação de pelo menos uma estrutura de decisão (if, switch ou equivalente).
+- **Estruturas de Repetição:** Reconhecimento e manipulação de pelo menos uma estrutura de repetição (for, while ou equivalente).
+- **Palavras Reservadas e Funções Reservadas:** Identificação e manipulação de palavras-chave e funções reservadas.
+- **Sub-rotinas:** Suporte para chamadas de sub-rotinas, excluindo a função main.
 
 ## Análise Léxica
 - Recebe como entrada a sequência de tokens gerada pela análise léxica.
@@ -62,10 +62,10 @@ make clean
 ## Contribuição
 Contribuições são bem-vindas! Para contribuir:
 
-1. Fork este repositório.
-2. Crie um branch para suas alterações: git checkout -b feature/nova-funcionalidade.
-3. Envie suas alterações: git push origin feature/nova-funcionalidade.
-4. Abra um Pull Request.
+1. **Fork** este repositório.
+2. Crie um branch para suas alterações: `git checkout -b feature/nova-funcionalidade`.
+3. Envie suas alterações: `git push origin feature/nova-funcionalidade`.
+4. Abra um **Pull Request**.
 
 ## Licença
 Este projeto é licenciado sob a licença MIT. Consulte o arquivo LICENSE para mais detalhes.
