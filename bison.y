@@ -58,6 +58,7 @@
 
 // Protótipos de funções
 const char* tipoParaString(TipoVariavel tipo);
+const char* nomeVariavel(const char* nome);
 TipoVariavel verificarTipos(TipoVariavel tipo1, const char* operador, TipoVariavel tipo2);
 void mostrarAnaliseGramatical(const char* regra);
 void mostrarAnaliseTipos(const char* operacao, TipoVariavel tipo1, TipoVariavel tipo2, TipoVariavel resultado);
@@ -67,6 +68,33 @@ extern int linha;
 extern int total_tokens;
 void yyerror(const char *s);
 int yylex(void);
+
+FILE* arvore_arquivo = NULL;
+int nivel_arvore = 0;
+
+void iniciar_arquivo_arvore() {
+    arvore_arquivo = fopen("arvore_sintatica.txt", "w");
+    if (arvore_arquivo == NULL) {
+        printf("Erro ao criar arquivo da árvore sintática\n");
+        exit(1);
+    }
+}
+
+void fechar_arquivo_arvore() {
+    if (arvore_arquivo != NULL) {
+        fclose(arvore_arquivo);
+    }
+}
+
+void mostrarAnaliseGramatical(const char* regra) {
+    printf("║ Regra: %-53s ║\n", regra);
+    if (arvore_arquivo != NULL) {
+        for (int i = 0; i < nivel_arvore; i++) {
+            fprintf(arvore_arquivo, "  ");
+        }
+        fprintf(arvore_arquivo, "└─ %s\n", regra);
+    }
+}
 
 %}
 
@@ -117,7 +145,7 @@ declaracao_variavel
             mostrarAnaliseGramatical("Declaração → create tipo id as expressão");
             printf("\n╔═════════════════ VERIFICAÇÃO DE TIPOS ═════════════════╗\n");
             printf("║ Variável: %-10s  Tipo Declarado: %-15s ║\n", 
-                   $3.nome, 
+                   $3.nome,
                    tipoParaString($2));
             printf("║ Expressão retorna: %-35s ║\n", 
                    tipoParaString($5));
@@ -305,6 +333,13 @@ void mostrarAnaliseTipos(const char* operacao, TipoVariavel tipo1, TipoVariavel 
            tipoParaString(resultado));
 }
 
+const char* nomeVariavel(const char* nome) {
+    if (nome == NULL) {
+        return "<<sem nome>>";
+    }
+    return nome;
+}
+
 TipoVariavel verificarTipos(TipoVariavel tipo1, const char* operador, TipoVariavel tipo2) {
     printf("\n╔════════════════════ ANÁLISE DE TIPOS ════════════════════╗\n");
     
@@ -326,10 +361,6 @@ TipoVariavel verificarTipos(TipoVariavel tipo1, const char* operador, TipoVariav
     return TIPO_ERRO;
 }
 
-void mostrarAnaliseGramatical(const char* regra) {
-    printf("║ Regra: %-53s ║\n", regra);
-}
-
 void yyerror(const char *s) {
     printf("\n╔══════════════════════ ERRO SINTÁTICO ══════════════════════╗\n");
     printf("║ Linha: %-52d ║\n", linha);
@@ -345,16 +376,28 @@ void yyerror(const char *s) {
 int main(void) {
     printf("\n╔════════════════════ COMPILADOR C-2024 ════════════════════╗\n");
     printf("║                                                           ║\n");
+    
+    if (getenv("GERAR_ARVORE")) {
+        iniciar_arquivo_arvore();
+    }
+    
+    int resultado;
     if (getenv("ANALISE_LEXICA")) {
         printf("║              Iniciando Análise Léxica                   ║\n");
         printf("║                                                           ║\n");
         printf("╚═══════════════════════════════════════════════════════════╝\n\n");
         analise_lexica();
-        return 0;
+        resultado = 0;
     } else {
         printf("║              Iniciando Análise Sintática                 ║\n");
         printf("║                                                           ║\n");
         printf("╚═══════════════════════════════════════════════════════════╝\n\n");
-        return yyparse();
+        resultado = yyparse();
     }
+    
+    if (getenv("GERAR_ARVORE")) {
+        fechar_arquivo_arvore();
+    }
+    
+    return resultado;
 }

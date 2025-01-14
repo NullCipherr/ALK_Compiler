@@ -14,7 +14,7 @@ lex.yy.c: $(FLEX_FILE) bison.tab.h
 	flex $(FLEX_FILE)
 
 bison.tab.c bison.tab.h: $(BISON_FILE)
-	bison -d $(BISON_FILE)
+	bison -v -d $(BISON_FILE)
 
 test-lex: $(COMPILER)
 	@echo "\n=== Executando teste léxico ==="
@@ -28,5 +28,10 @@ test-bison: $(COMPILER)
 	@echo "----------------------------------------"
 	./$(COMPILER) < test_code.txt
 
+tree: bison.tab.c
+	@echo "\n=== Gerando árvore sintática ==="
+	@echo "Árvore gerada em bison.output"
+	cat bison.output
+
 clean:
-	rm -f $(COMPILER) lex.yy.c bison.tab.c bison.tab.h
+	rm -f $(COMPILER) lex.yy.c bison.tab.c bison.tab.h bison.output
