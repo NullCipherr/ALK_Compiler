@@ -573,6 +573,7 @@ char *yytext;
 #include "types.h"
 #include "bison.tab.h"
 
+
 int linha = 1;
 int coluna = 1;
 int total_tokens = 0;
@@ -609,9 +610,9 @@ void analise_lexica(void) {
         printf("╚════════════════════════════════════════════════════════════════╝\n\n");
     }
 }
-#line 613 "lex.yy.c"
+#line 614 "lex.yy.c"
 #define YY_NO_INPUT 1
-#line 615 "lex.yy.c"
+#line 616 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -826,10 +827,10 @@ YY_DECL
 		}
 
 	{
-#line 84 "flex.l"
+#line 85 "flex.l"
 
 
-#line 833 "lex.yy.c"
+#line 834 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -888,227 +889,227 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 86 "flex.l"
+#line 87 "flex.l"
 { coluna += yyleng; }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 87 "flex.l"
+#line 88 "flex.l"
 { linha++; coluna = 1; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 88 "flex.l"
+#line 89 "flex.l"
 { /* Ignora comentários */ }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 90 "flex.l"
+#line 91 "flex.l"
 { emitToken("DECL_CREATE", yytext); return DECL_CREATE; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 91 "flex.l"
+#line 92 "flex.l"
 { emitToken("DECL_AS", yytext); return DECL_AS; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 92 "flex.l"
+#line 93 "flex.l"
 { emitToken("DECL_ARRAY", yytext); return DECL_ARRAY; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 93 "flex.l"
+#line 94 "flex.l"
 { emitToken("DECL_FUNCTION", yytext); return DECL_FUNCTION; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 95 "flex.l"
+#line 96 "flex.l"
 { emitToken("TYPE_INT", yytext); return TYPE_INT; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 96 "flex.l"
+#line 97 "flex.l"
 { emitToken("TYPE_FLT", yytext); return TYPE_FLT; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 97 "flex.l"
+#line 98 "flex.l"
 { emitToken("TYPE_CHR", yytext); return TYPE_CHR; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 98 "flex.l"
+#line 99 "flex.l"
 { emitToken("TYPE_STR", yytext); return TYPE_STR; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 99 "flex.l"
+#line 100 "flex.l"
 { emitToken("TYPE_VOID", yytext); return TYPE_VOID; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 101 "flex.l"
+#line 102 "flex.l"
 { emitToken("CTRL_CHECK", yytext); return CTRL_CHECK; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 102 "flex.l"
+#line 103 "flex.l"
 { emitToken("CTRL_THEN", yytext); return CTRL_THEN; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 103 "flex.l"
+#line 104 "flex.l"
 { emitToken("CTRL_OTHERWISE", yytext); return CTRL_OTHERWISE; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 104 "flex.l"
+#line 105 "flex.l"
 { emitToken("CTRL_REPEAT", yytext); return CTRL_REPEAT; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 105 "flex.l"
+#line 106 "flex.l"
 { emitToken("CTRL_WHILE", yytext); return CTRL_WHILE; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 106 "flex.l"
+#line 107 "flex.l"
 { emitToken("CTRL_GIVE", yytext); return CTRL_GIVE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 107 "flex.l"
+#line 108 "flex.l"
 { emitToken("CTRL_BACK", yytext); return CTRL_BACK; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 109 "flex.l"
+#line 110 "flex.l"
 { emitToken("OP_ADD", yytext); return OP_ADD; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 110 "flex.l"
+#line 111 "flex.l"
 { emitToken("OP_SUB", yytext); return OP_SUB; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 111 "flex.l"
+#line 112 "flex.l"
 { emitToken("OP_MUL", yytext); return OP_MUL; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 112 "flex.l"
+#line 113 "flex.l"
 { emitToken("OP_DIV", yytext); return OP_DIV; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 113 "flex.l"
+#line 114 "flex.l"
 { emitToken("OP_ASSIGN", yytext); return OP_ASSIGN; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 114 "flex.l"
+#line 115 "flex.l"
 { emitToken("OP_ADD_ASSIGN", yytext); return OP_ADD_ASSIGN; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 115 "flex.l"
+#line 116 "flex.l"
 { emitToken("OP_EQ", yytext); return OP_EQ; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 116 "flex.l"
+#line 117 "flex.l"
 { emitToken("OP_NE", yytext); return OP_NE; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 117 "flex.l"
+#line 118 "flex.l"
 { emitToken("OP_LT", yytext); return OP_LT; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 118 "flex.l"
+#line 119 "flex.l"
 { emitToken("OP_GT", yytext); return OP_GT; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 120 "flex.l"
+#line 121 "flex.l"
 { emitToken("DELIM_PAREN_OPEN", yytext); return DELIM_PAREN_OPEN; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 121 "flex.l"
+#line 122 "flex.l"
 { emitToken("DELIM_PAREN_CLOSE", yytext); return DELIM_PAREN_CLOSE; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 122 "flex.l"
+#line 123 "flex.l"
 { emitToken("DELIM_BRACKET_OPEN", yytext); return DELIM_BRACKET_OPEN; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 123 "flex.l"
+#line 124 "flex.l"
 { emitToken("DELIM_BRACKET_CLOSE", yytext); return DELIM_BRACKET_CLOSE; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 124 "flex.l"
+#line 125 "flex.l"
 { emitToken("DELIM_BLOCK_OPEN", yytext); return DELIM_BLOCK_OPEN; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 125 "flex.l"
+#line 126 "flex.l"
 { emitToken("DELIM_BLOCK_CLOSE", yytext); return DELIM_BLOCK_CLOSE; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 126 "flex.l"
+#line 127 "flex.l"
 { emitToken("DELIM_END_STATEMENT", yytext); return DELIM_END_STATEMENT; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 127 "flex.l"
+#line 128 "flex.l"
 { emitToken("DELIM_SEPARATOR", yytext); return DELIM_SEPARATOR; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 129 "flex.l"
+#line 130 "flex.l"
 { emitToken("IDENTIFIER", yytext); return IDENTIFIER; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 130 "flex.l"
+#line 131 "flex.l"
 { emitToken("LITERAL_INT", yytext); return LITERAL_INT; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 131 "flex.l"
+#line 132 "flex.l"
 { emitToken("LITERAL_FLT", yytext); return LITERAL_FLT; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 132 "flex.l"
+#line 133 "flex.l"
 { emitToken("LITERAL_CHR", yytext); return LITERAL_CHR; }
 	YY_BREAK
 case 42:
 /* rule 42 can match eol */
 YY_RULE_SETUP
-#line 133 "flex.l"
+#line 134 "flex.l"
 { emitToken("LITERAL_STR", yytext); return LITERAL_STR; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 135 "flex.l"
+#line 136 "flex.l"
 { printf("ERRO LEXICO: caractere invalido '%s' na linha %d\n", yytext, linha); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 137 "flex.l"
+#line 138 "flex.l"
 ECHO;
 	YY_BREAK
-#line 1112 "lex.yy.c"
+#line 1113 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2076,7 +2077,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 137 "flex.l"
+#line 138 "flex.l"
 
 
 int yywrap(void) {

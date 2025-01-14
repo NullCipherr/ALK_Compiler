@@ -70,3 +70,5 @@ create int numeroGrande as 123456;
 create float numeroDecimal as 0.123;
 create char simbolo as '#';
 create string textoLongo as "Este eh um texto mais longo para teste";
+
+create asf texto as "a";
