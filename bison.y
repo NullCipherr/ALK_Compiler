@@ -56,6 +56,8 @@
 #include <string.h>
 #include "types.h"
 
+
+
 // Protótipos de funções
 const char* tipoParaString(TipoVariavel tipo);
 TipoVariavel verificarTipos(TipoVariavel tipo1, const char* operador, TipoVariavel tipo2);
@@ -65,6 +67,7 @@ extern void analise_lexica(void);
 
 extern int linha;
 extern int total_tokens;
+extern char* yytext;
 void yyerror(const char *s);
 int yylex(void);
 
@@ -334,6 +337,7 @@ void yyerror(const char *s) {
     printf("\n╔══════════════════════ ERRO SINTÁTICO ══════════════════════╗\n");
     printf("║ Linha: %-52d ║\n", linha);
     printf("║ Erro:  %-52s ║\n", s);
+    printf("║ Nao se esperava:  %-52s ║\n", yytext);
     printf("║                                                             ║\n");
     printf("║ Contexto do Erro:                                          ║\n");
     printf("║ - Verificar tipos dos operandos                           ║\n");

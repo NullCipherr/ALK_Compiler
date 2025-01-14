@@ -30,6 +30,7 @@
 #include "types.h"
 #include "bison.tab.h"
 
+
 int linha = 1;
 int coluna = 1;
 int total_tokens = 0;
