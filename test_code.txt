@@ -11,28 +11,26 @@ create char letras[3] as array;
 create string nomes[2] as array;
 
 // Estrutura de decisão mais expressiva
-check (numero > 0) then {
+check (numero is_greater_than 0) then {
     numero += 1;
 } otherwise {
     numero = 0;
 }
 
 // Loop
-repeat while (numero < 10) {
+repeat while (numero is_less_than 10) {
     numero += 1;
 }
 
 // Funções
 function int soma(int a, int b) {
-    give back a + b;
+    give back a plus b;
 }
 
 // Função com múltiplos comandos
 function void processaNumeros(int x, float y) {
-    create int temp;
-    temp = x * 2;
-    
-    check (temp > 10) then {
+    temp = x times 2;
+    check (temp is_greater_than 10) then {
         temp += 1;
     } otherwise {
         temp = 0;
@@ -63,12 +61,12 @@ check (a is_greater_than b) then {
 }
 
 // Teste de identificadores complexos
-int contador123;
-float temperatura_maxima;
-string nomeCompleto;
+create int contador123 as 0;
+create float temperatura_maxima as 0.0;
+create string nomeCompleto as "";
 
 // Teste de valores n
-int numeroGrande = 123456;
-float numeroDecimal = 0.123;
-char simbolo = '#';
-string textoLongo = "Este eh um texto mais longo para teste";
+create int numeroGrande as 123456;
+create float numeroDecimal as 0.123;
+create char simbolo as '#';
+create string textoLongo as "Este eh um texto mais longo para teste";
