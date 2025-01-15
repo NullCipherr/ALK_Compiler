@@ -1,0 +1,22 @@
+// Teste de estruturas de decisão
+create int numero as 10;
+
+check (numero is_greater_than 0) then {
+    print("Positivo");
+} otherwise {
+    print("Não positivo");
+}
+
+// Teste de estruturas de repetição
+create int contador as 0;
+repeat while (contador is_less_than 5) {
+    print("Iteração");
+    contador = contador plus 1;
+}
+
+// Teste de condições compostas
+check (numero is_greater_than 0) then {
+    check (numero is_less_than 10) then {
+        print("Entre 0 e 10");
+    }
+}

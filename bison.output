@@ -1,1430 +1,1733 @@
+State 4 conflicts: 1 shift/reduce
+State 52 conflicts: 10 reduce/reduce
+
+
 Grammar
 
     0 $accept: programa $end
 
-    1 programa: declaracoes
+    1 $@1: ε
 
-    2 declaracoes: declaracao
-    3            | declaracoes declaracao
+    2 programa: $@1 lista_declaracoes lista_comandos
 
-    4 declaracao: declaracao_variavel
-    5           | declaracao_funcao
-    6           | comando
+    3 lista_declaracoes: ε
+    4                  | lista_declaracoes declaracao
 
-    7 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT
-    8                    | DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
+    5 lista_comandos: ε
+    6               | lista_comandos comando
 
-    9 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco
-   10                  | DECL_FUNCTION TYPE_VOID IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco
+    7 declaracao: declaracao_variavel
+    8           | declaracao_funcao
 
-   11 parametros: ε
-   12           | lista_parametros
+    9 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT
+   10                    | DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
 
-   13 lista_parametros: parametro
-   14                 | lista_parametros DELIM_SEPARATOR parametro
+   11 $@2: ε
 
-   15 parametro: tipo IDENTIFIER
+   12 $@3: ε
 
-   16 tipo: TYPE_INT
-   17     | TYPE_FLT
-   18     | TYPE_CHR
-   19     | TYPE_STR
+   13 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER $@2 DELIM_PAREN_OPEN parametros $@3 DELIM_PAREN_CLOSE bloco
 
-   20 comando: comando_check
-   21        | comando_repeat
-   22        | atribuicao
-   23        | comando_give
-   24        | chamada_funcao DELIM_END_STATEMENT
+   14 parametros: ε
+   15           | lista_parametros
 
-   25 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco
-   26              | CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco
+   16 lista_parametros: parametro
+   17                 | lista_parametros DELIM_SEPARATOR parametro
 
-   27 comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco
+   18 parametro: tipo IDENTIFIER
 
-   28 comando_give: CTRL_GIVE CTRL_BACK expressao DELIM_END_STATEMENT
-   29             | CTRL_GIVE CTRL_BACK DELIM_END_STATEMENT
+   19 tipo: TYPE_INT
+   20     | TYPE_FLT
+   21     | TYPE_CHR
+   22     | TYPE_STR
+   23     | TYPE_VOID
 
-   30 bloco: DELIM_BLOCK_OPEN comandos DELIM_BLOCK_CLOSE
+   24 comando: comando_check
+   25        | comando_repeat
+   26        | atribuicao DELIM_END_STATEMENT
+   27        | chamada_funcao DELIM_END_STATEMENT
+   28        | comando_give
+   29        | declaracao_variavel
 
-   31 comandos: ε
-   32         | comandos comando
+   30 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco
+   31              | CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco
 
-   33 atribuicao: IDENTIFIER OP_ASSIGN expressao DELIM_END_STATEMENT
-   34           | IDENTIFIER OP_ADD_ASSIGN expressao DELIM_END_STATEMENT
+   32 comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco
 
-   35 expressao: termo
-   36          | expressao OP_ADD termo
-   37          | expressao OP_SUB termo
-   38          | expressao OP_EQ termo
-   39          | expressao OP_NE termo
-   40          | expressao OP_LT termo
-   41          | expressao OP_GT termo
+   33 comando_give: CTRL_GIVE CTRL_BACK expressao DELIM_END_STATEMENT
+   34             | CTRL_GIVE CTRL_BACK DELIM_END_STATEMENT
 
-   42 termo: fator
-   43      | termo OP_MUL fator
-   44      | termo OP_DIV fator
+   35 bloco: DELIM_BLOCK_OPEN lista_comandos DELIM_BLOCK_CLOSE
 
-   45 fator: IDENTIFIER
-   46      | LITERAL_INT
-   47      | LITERAL_FLT
-   48      | LITERAL_CHR
-   49      | LITERAL_STR
-   50      | DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE
-   51      | chamada_funcao
+   36 atribuicao: IDENTIFIER OP_ASSIGN expressao
+   37           | IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE OP_ASSIGN expressao
+   38           | IDENTIFIER OP_ADD_ASSIGN expressao
 
-   52 chamada_funcao: IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE
+   39 expressao: termo
+   40          | LITERAL_STR
+   41          | expressao OP_ADD termo
+   42          | expressao OP_SUB termo
+   43          | expressao OP_GT termo
+   44          | expressao OP_LT termo
+   45          | expressao OP_EQ termo
+   46          | expressao OP_NE termo
 
-   53 argumentos: ε
-   54           | lista_argumentos
+   47 termo: fator
+   48      | termo OP_MUL fator
+   49      | termo OP_DIV fator
 
-   55 lista_argumentos: expressao
-   56                 | lista_argumentos DELIM_SEPARATOR expressao
+   50 fator: IDENTIFIER
+   51      | IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE
+   52      | LITERAL_INT
+   53      | LITERAL_FLT
+   54      | LITERAL_CHR
+   55      | LITERAL_STR
+   56      | DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE
+   57      | IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE
+
+   58 chamada_funcao: IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE
+   59               | "print" DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE
+   60               | "scan" DELIM_PAREN_OPEN acesso_variavel DELIM_PAREN_CLOSE
+
+   61 acesso_variavel: IDENTIFIER
+   62                | IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE
+
+   63 argumentos: ε
+   64           | lista_argumentos
+
+   65 lista_argumentos: expressao
+   66                 | lista_argumentos DELIM_SEPARATOR expressao
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
     error (256)
-    IDENTIFIER <id> (258) 7 8 9 10 15 33 34 45 52
-    TYPE_INT <tipo> (259) 16
-    TYPE_FLT <tipo> (260) 17
-    TYPE_CHR <tipo> (261) 18
-    TYPE_STR <tipo> (262) 19
-    TYPE_VOID <tipo> (263) 10
-    DECL_CREATE (264) 7 8
-    DECL_AS (265) 7 8
-    DECL_ARRAY (266) 8
-    DECL_FUNCTION (267) 9 10
-    CTRL_CHECK (268) 25 26
-    CTRL_THEN (269) 25 26
-    CTRL_OTHERWISE (270) 26
-    CTRL_REPEAT (271) 27
-    CTRL_WHILE (272) 27
-    CTRL_GIVE (273) 28 29
-    CTRL_BACK (274) 28 29
-    OP_ADD (275) 36
-    OP_SUB (276) 37
-    OP_MUL (277) 43
-    OP_DIV (278) 44
-    OP_ASSIGN (279) 33
-    OP_ADD_ASSIGN (280) 34
-    OP_EQ (281) 38
-    OP_NE (282) 39
-    OP_LT (283) 40
-    OP_GT (284) 41
-    DELIM_PAREN_OPEN (285) 9 10 25 26 27 50 52
-    DELIM_PAREN_CLOSE (286) 9 10 25 26 27 50 52
-    DELIM_BRACKET_OPEN (287) 8
-    DELIM_BRACKET_CLOSE (288) 8
-    DELIM_BLOCK_OPEN (289) 30
-    DELIM_BLOCK_CLOSE (290) 30
-    DELIM_END_STATEMENT (291) 7 8 24 28 29 33 34
-    DELIM_SEPARATOR (292) 14 56
-    LITERAL_INT (293) 8 46
-    LITERAL_FLT (294) 47
-    LITERAL_CHR (295) 48
-    LITERAL_STR (296) 49
+    IDENTIFIER <id> (258) 9 10 13 18 36 37 38 50 51 57 58 61 62
+    TYPE_INT <tipo> (259) 19
+    TYPE_FLT <tipo> (260) 20
+    TYPE_CHR <tipo> (261) 21
+    TYPE_STR <tipo> (262) 22
+    TYPE_VOID <tipo> (263) 23
+    DECL_CREATE (264) 9 10
+    DECL_AS (265) 9 10
+    DECL_ARRAY (266) 10
+    DECL_FUNCTION (267) 13
+    CTRL_CHECK (268) 30 31
+    CTRL_THEN (269) 30 31
+    CTRL_OTHERWISE (270) 31
+    CTRL_REPEAT (271) 32
+    CTRL_WHILE (272) 32
+    CTRL_GIVE (273) 33 34
+    CTRL_BACK (274) 33 34
+    OP_ADD (275) 41
+    OP_SUB (276) 42
+    OP_MUL (277) 48
+    OP_DIV (278) 49
+    OP_ASSIGN (279) 36 37
+    OP_ADD_ASSIGN (280) 38
+    OP_EQ (281) 45
+    OP_NE (282) 46
+    OP_LT (283) 44
+    OP_GT (284) 43
+    DELIM_PAREN_OPEN (285) 13 30 31 32 56 57 58 59 60
+    DELIM_PAREN_CLOSE (286) 13 30 31 32 56 57 58 59 60
+    DELIM_BRACKET_OPEN (287) 10 37 51 62
+    DELIM_BRACKET_CLOSE (288) 10 37 51 62
+    DELIM_BLOCK_OPEN (289) 35
+    DELIM_BLOCK_CLOSE (290) 35
+    DELIM_END_STATEMENT (291) 9 10 26 27 33 34
+    DELIM_SEPARATOR (292) 17 66
+    LITERAL_INT <literal> (293) 10 52
+    LITERAL_FLT <literal> (294) 53
+    LITERAL_CHR <literal> (295) 54
+    LITERAL_STR <literal> (296) 40 55
+    "print" (297) 59
+    "scan" (298) 60
 
 
 Nonterminals, with rules where they appear
 
-    $accept (42)
+    $accept (44)
         on left: 0
-    programa (43)
-        on left: 1
+    programa (45)
+        on left: 2
         on right: 0
-    declaracoes (44)
-        on left: 2 3
-        on right: 1 3
-    declaracao (45)
-        on left: 4 5 6
-        on right: 2 3
-    declaracao_variavel (46)
+    $@1 (46)
+        on left: 1
+        on right: 2
+    lista_declaracoes (47)
+        on left: 3 4
+        on right: 2 4
+    lista_comandos (48)
+        on left: 5 6
+        on right: 2 6 35
+    declaracao (49)
         on left: 7 8
         on right: 4
-    declaracao_funcao (47)
+    declaracao_variavel (50)
         on left: 9 10
-        on right: 5
-    parametros (48)
-        on left: 11 12
-        on right: 9 10
-    lista_parametros (49)
-        on left: 13 14
-        on right: 12 14
-    parametro (50)
-        on left: 15
-        on right: 13 14
-    tipo <tipo> (51)
-        on left: 16 17 18 19
-        on right: 7 8 9 15
-    comando (52)
-        on left: 20 21 22 23 24
-        on right: 6 32
-    comando_check (53)
-        on left: 25 26
-        on right: 20
-    comando_repeat (54)
-        on left: 27
-        on right: 21
-    comando_give (55)
-        on left: 28 29
-        on right: 23
-    bloco (56)
-        on left: 30
-        on right: 9 10 25 26 27
-    comandos (57)
-        on left: 31 32
-        on right: 30 32
-    atribuicao (58)
+        on right: 7 29
+    declaracao_funcao (51)
+        on left: 13
+        on right: 8
+    $@2 (52)
+        on left: 11
+        on right: 13
+    $@3 (53)
+        on left: 12
+        on right: 13
+    parametros (54)
+        on left: 14 15
+        on right: 13
+    lista_parametros (55)
+        on left: 16 17
+        on right: 15 17
+    parametro (56)
+        on left: 18
+        on right: 16 17
+    tipo <tipo> (57)
+        on left: 19 20 21 22 23
+        on right: 9 10 13 18
+    comando (58)
+        on left: 24 25 26 27 28 29
+        on right: 6
+    comando_check (59)
+        on left: 30 31
+        on right: 24
+    comando_repeat (60)
+        on left: 32
+        on right: 25
+    comando_give (61)
         on left: 33 34
-        on right: 22
-    expressao <tipo> (59)
-        on left: 35 36 37 38 39 40 41
-        on right: 7 25 26 27 28 33 34 36 37 38 39 40 41 50 55 56
-    termo <tipo> (60)
-        on left: 42 43 44
-        on right: 35 36 37 38 39 40 41 43 44
-    fator <tipo> (61)
-        on left: 45 46 47 48 49 50 51
-        on right: 42 43 44
-    chamada_funcao (62)
-        on left: 52
-        on right: 24 51
-    argumentos (63)
-        on left: 53 54
-        on right: 52
-    lista_argumentos (64)
-        on left: 55 56
-        on right: 54 56
+        on right: 28
+    bloco (62)
+        on left: 35
+        on right: 13 30 31 32
+    atribuicao (63)
+        on left: 36 37 38
+        on right: 26
+    expressao <tipo> (64)
+        on left: 39 40 41 42 43 44 45 46
+        on right: 9 30 31 32 33 36 37 38 41 42 43 44 45 46 51 56 59 62 65 66
+    termo <tipo> (65)
+        on left: 47 48 49
+        on right: 39 41 42 43 44 45 46 48 49
+    fator <tipo> (66)
+        on left: 50 51 52 53 54 55 56 57
+        on right: 47 48 49
+    chamada_funcao <tipo> (67)
+        on left: 58 59 60
+        on right: 27
+    acesso_variavel <id> (68)
+        on left: 61 62
+        on right: 60
+    argumentos (69)
+        on left: 63 64
+        on right: 57 58
+    lista_argumentos (70)
+        on left: 65 66
+        on right: 64 66
 
 
 State 0
 
     0 $accept: • programa $end
 
-    IDENTIFIER     shift, and go to state 1
-    DECL_CREATE    shift, and go to state 2
-    DECL_FUNCTION  shift, and go to state 3
-    CTRL_CHECK     shift, and go to state 4
-    CTRL_REPEAT    shift, and go to state 5
-    CTRL_GIVE      shift, and go to state 6
+    $default  reduce using rule 1 ($@1)
 
-    programa             go to state 7
-    declaracoes          go to state 8
-    declaracao           go to state 9
-    declaracao_variavel  go to state 10
-    declaracao_funcao    go to state 11
-    comando              go to state 12
-    comando_check        go to state 13
-    comando_repeat       go to state 14
-    comando_give         go to state 15
-    atribuicao           go to state 16
-    chamada_funcao       go to state 17
+    programa  go to state 1
+    $@1       go to state 2
 
 
 State 1
 
-   33 atribuicao: IDENTIFIER • OP_ASSIGN expressao DELIM_END_STATEMENT
-   34           | IDENTIFIER • OP_ADD_ASSIGN expressao DELIM_END_STATEMENT
-   52 chamada_funcao: IDENTIFIER • DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE
+    0 $accept: programa • $end
 
-    OP_ASSIGN         shift, and go to state 18
-    OP_ADD_ASSIGN     shift, and go to state 19
-    DELIM_PAREN_OPEN  shift, and go to state 20
+    $end  shift, and go to state 3
 
 
 State 2
 
-    7 declaracao_variavel: DECL_CREATE • tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT
-    8                    | DECL_CREATE • tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
+    2 programa: $@1 • lista_declaracoes lista_comandos
 
-    TYPE_INT  shift, and go to state 21
-    TYPE_FLT  shift, and go to state 22
-    TYPE_CHR  shift, and go to state 23
-    TYPE_STR  shift, and go to state 24
+    $default  reduce using rule 3 (lista_declaracoes)
 
-    tipo  go to state 25
+    lista_declaracoes  go to state 4
 
 
 State 3
-
-    9 declaracao_funcao: DECL_FUNCTION • tipo IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco
-   10                  | DECL_FUNCTION • TYPE_VOID IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco
-
-    TYPE_INT   shift, and go to state 21
-    TYPE_FLT   shift, and go to state 22
-    TYPE_CHR   shift, and go to state 23
-    TYPE_STR   shift, and go to state 24
-    TYPE_VOID  shift, and go to state 26
-
-    tipo  go to state 27
-
-
-State 4
-
-   25 comando_check: CTRL_CHECK • DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco
-   26              | CTRL_CHECK • DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco
-
-    DELIM_PAREN_OPEN  shift, and go to state 28
-
-
-State 5
-
-   27 comando_repeat: CTRL_REPEAT • CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco
-
-    CTRL_WHILE  shift, and go to state 29
-
-
-State 6
-
-   28 comando_give: CTRL_GIVE • CTRL_BACK expressao DELIM_END_STATEMENT
-   29             | CTRL_GIVE • CTRL_BACK DELIM_END_STATEMENT
-
-    CTRL_BACK  shift, and go to state 30
-
-
-State 7
-
-    0 $accept: programa • $end
-
-    $end  shift, and go to state 31
-
-
-State 8
-
-    1 programa: declaracoes •
-    3 declaracoes: declaracoes • declaracao
-
-    IDENTIFIER     shift, and go to state 1
-    DECL_CREATE    shift, and go to state 2
-    DECL_FUNCTION  shift, and go to state 3
-    CTRL_CHECK     shift, and go to state 4
-    CTRL_REPEAT    shift, and go to state 5
-    CTRL_GIVE      shift, and go to state 6
-
-    $default  reduce using rule 1 (programa)
-
-    declaracao           go to state 32
-    declaracao_variavel  go to state 10
-    declaracao_funcao    go to state 11
-    comando              go to state 12
-    comando_check        go to state 13
-    comando_repeat       go to state 14
-    comando_give         go to state 15
-    atribuicao           go to state 16
-    chamada_funcao       go to state 17
-
-
-State 9
-
-    2 declaracoes: declaracao •
-
-    $default  reduce using rule 2 (declaracoes)
-
-
-State 10
-
-    4 declaracao: declaracao_variavel •
-
-    $default  reduce using rule 4 (declaracao)
-
-
-State 11
-
-    5 declaracao: declaracao_funcao •
-
-    $default  reduce using rule 5 (declaracao)
-
-
-State 12
-
-    6 declaracao: comando •
-
-    $default  reduce using rule 6 (declaracao)
-
-
-State 13
-
-   20 comando: comando_check •
-
-    $default  reduce using rule 20 (comando)
-
-
-State 14
-
-   21 comando: comando_repeat •
-
-    $default  reduce using rule 21 (comando)
-
-
-State 15
-
-   23 comando: comando_give •
-
-    $default  reduce using rule 23 (comando)
-
-
-State 16
-
-   22 comando: atribuicao •
-
-    $default  reduce using rule 22 (comando)
-
-
-State 17
-
-   24 comando: chamada_funcao • DELIM_END_STATEMENT
-
-    DELIM_END_STATEMENT  shift, and go to state 33
-
-
-State 18
-
-   33 atribuicao: IDENTIFIER OP_ASSIGN • expressao DELIM_END_STATEMENT
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    expressao       go to state 40
-    termo           go to state 41
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 19
-
-   34 atribuicao: IDENTIFIER OP_ADD_ASSIGN • expressao DELIM_END_STATEMENT
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    expressao       go to state 44
-    termo           go to state 41
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 20
-
-   52 chamada_funcao: IDENTIFIER DELIM_PAREN_OPEN • argumentos DELIM_PAREN_CLOSE
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    $default  reduce using rule 53 (argumentos)
-
-    expressao         go to state 45
-    termo             go to state 41
-    fator             go to state 42
-    chamada_funcao    go to state 43
-    argumentos        go to state 46
-    lista_argumentos  go to state 47
-
-
-State 21
-
-   16 tipo: TYPE_INT •
-
-    $default  reduce using rule 16 (tipo)
-
-
-State 22
-
-   17 tipo: TYPE_FLT •
-
-    $default  reduce using rule 17 (tipo)
-
-
-State 23
-
-   18 tipo: TYPE_CHR •
-
-    $default  reduce using rule 18 (tipo)
-
-
-State 24
-
-   19 tipo: TYPE_STR •
-
-    $default  reduce using rule 19 (tipo)
-
-
-State 25
-
-    7 declaracao_variavel: DECL_CREATE tipo • IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT
-    8                    | DECL_CREATE tipo • IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
-
-    IDENTIFIER  shift, and go to state 48
-
-
-State 26
-
-   10 declaracao_funcao: DECL_FUNCTION TYPE_VOID • IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco
-
-    IDENTIFIER  shift, and go to state 49
-
-
-State 27
-
-    9 declaracao_funcao: DECL_FUNCTION tipo • IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco
-
-    IDENTIFIER  shift, and go to state 50
-
-
-State 28
-
-   25 comando_check: CTRL_CHECK DELIM_PAREN_OPEN • expressao DELIM_PAREN_CLOSE CTRL_THEN bloco
-   26              | CTRL_CHECK DELIM_PAREN_OPEN • expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    expressao       go to state 51
-    termo           go to state 41
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 29
-
-   27 comando_repeat: CTRL_REPEAT CTRL_WHILE • DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco
-
-    DELIM_PAREN_OPEN  shift, and go to state 52
-
-
-State 30
-
-   28 comando_give: CTRL_GIVE CTRL_BACK • expressao DELIM_END_STATEMENT
-   29             | CTRL_GIVE CTRL_BACK • DELIM_END_STATEMENT
-
-    IDENTIFIER           shift, and go to state 34
-    DELIM_PAREN_OPEN     shift, and go to state 35
-    DELIM_END_STATEMENT  shift, and go to state 53
-    LITERAL_INT          shift, and go to state 36
-    LITERAL_FLT          shift, and go to state 37
-    LITERAL_CHR          shift, and go to state 38
-    LITERAL_STR          shift, and go to state 39
-
-    expressao       go to state 54
-    termo           go to state 41
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 31
 
     0 $accept: programa $end •
 
     $default  accept
 
 
-State 32
+State 4
 
-    3 declaracoes: declaracoes declaracao •
+    2 programa: $@1 lista_declaracoes • lista_comandos
+    4 lista_declaracoes: lista_declaracoes • declaracao
 
-    $default  reduce using rule 3 (declaracoes)
+    DECL_CREATE    shift, and go to state 5
+    DECL_FUNCTION  shift, and go to state 6
+
+    DECL_CREATE  [reduce using rule 5 (lista_comandos)]
+    $default     reduce using rule 5 (lista_comandos)
+
+    lista_comandos       go to state 7
+    declaracao           go to state 8
+    declaracao_variavel  go to state 9
+    declaracao_funcao    go to state 10
 
 
-State 33
+State 5
 
-   24 comando: chamada_funcao DELIM_END_STATEMENT •
+    9 declaracao_variavel: DECL_CREATE • tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT
+   10                    | DECL_CREATE • tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
+
+    TYPE_INT   shift, and go to state 11
+    TYPE_FLT   shift, and go to state 12
+    TYPE_CHR   shift, and go to state 13
+    TYPE_STR   shift, and go to state 14
+    TYPE_VOID  shift, and go to state 15
+
+    tipo  go to state 16
+
+
+State 6
+
+   13 declaracao_funcao: DECL_FUNCTION • tipo IDENTIFIER $@2 DELIM_PAREN_OPEN parametros $@3 DELIM_PAREN_CLOSE bloco
+
+    TYPE_INT   shift, and go to state 11
+    TYPE_FLT   shift, and go to state 12
+    TYPE_CHR   shift, and go to state 13
+    TYPE_STR   shift, and go to state 14
+    TYPE_VOID  shift, and go to state 15
+
+    tipo  go to state 17
+
+
+State 7
+
+    2 programa: $@1 lista_declaracoes lista_comandos •
+    6 lista_comandos: lista_comandos • comando
+
+    IDENTIFIER   shift, and go to state 18
+    DECL_CREATE  shift, and go to state 5
+    CTRL_CHECK   shift, and go to state 19
+    CTRL_REPEAT  shift, and go to state 20
+    CTRL_GIVE    shift, and go to state 21
+    "print"      shift, and go to state 22
+    "scan"       shift, and go to state 23
+
+    $default  reduce using rule 2 (programa)
+
+    declaracao_variavel  go to state 24
+    comando              go to state 25
+    comando_check        go to state 26
+    comando_repeat       go to state 27
+    comando_give         go to state 28
+    atribuicao           go to state 29
+    chamada_funcao       go to state 30
+
+
+State 8
+
+    4 lista_declaracoes: lista_declaracoes declaracao •
+
+    $default  reduce using rule 4 (lista_declaracoes)
+
+
+State 9
+
+    7 declaracao: declaracao_variavel •
+
+    $default  reduce using rule 7 (declaracao)
+
+
+State 10
+
+    8 declaracao: declaracao_funcao •
+
+    $default  reduce using rule 8 (declaracao)
+
+
+State 11
+
+   19 tipo: TYPE_INT •
+
+    $default  reduce using rule 19 (tipo)
+
+
+State 12
+
+   20 tipo: TYPE_FLT •
+
+    $default  reduce using rule 20 (tipo)
+
+
+State 13
+
+   21 tipo: TYPE_CHR •
+
+    $default  reduce using rule 21 (tipo)
+
+
+State 14
+
+   22 tipo: TYPE_STR •
+
+    $default  reduce using rule 22 (tipo)
+
+
+State 15
+
+   23 tipo: TYPE_VOID •
+
+    $default  reduce using rule 23 (tipo)
+
+
+State 16
+
+    9 declaracao_variavel: DECL_CREATE tipo • IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT
+   10                    | DECL_CREATE tipo • IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
+
+    IDENTIFIER  shift, and go to state 31
+
+
+State 17
+
+   13 declaracao_funcao: DECL_FUNCTION tipo • IDENTIFIER $@2 DELIM_PAREN_OPEN parametros $@3 DELIM_PAREN_CLOSE bloco
+
+    IDENTIFIER  shift, and go to state 32
+
+
+State 18
+
+   36 atribuicao: IDENTIFIER • OP_ASSIGN expressao
+   37           | IDENTIFIER • DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE OP_ASSIGN expressao
+   38           | IDENTIFIER • OP_ADD_ASSIGN expressao
+   58 chamada_funcao: IDENTIFIER • DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE
+
+    OP_ASSIGN           shift, and go to state 33
+    OP_ADD_ASSIGN       shift, and go to state 34
+    DELIM_PAREN_OPEN    shift, and go to state 35
+    DELIM_BRACKET_OPEN  shift, and go to state 36
+
+
+State 19
+
+   30 comando_check: CTRL_CHECK • DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco
+   31              | CTRL_CHECK • DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco
+
+    DELIM_PAREN_OPEN  shift, and go to state 37
+
+
+State 20
+
+   32 comando_repeat: CTRL_REPEAT • CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco
+
+    CTRL_WHILE  shift, and go to state 38
+
+
+State 21
+
+   33 comando_give: CTRL_GIVE • CTRL_BACK expressao DELIM_END_STATEMENT
+   34             | CTRL_GIVE • CTRL_BACK DELIM_END_STATEMENT
+
+    CTRL_BACK  shift, and go to state 39
+
+
+State 22
+
+   59 chamada_funcao: "print" • DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE
+
+    DELIM_PAREN_OPEN  shift, and go to state 40
+
+
+State 23
+
+   60 chamada_funcao: "scan" • DELIM_PAREN_OPEN acesso_variavel DELIM_PAREN_CLOSE
+
+    DELIM_PAREN_OPEN  shift, and go to state 41
+
+
+State 24
+
+   29 comando: declaracao_variavel •
+
+    $default  reduce using rule 29 (comando)
+
+
+State 25
+
+    6 lista_comandos: lista_comandos comando •
+
+    $default  reduce using rule 6 (lista_comandos)
+
+
+State 26
+
+   24 comando: comando_check •
 
     $default  reduce using rule 24 (comando)
 
 
+State 27
+
+   25 comando: comando_repeat •
+
+    $default  reduce using rule 25 (comando)
+
+
+State 28
+
+   28 comando: comando_give •
+
+    $default  reduce using rule 28 (comando)
+
+
+State 29
+
+   26 comando: atribuicao • DELIM_END_STATEMENT
+
+    DELIM_END_STATEMENT  shift, and go to state 42
+
+
+State 30
+
+   27 comando: chamada_funcao • DELIM_END_STATEMENT
+
+    DELIM_END_STATEMENT  shift, and go to state 43
+
+
+State 31
+
+    9 declaracao_variavel: DECL_CREATE tipo IDENTIFIER • DECL_AS expressao DELIM_END_STATEMENT
+   10                    | DECL_CREATE tipo IDENTIFIER • DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
+
+    DECL_AS             shift, and go to state 44
+    DELIM_BRACKET_OPEN  shift, and go to state 45
+
+
+State 32
+
+   13 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER • $@2 DELIM_PAREN_OPEN parametros $@3 DELIM_PAREN_CLOSE bloco
+
+    $default  reduce using rule 11 ($@2)
+
+    $@2  go to state 46
+
+
+State 33
+
+   36 atribuicao: IDENTIFIER OP_ASSIGN • expressao
+
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
+
+    expressao  go to state 53
+    termo      go to state 54
+    fator      go to state 55
+
+
 State 34
 
-   45 fator: IDENTIFIER •
-   52 chamada_funcao: IDENTIFIER • DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE
+   38 atribuicao: IDENTIFIER OP_ADD_ASSIGN • expressao
 
-    DELIM_PAREN_OPEN  shift, and go to state 20
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
 
-    $default  reduce using rule 45 (fator)
+    expressao  go to state 56
+    termo      go to state 54
+    fator      go to state 55
 
 
 State 35
 
-   50 fator: DELIM_PAREN_OPEN • expressao DELIM_PAREN_CLOSE
+   58 chamada_funcao: IDENTIFIER DELIM_PAREN_OPEN • argumentos DELIM_PAREN_CLOSE
 
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
 
-    expressao       go to state 55
-    termo           go to state 41
-    fator           go to state 42
-    chamada_funcao  go to state 43
+    $default  reduce using rule 63 (argumentos)
+
+    expressao         go to state 57
+    termo             go to state 54
+    fator             go to state 55
+    argumentos        go to state 58
+    lista_argumentos  go to state 59
 
 
 State 36
 
-   46 fator: LITERAL_INT •
+   37 atribuicao: IDENTIFIER DELIM_BRACKET_OPEN • expressao DELIM_BRACKET_CLOSE OP_ASSIGN expressao
 
-    $default  reduce using rule 46 (fator)
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
+
+    expressao  go to state 60
+    termo      go to state 54
+    fator      go to state 55
 
 
 State 37
 
-   47 fator: LITERAL_FLT •
+   30 comando_check: CTRL_CHECK DELIM_PAREN_OPEN • expressao DELIM_PAREN_CLOSE CTRL_THEN bloco
+   31              | CTRL_CHECK DELIM_PAREN_OPEN • expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco
 
-    $default  reduce using rule 47 (fator)
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
+
+    expressao  go to state 61
+    termo      go to state 54
+    fator      go to state 55
 
 
 State 38
 
-   48 fator: LITERAL_CHR •
+   32 comando_repeat: CTRL_REPEAT CTRL_WHILE • DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco
 
-    $default  reduce using rule 48 (fator)
+    DELIM_PAREN_OPEN  shift, and go to state 62
 
 
 State 39
 
-   49 fator: LITERAL_STR •
+   33 comando_give: CTRL_GIVE CTRL_BACK • expressao DELIM_END_STATEMENT
+   34             | CTRL_GIVE CTRL_BACK • DELIM_END_STATEMENT
 
-    $default  reduce using rule 49 (fator)
+    IDENTIFIER           shift, and go to state 47
+    DELIM_PAREN_OPEN     shift, and go to state 48
+    DELIM_END_STATEMENT  shift, and go to state 63
+    LITERAL_INT          shift, and go to state 49
+    LITERAL_FLT          shift, and go to state 50
+    LITERAL_CHR          shift, and go to state 51
+    LITERAL_STR          shift, and go to state 52
+
+    expressao  go to state 64
+    termo      go to state 54
+    fator      go to state 55
 
 
 State 40
 
-   33 atribuicao: IDENTIFIER OP_ASSIGN expressao • DELIM_END_STATEMENT
-   36 expressao: expressao • OP_ADD termo
-   37          | expressao • OP_SUB termo
-   38          | expressao • OP_EQ termo
-   39          | expressao • OP_NE termo
-   40          | expressao • OP_LT termo
-   41          | expressao • OP_GT termo
+   59 chamada_funcao: "print" DELIM_PAREN_OPEN • expressao DELIM_PAREN_CLOSE
 
-    OP_ADD               shift, and go to state 56
-    OP_SUB               shift, and go to state 57
-    OP_EQ                shift, and go to state 58
-    OP_NE                shift, and go to state 59
-    OP_LT                shift, and go to state 60
-    OP_GT                shift, and go to state 61
-    DELIM_END_STATEMENT  shift, and go to state 62
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
+
+    expressao  go to state 65
+    termo      go to state 54
+    fator      go to state 55
 
 
 State 41
 
-   35 expressao: termo •
-   43 termo: termo • OP_MUL fator
-   44      | termo • OP_DIV fator
+   60 chamada_funcao: "scan" DELIM_PAREN_OPEN • acesso_variavel DELIM_PAREN_CLOSE
 
-    OP_MUL  shift, and go to state 63
-    OP_DIV  shift, and go to state 64
+    IDENTIFIER  shift, and go to state 66
 
-    $default  reduce using rule 35 (expressao)
+    acesso_variavel  go to state 67
 
 
 State 42
 
-   42 termo: fator •
+   26 comando: atribuicao DELIM_END_STATEMENT •
 
-    $default  reduce using rule 42 (termo)
+    $default  reduce using rule 26 (comando)
 
 
 State 43
 
-   51 fator: chamada_funcao •
+   27 comando: chamada_funcao DELIM_END_STATEMENT •
 
-    $default  reduce using rule 51 (fator)
+    $default  reduce using rule 27 (comando)
 
 
 State 44
 
-   34 atribuicao: IDENTIFIER OP_ADD_ASSIGN expressao • DELIM_END_STATEMENT
-   36 expressao: expressao • OP_ADD termo
-   37          | expressao • OP_SUB termo
-   38          | expressao • OP_EQ termo
-   39          | expressao • OP_NE termo
-   40          | expressao • OP_LT termo
-   41          | expressao • OP_GT termo
+    9 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DECL_AS • expressao DELIM_END_STATEMENT
 
-    OP_ADD               shift, and go to state 56
-    OP_SUB               shift, and go to state 57
-    OP_EQ                shift, and go to state 58
-    OP_NE                shift, and go to state 59
-    OP_LT                shift, and go to state 60
-    OP_GT                shift, and go to state 61
-    DELIM_END_STATEMENT  shift, and go to state 65
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
+
+    expressao  go to state 68
+    termo      go to state 54
+    fator      go to state 55
 
 
 State 45
 
-   36 expressao: expressao • OP_ADD termo
-   37          | expressao • OP_SUB termo
-   38          | expressao • OP_EQ termo
-   39          | expressao • OP_NE termo
-   40          | expressao • OP_LT termo
-   41          | expressao • OP_GT termo
-   55 lista_argumentos: expressao •
+   10 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN • LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
 
-    OP_ADD  shift, and go to state 56
-    OP_SUB  shift, and go to state 57
-    OP_EQ   shift, and go to state 58
-    OP_NE   shift, and go to state 59
-    OP_LT   shift, and go to state 60
-    OP_GT   shift, and go to state 61
-
-    $default  reduce using rule 55 (lista_argumentos)
+    LITERAL_INT  shift, and go to state 69
 
 
 State 46
 
-   52 chamada_funcao: IDENTIFIER DELIM_PAREN_OPEN argumentos • DELIM_PAREN_CLOSE
-
-    DELIM_PAREN_CLOSE  shift, and go to state 66
-
-
-State 47
-
-   54 argumentos: lista_argumentos •
-   56 lista_argumentos: lista_argumentos • DELIM_SEPARATOR expressao
-
-    DELIM_SEPARATOR  shift, and go to state 67
-
-    $default  reduce using rule 54 (argumentos)
-
-
-State 48
-
-    7 declaracao_variavel: DECL_CREATE tipo IDENTIFIER • DECL_AS expressao DELIM_END_STATEMENT
-    8                    | DECL_CREATE tipo IDENTIFIER • DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
-
-    DECL_AS             shift, and go to state 68
-    DELIM_BRACKET_OPEN  shift, and go to state 69
-
-
-State 49
-
-   10 declaracao_funcao: DECL_FUNCTION TYPE_VOID IDENTIFIER • DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco
+   13 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER $@2 • DELIM_PAREN_OPEN parametros $@3 DELIM_PAREN_CLOSE bloco
 
     DELIM_PAREN_OPEN  shift, and go to state 70
 
 
-State 50
+State 47
 
-    9 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER • DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco
+   50 fator: IDENTIFIER •
+   51      | IDENTIFIER • DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE
+   57      | IDENTIFIER • DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE
 
-    DELIM_PAREN_OPEN  shift, and go to state 71
-
-
-State 51
-
-   25 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao • DELIM_PAREN_CLOSE CTRL_THEN bloco
-   26              | CTRL_CHECK DELIM_PAREN_OPEN expressao • DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco
-   36 expressao: expressao • OP_ADD termo
-   37          | expressao • OP_SUB termo
-   38          | expressao • OP_EQ termo
-   39          | expressao • OP_NE termo
-   40          | expressao • OP_LT termo
-   41          | expressao • OP_GT termo
-
-    OP_ADD             shift, and go to state 56
-    OP_SUB             shift, and go to state 57
-    OP_EQ              shift, and go to state 58
-    OP_NE              shift, and go to state 59
-    OP_LT              shift, and go to state 60
-    OP_GT              shift, and go to state 61
-    DELIM_PAREN_CLOSE  shift, and go to state 72
-
-
-State 52
-
-   27 comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN • expressao DELIM_PAREN_CLOSE bloco
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    expressao       go to state 73
-    termo           go to state 41
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 53
-
-   29 comando_give: CTRL_GIVE CTRL_BACK DELIM_END_STATEMENT •
-
-    $default  reduce using rule 29 (comando_give)
-
-
-State 54
-
-   28 comando_give: CTRL_GIVE CTRL_BACK expressao • DELIM_END_STATEMENT
-   36 expressao: expressao • OP_ADD termo
-   37          | expressao • OP_SUB termo
-   38          | expressao • OP_EQ termo
-   39          | expressao • OP_NE termo
-   40          | expressao • OP_LT termo
-   41          | expressao • OP_GT termo
-
-    OP_ADD               shift, and go to state 56
-    OP_SUB               shift, and go to state 57
-    OP_EQ                shift, and go to state 58
-    OP_NE                shift, and go to state 59
-    OP_LT                shift, and go to state 60
-    OP_GT                shift, and go to state 61
-    DELIM_END_STATEMENT  shift, and go to state 74
-
-
-State 55
-
-   36 expressao: expressao • OP_ADD termo
-   37          | expressao • OP_SUB termo
-   38          | expressao • OP_EQ termo
-   39          | expressao • OP_NE termo
-   40          | expressao • OP_LT termo
-   41          | expressao • OP_GT termo
-   50 fator: DELIM_PAREN_OPEN expressao • DELIM_PAREN_CLOSE
-
-    OP_ADD             shift, and go to state 56
-    OP_SUB             shift, and go to state 57
-    OP_EQ              shift, and go to state 58
-    OP_NE              shift, and go to state 59
-    OP_LT              shift, and go to state 60
-    OP_GT              shift, and go to state 61
-    DELIM_PAREN_CLOSE  shift, and go to state 75
-
-
-State 56
-
-   36 expressao: expressao OP_ADD • termo
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    termo           go to state 76
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 57
-
-   37 expressao: expressao OP_SUB • termo
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    termo           go to state 77
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 58
-
-   38 expressao: expressao OP_EQ • termo
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    termo           go to state 78
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 59
-
-   39 expressao: expressao OP_NE • termo
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    termo           go to state 79
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 60
-
-   40 expressao: expressao OP_LT • termo
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    termo           go to state 80
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 61
-
-   41 expressao: expressao OP_GT • termo
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    termo           go to state 81
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 62
-
-   33 atribuicao: IDENTIFIER OP_ASSIGN expressao DELIM_END_STATEMENT •
-
-    $default  reduce using rule 33 (atribuicao)
-
-
-State 63
-
-   43 termo: termo OP_MUL • fator
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    fator           go to state 82
-    chamada_funcao  go to state 43
-
-
-State 64
-
-   44 termo: termo OP_DIV • fator
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    fator           go to state 83
-    chamada_funcao  go to state 43
-
-
-State 65
-
-   34 atribuicao: IDENTIFIER OP_ADD_ASSIGN expressao DELIM_END_STATEMENT •
-
-    $default  reduce using rule 34 (atribuicao)
-
-
-State 66
-
-   52 chamada_funcao: IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE •
-
-    $default  reduce using rule 52 (chamada_funcao)
-
-
-State 67
-
-   56 lista_argumentos: lista_argumentos DELIM_SEPARATOR • expressao
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    expressao       go to state 84
-    termo           go to state 41
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 68
-
-    7 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DECL_AS • expressao DELIM_END_STATEMENT
-
-    IDENTIFIER        shift, and go to state 34
-    DELIM_PAREN_OPEN  shift, and go to state 35
-    LITERAL_INT       shift, and go to state 36
-    LITERAL_FLT       shift, and go to state 37
-    LITERAL_CHR       shift, and go to state 38
-    LITERAL_STR       shift, and go to state 39
-
-    expressao       go to state 85
-    termo           go to state 41
-    fator           go to state 42
-    chamada_funcao  go to state 43
-
-
-State 69
-
-    8 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN • LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
-
-    LITERAL_INT  shift, and go to state 86
-
-
-State 70
-
-   10 declaracao_funcao: DECL_FUNCTION TYPE_VOID IDENTIFIER DELIM_PAREN_OPEN • parametros DELIM_PAREN_CLOSE bloco
-
-    TYPE_INT  shift, and go to state 21
-    TYPE_FLT  shift, and go to state 22
-    TYPE_CHR  shift, and go to state 23
-    TYPE_STR  shift, and go to state 24
-
-    $default  reduce using rule 11 (parametros)
-
-    parametros        go to state 87
-    lista_parametros  go to state 88
-    parametro         go to state 89
-    tipo              go to state 90
-
-
-State 71
-
-    9 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER DELIM_PAREN_OPEN • parametros DELIM_PAREN_CLOSE bloco
-
-    TYPE_INT  shift, and go to state 21
-    TYPE_FLT  shift, and go to state 22
-    TYPE_CHR  shift, and go to state 23
-    TYPE_STR  shift, and go to state 24
-
-    $default  reduce using rule 11 (parametros)
-
-    parametros        go to state 91
-    lista_parametros  go to state 88
-    parametro         go to state 89
-    tipo              go to state 90
-
-
-State 72
-
-   25 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE • CTRL_THEN bloco
-   26              | CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE • CTRL_THEN bloco CTRL_OTHERWISE bloco
-
-    CTRL_THEN  shift, and go to state 92
-
-
-State 73
-
-   27 comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao • DELIM_PAREN_CLOSE bloco
-   36 expressao: expressao • OP_ADD termo
-   37          | expressao • OP_SUB termo
-   38          | expressao • OP_EQ termo
-   39          | expressao • OP_NE termo
-   40          | expressao • OP_LT termo
-   41          | expressao • OP_GT termo
-
-    OP_ADD             shift, and go to state 56
-    OP_SUB             shift, and go to state 57
-    OP_EQ              shift, and go to state 58
-    OP_NE              shift, and go to state 59
-    OP_LT              shift, and go to state 60
-    OP_GT              shift, and go to state 61
-    DELIM_PAREN_CLOSE  shift, and go to state 93
-
-
-State 74
-
-   28 comando_give: CTRL_GIVE CTRL_BACK expressao DELIM_END_STATEMENT •
-
-    $default  reduce using rule 28 (comando_give)
-
-
-State 75
-
-   50 fator: DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE •
+    DELIM_PAREN_OPEN    shift, and go to state 71
+    DELIM_BRACKET_OPEN  shift, and go to state 72
 
     $default  reduce using rule 50 (fator)
 
 
-State 76
+State 48
 
-   36 expressao: expressao OP_ADD termo •
-   43 termo: termo • OP_MUL fator
-   44      | termo • OP_DIV fator
+   56 fator: DELIM_PAREN_OPEN • expressao DELIM_PAREN_CLOSE
 
-    OP_MUL  shift, and go to state 63
-    OP_DIV  shift, and go to state 64
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
 
-    $default  reduce using rule 36 (expressao)
-
-
-State 77
-
-   37 expressao: expressao OP_SUB termo •
-   43 termo: termo • OP_MUL fator
-   44      | termo • OP_DIV fator
-
-    OP_MUL  shift, and go to state 63
-    OP_DIV  shift, and go to state 64
-
-    $default  reduce using rule 37 (expressao)
+    expressao  go to state 73
+    termo      go to state 54
+    fator      go to state 55
 
 
-State 78
+State 49
 
-   38 expressao: expressao OP_EQ termo •
-   43 termo: termo • OP_MUL fator
-   44      | termo • OP_DIV fator
+   52 fator: LITERAL_INT •
 
-    OP_MUL  shift, and go to state 63
-    OP_DIV  shift, and go to state 64
-
-    $default  reduce using rule 38 (expressao)
+    $default  reduce using rule 52 (fator)
 
 
-State 79
+State 50
 
-   39 expressao: expressao OP_NE termo •
-   43 termo: termo • OP_MUL fator
-   44      | termo • OP_DIV fator
+   53 fator: LITERAL_FLT •
 
-    OP_MUL  shift, and go to state 63
-    OP_DIV  shift, and go to state 64
+    $default  reduce using rule 53 (fator)
+
+
+State 51
+
+   54 fator: LITERAL_CHR •
+
+    $default  reduce using rule 54 (fator)
+
+
+State 52
+
+   40 expressao: LITERAL_STR •
+   55 fator: LITERAL_STR •
+
+    OP_ADD               reduce using rule 40 (expressao)
+    OP_ADD               [reduce using rule 55 (fator)]
+    OP_SUB               reduce using rule 40 (expressao)
+    OP_SUB               [reduce using rule 55 (fator)]
+    OP_MUL               reduce using rule 55 (fator)
+    OP_DIV               reduce using rule 55 (fator)
+    OP_EQ                reduce using rule 40 (expressao)
+    OP_EQ                [reduce using rule 55 (fator)]
+    OP_NE                reduce using rule 40 (expressao)
+    OP_NE                [reduce using rule 55 (fator)]
+    OP_LT                reduce using rule 40 (expressao)
+    OP_LT                [reduce using rule 55 (fator)]
+    OP_GT                reduce using rule 40 (expressao)
+    OP_GT                [reduce using rule 55 (fator)]
+    DELIM_PAREN_CLOSE    reduce using rule 40 (expressao)
+    DELIM_PAREN_CLOSE    [reduce using rule 55 (fator)]
+    DELIM_BRACKET_CLOSE  reduce using rule 40 (expressao)
+    DELIM_BRACKET_CLOSE  [reduce using rule 55 (fator)]
+    DELIM_END_STATEMENT  reduce using rule 40 (expressao)
+    DELIM_END_STATEMENT  [reduce using rule 55 (fator)]
+    DELIM_SEPARATOR      reduce using rule 40 (expressao)
+    DELIM_SEPARATOR      [reduce using rule 55 (fator)]
+    $default             reduce using rule 40 (expressao)
+
+
+State 53
+
+   36 atribuicao: IDENTIFIER OP_ASSIGN expressao •
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+
+    OP_ADD  shift, and go to state 74
+    OP_SUB  shift, and go to state 75
+    OP_EQ   shift, and go to state 76
+    OP_NE   shift, and go to state 77
+    OP_LT   shift, and go to state 78
+    OP_GT   shift, and go to state 79
+
+    $default  reduce using rule 36 (atribuicao)
+
+
+State 54
+
+   39 expressao: termo •
+   48 termo: termo • OP_MUL fator
+   49      | termo • OP_DIV fator
+
+    OP_MUL  shift, and go to state 80
+    OP_DIV  shift, and go to state 81
 
     $default  reduce using rule 39 (expressao)
 
 
+State 55
+
+   47 termo: fator •
+
+    $default  reduce using rule 47 (termo)
+
+
+State 56
+
+   38 atribuicao: IDENTIFIER OP_ADD_ASSIGN expressao •
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+
+    OP_ADD  shift, and go to state 74
+    OP_SUB  shift, and go to state 75
+    OP_EQ   shift, and go to state 76
+    OP_NE   shift, and go to state 77
+    OP_LT   shift, and go to state 78
+    OP_GT   shift, and go to state 79
+
+    $default  reduce using rule 38 (atribuicao)
+
+
+State 57
+
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+   65 lista_argumentos: expressao •
+
+    OP_ADD  shift, and go to state 74
+    OP_SUB  shift, and go to state 75
+    OP_EQ   shift, and go to state 76
+    OP_NE   shift, and go to state 77
+    OP_LT   shift, and go to state 78
+    OP_GT   shift, and go to state 79
+
+    $default  reduce using rule 65 (lista_argumentos)
+
+
+State 58
+
+   58 chamada_funcao: IDENTIFIER DELIM_PAREN_OPEN argumentos • DELIM_PAREN_CLOSE
+
+    DELIM_PAREN_CLOSE  shift, and go to state 82
+
+
+State 59
+
+   64 argumentos: lista_argumentos •
+   66 lista_argumentos: lista_argumentos • DELIM_SEPARATOR expressao
+
+    DELIM_SEPARATOR  shift, and go to state 83
+
+    $default  reduce using rule 64 (argumentos)
+
+
+State 60
+
+   37 atribuicao: IDENTIFIER DELIM_BRACKET_OPEN expressao • DELIM_BRACKET_CLOSE OP_ASSIGN expressao
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+
+    OP_ADD               shift, and go to state 74
+    OP_SUB               shift, and go to state 75
+    OP_EQ                shift, and go to state 76
+    OP_NE                shift, and go to state 77
+    OP_LT                shift, and go to state 78
+    OP_GT                shift, and go to state 79
+    DELIM_BRACKET_CLOSE  shift, and go to state 84
+
+
+State 61
+
+   30 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao • DELIM_PAREN_CLOSE CTRL_THEN bloco
+   31              | CTRL_CHECK DELIM_PAREN_OPEN expressao • DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+
+    OP_ADD             shift, and go to state 74
+    OP_SUB             shift, and go to state 75
+    OP_EQ              shift, and go to state 76
+    OP_NE              shift, and go to state 77
+    OP_LT              shift, and go to state 78
+    OP_GT              shift, and go to state 79
+    DELIM_PAREN_CLOSE  shift, and go to state 85
+
+
+State 62
+
+   32 comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN • expressao DELIM_PAREN_CLOSE bloco
+
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
+
+    expressao  go to state 86
+    termo      go to state 54
+    fator      go to state 55
+
+
+State 63
+
+   34 comando_give: CTRL_GIVE CTRL_BACK DELIM_END_STATEMENT •
+
+    $default  reduce using rule 34 (comando_give)
+
+
+State 64
+
+   33 comando_give: CTRL_GIVE CTRL_BACK expressao • DELIM_END_STATEMENT
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+
+    OP_ADD               shift, and go to state 74
+    OP_SUB               shift, and go to state 75
+    OP_EQ                shift, and go to state 76
+    OP_NE                shift, and go to state 77
+    OP_LT                shift, and go to state 78
+    OP_GT                shift, and go to state 79
+    DELIM_END_STATEMENT  shift, and go to state 87
+
+
+State 65
+
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+   59 chamada_funcao: "print" DELIM_PAREN_OPEN expressao • DELIM_PAREN_CLOSE
+
+    OP_ADD             shift, and go to state 74
+    OP_SUB             shift, and go to state 75
+    OP_EQ              shift, and go to state 76
+    OP_NE              shift, and go to state 77
+    OP_LT              shift, and go to state 78
+    OP_GT              shift, and go to state 79
+    DELIM_PAREN_CLOSE  shift, and go to state 88
+
+
+State 66
+
+   61 acesso_variavel: IDENTIFIER •
+   62                | IDENTIFIER • DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE
+
+    DELIM_BRACKET_OPEN  shift, and go to state 89
+
+    $default  reduce using rule 61 (acesso_variavel)
+
+
+State 67
+
+   60 chamada_funcao: "scan" DELIM_PAREN_OPEN acesso_variavel • DELIM_PAREN_CLOSE
+
+    DELIM_PAREN_CLOSE  shift, and go to state 90
+
+
+State 68
+
+    9 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DECL_AS expressao • DELIM_END_STATEMENT
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+
+    OP_ADD               shift, and go to state 74
+    OP_SUB               shift, and go to state 75
+    OP_EQ                shift, and go to state 76
+    OP_NE                shift, and go to state 77
+    OP_LT                shift, and go to state 78
+    OP_GT                shift, and go to state 79
+    DELIM_END_STATEMENT  shift, and go to state 91
+
+
+State 69
+
+   10 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT • DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
+
+    DELIM_BRACKET_CLOSE  shift, and go to state 92
+
+
+State 70
+
+   13 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER $@2 DELIM_PAREN_OPEN • parametros $@3 DELIM_PAREN_CLOSE bloco
+
+    TYPE_INT   shift, and go to state 11
+    TYPE_FLT   shift, and go to state 12
+    TYPE_CHR   shift, and go to state 13
+    TYPE_STR   shift, and go to state 14
+    TYPE_VOID  shift, and go to state 15
+
+    $default  reduce using rule 14 (parametros)
+
+    parametros        go to state 93
+    lista_parametros  go to state 94
+    parametro         go to state 95
+    tipo              go to state 96
+
+
+State 71
+
+   57 fator: IDENTIFIER DELIM_PAREN_OPEN • argumentos DELIM_PAREN_CLOSE
+
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
+
+    $default  reduce using rule 63 (argumentos)
+
+    expressao         go to state 57
+    termo             go to state 54
+    fator             go to state 55
+    argumentos        go to state 97
+    lista_argumentos  go to state 59
+
+
+State 72
+
+   51 fator: IDENTIFIER DELIM_BRACKET_OPEN • expressao DELIM_BRACKET_CLOSE
+
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
+
+    expressao  go to state 98
+    termo      go to state 54
+    fator      go to state 55
+
+
+State 73
+
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+   56 fator: DELIM_PAREN_OPEN expressao • DELIM_PAREN_CLOSE
+
+    OP_ADD             shift, and go to state 74
+    OP_SUB             shift, and go to state 75
+    OP_EQ              shift, and go to state 76
+    OP_NE              shift, and go to state 77
+    OP_LT              shift, and go to state 78
+    OP_GT              shift, and go to state 79
+    DELIM_PAREN_CLOSE  shift, and go to state 99
+
+
+State 74
+
+   41 expressao: expressao OP_ADD • termo
+
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 100
+
+    termo  go to state 101
+    fator  go to state 55
+
+
+State 75
+
+   42 expressao: expressao OP_SUB • termo
+
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 100
+
+    termo  go to state 102
+    fator  go to state 55
+
+
+State 76
+
+   45 expressao: expressao OP_EQ • termo
+
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 100
+
+    termo  go to state 103
+    fator  go to state 55
+
+
+State 77
+
+   46 expressao: expressao OP_NE • termo
+
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 100
+
+    termo  go to state 104
+    fator  go to state 55
+
+
+State 78
+
+   44 expressao: expressao OP_LT • termo
+
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 100
+
+    termo  go to state 105
+    fator  go to state 55
+
+
+State 79
+
+   43 expressao: expressao OP_GT • termo
+
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 100
+
+    termo  go to state 106
+    fator  go to state 55
+
+
 State 80
 
-   40 expressao: expressao OP_LT termo •
-   43 termo: termo • OP_MUL fator
-   44      | termo • OP_DIV fator
+   48 termo: termo OP_MUL • fator
 
-    OP_MUL  shift, and go to state 63
-    OP_DIV  shift, and go to state 64
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 100
 
-    $default  reduce using rule 40 (expressao)
+    fator  go to state 107
 
 
 State 81
 
-   41 expressao: expressao OP_GT termo •
-   43 termo: termo • OP_MUL fator
-   44      | termo • OP_DIV fator
+   49 termo: termo OP_DIV • fator
 
-    OP_MUL  shift, and go to state 63
-    OP_DIV  shift, and go to state 64
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 100
 
-    $default  reduce using rule 41 (expressao)
+    fator  go to state 108
 
 
 State 82
 
-   43 termo: termo OP_MUL fator •
+   58 chamada_funcao: IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE •
 
-    $default  reduce using rule 43 (termo)
+    $default  reduce using rule 58 (chamada_funcao)
 
 
 State 83
 
-   44 termo: termo OP_DIV fator •
+   66 lista_argumentos: lista_argumentos DELIM_SEPARATOR • expressao
 
-    $default  reduce using rule 44 (termo)
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
+
+    expressao  go to state 109
+    termo      go to state 54
+    fator      go to state 55
 
 
 State 84
 
-   36 expressao: expressao • OP_ADD termo
-   37          | expressao • OP_SUB termo
-   38          | expressao • OP_EQ termo
-   39          | expressao • OP_NE termo
-   40          | expressao • OP_LT termo
-   41          | expressao • OP_GT termo
-   56 lista_argumentos: lista_argumentos DELIM_SEPARATOR expressao •
+   37 atribuicao: IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE • OP_ASSIGN expressao
 
-    OP_ADD  shift, and go to state 56
-    OP_SUB  shift, and go to state 57
-    OP_EQ   shift, and go to state 58
-    OP_NE   shift, and go to state 59
-    OP_LT   shift, and go to state 60
-    OP_GT   shift, and go to state 61
-
-    $default  reduce using rule 56 (lista_argumentos)
+    OP_ASSIGN  shift, and go to state 110
 
 
 State 85
 
-    7 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DECL_AS expressao • DELIM_END_STATEMENT
-   36 expressao: expressao • OP_ADD termo
-   37          | expressao • OP_SUB termo
-   38          | expressao • OP_EQ termo
-   39          | expressao • OP_NE termo
-   40          | expressao • OP_LT termo
-   41          | expressao • OP_GT termo
+   30 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE • CTRL_THEN bloco
+   31              | CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE • CTRL_THEN bloco CTRL_OTHERWISE bloco
 
-    OP_ADD               shift, and go to state 56
-    OP_SUB               shift, and go to state 57
-    OP_EQ                shift, and go to state 58
-    OP_NE                shift, and go to state 59
-    OP_LT                shift, and go to state 60
-    OP_GT                shift, and go to state 61
-    DELIM_END_STATEMENT  shift, and go to state 94
+    CTRL_THEN  shift, and go to state 111
 
 
 State 86
 
-    8 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT • DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
+   32 comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao • DELIM_PAREN_CLOSE bloco
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
 
-    DELIM_BRACKET_CLOSE  shift, and go to state 95
+    OP_ADD             shift, and go to state 74
+    OP_SUB             shift, and go to state 75
+    OP_EQ              shift, and go to state 76
+    OP_NE              shift, and go to state 77
+    OP_LT              shift, and go to state 78
+    OP_GT              shift, and go to state 79
+    DELIM_PAREN_CLOSE  shift, and go to state 112
 
 
 State 87
 
-   10 declaracao_funcao: DECL_FUNCTION TYPE_VOID IDENTIFIER DELIM_PAREN_OPEN parametros • DELIM_PAREN_CLOSE bloco
+   33 comando_give: CTRL_GIVE CTRL_BACK expressao DELIM_END_STATEMENT •
 
-    DELIM_PAREN_CLOSE  shift, and go to state 96
+    $default  reduce using rule 33 (comando_give)
 
 
 State 88
 
-   12 parametros: lista_parametros •
-   14 lista_parametros: lista_parametros • DELIM_SEPARATOR parametro
+   59 chamada_funcao: "print" DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE •
 
-    DELIM_SEPARATOR  shift, and go to state 97
-
-    $default  reduce using rule 12 (parametros)
+    $default  reduce using rule 59 (chamada_funcao)
 
 
 State 89
 
-   13 lista_parametros: parametro •
+   62 acesso_variavel: IDENTIFIER DELIM_BRACKET_OPEN • expressao DELIM_BRACKET_CLOSE
 
-    $default  reduce using rule 13 (lista_parametros)
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
+
+    expressao  go to state 113
+    termo      go to state 54
+    fator      go to state 55
 
 
 State 90
 
-   15 parametro: tipo • IDENTIFIER
+   60 chamada_funcao: "scan" DELIM_PAREN_OPEN acesso_variavel DELIM_PAREN_CLOSE •
 
-    IDENTIFIER  shift, and go to state 98
+    $default  reduce using rule 60 (chamada_funcao)
 
 
 State 91
 
-    9 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER DELIM_PAREN_OPEN parametros • DELIM_PAREN_CLOSE bloco
+    9 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT •
 
-    DELIM_PAREN_CLOSE  shift, and go to state 99
+    $default  reduce using rule 9 (declaracao_variavel)
 
 
 State 92
 
-   25 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN • bloco
-   26              | CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN • bloco CTRL_OTHERWISE bloco
+   10 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE • DECL_AS DECL_ARRAY DELIM_END_STATEMENT
 
-    DELIM_BLOCK_OPEN  shift, and go to state 100
-
-    bloco  go to state 101
+    DECL_AS  shift, and go to state 114
 
 
 State 93
 
-   27 comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE • bloco
+   13 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER $@2 DELIM_PAREN_OPEN parametros • $@3 DELIM_PAREN_CLOSE bloco
 
-    DELIM_BLOCK_OPEN  shift, and go to state 100
+    $default  reduce using rule 12 ($@3)
 
-    bloco  go to state 102
+    $@3  go to state 115
 
 
 State 94
 
-    7 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT •
+   15 parametros: lista_parametros •
+   17 lista_parametros: lista_parametros • DELIM_SEPARATOR parametro
 
-    $default  reduce using rule 7 (declaracao_variavel)
+    DELIM_SEPARATOR  shift, and go to state 116
+
+    $default  reduce using rule 15 (parametros)
 
 
 State 95
 
-    8 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE • DECL_AS DECL_ARRAY DELIM_END_STATEMENT
+   16 lista_parametros: parametro •
 
-    DECL_AS  shift, and go to state 103
+    $default  reduce using rule 16 (lista_parametros)
 
 
 State 96
 
-   10 declaracao_funcao: DECL_FUNCTION TYPE_VOID IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE • bloco
+   18 parametro: tipo • IDENTIFIER
 
-    DELIM_BLOCK_OPEN  shift, and go to state 100
-
-    bloco  go to state 104
+    IDENTIFIER  shift, and go to state 117
 
 
 State 97
 
-   14 lista_parametros: lista_parametros DELIM_SEPARATOR • parametro
+   57 fator: IDENTIFIER DELIM_PAREN_OPEN argumentos • DELIM_PAREN_CLOSE
 
-    TYPE_INT  shift, and go to state 21
-    TYPE_FLT  shift, and go to state 22
-    TYPE_CHR  shift, and go to state 23
-    TYPE_STR  shift, and go to state 24
-
-    parametro  go to state 105
-    tipo       go to state 90
+    DELIM_PAREN_CLOSE  shift, and go to state 118
 
 
 State 98
 
-   15 parametro: tipo IDENTIFIER •
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+   51 fator: IDENTIFIER DELIM_BRACKET_OPEN expressao • DELIM_BRACKET_CLOSE
 
-    $default  reduce using rule 15 (parametro)
+    OP_ADD               shift, and go to state 74
+    OP_SUB               shift, and go to state 75
+    OP_EQ                shift, and go to state 76
+    OP_NE                shift, and go to state 77
+    OP_LT                shift, and go to state 78
+    OP_GT                shift, and go to state 79
+    DELIM_BRACKET_CLOSE  shift, and go to state 119
 
 
 State 99
 
-    9 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE • bloco
+   56 fator: DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE •
 
-    DELIM_BLOCK_OPEN  shift, and go to state 100
-
-    bloco  go to state 106
+    $default  reduce using rule 56 (fator)
 
 
 State 100
 
-   30 bloco: DELIM_BLOCK_OPEN • comandos DELIM_BLOCK_CLOSE
+   55 fator: LITERAL_STR •
 
-    $default  reduce using rule 31 (comandos)
-
-    comandos  go to state 107
+    $default  reduce using rule 55 (fator)
 
 
 State 101
 
-   25 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco •
-   26              | CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco • CTRL_OTHERWISE bloco
+   41 expressao: expressao OP_ADD termo •
+   48 termo: termo • OP_MUL fator
+   49      | termo • OP_DIV fator
 
-    CTRL_OTHERWISE  shift, and go to state 108
+    OP_MUL  shift, and go to state 80
+    OP_DIV  shift, and go to state 81
 
-    $default  reduce using rule 25 (comando_check)
+    $default  reduce using rule 41 (expressao)
 
 
 State 102
 
-   27 comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco •
+   42 expressao: expressao OP_SUB termo •
+   48 termo: termo • OP_MUL fator
+   49      | termo • OP_DIV fator
 
-    $default  reduce using rule 27 (comando_repeat)
+    OP_MUL  shift, and go to state 80
+    OP_DIV  shift, and go to state 81
+
+    $default  reduce using rule 42 (expressao)
 
 
 State 103
 
-    8 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS • DECL_ARRAY DELIM_END_STATEMENT
+   45 expressao: expressao OP_EQ termo •
+   48 termo: termo • OP_MUL fator
+   49      | termo • OP_DIV fator
 
-    DECL_ARRAY  shift, and go to state 109
+    OP_MUL  shift, and go to state 80
+    OP_DIV  shift, and go to state 81
+
+    $default  reduce using rule 45 (expressao)
 
 
 State 104
 
-   10 declaracao_funcao: DECL_FUNCTION TYPE_VOID IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco •
+   46 expressao: expressao OP_NE termo •
+   48 termo: termo • OP_MUL fator
+   49      | termo • OP_DIV fator
 
-    $default  reduce using rule 10 (declaracao_funcao)
+    OP_MUL  shift, and go to state 80
+    OP_DIV  shift, and go to state 81
+
+    $default  reduce using rule 46 (expressao)
 
 
 State 105
 
-   14 lista_parametros: lista_parametros DELIM_SEPARATOR parametro •
+   44 expressao: expressao OP_LT termo •
+   48 termo: termo • OP_MUL fator
+   49      | termo • OP_DIV fator
 
-    $default  reduce using rule 14 (lista_parametros)
+    OP_MUL  shift, and go to state 80
+    OP_DIV  shift, and go to state 81
+
+    $default  reduce using rule 44 (expressao)
 
 
 State 106
 
-    9 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco •
+   43 expressao: expressao OP_GT termo •
+   48 termo: termo • OP_MUL fator
+   49      | termo • OP_DIV fator
 
-    $default  reduce using rule 9 (declaracao_funcao)
+    OP_MUL  shift, and go to state 80
+    OP_DIV  shift, and go to state 81
+
+    $default  reduce using rule 43 (expressao)
 
 
 State 107
 
-   30 bloco: DELIM_BLOCK_OPEN comandos • DELIM_BLOCK_CLOSE
-   32 comandos: comandos • comando
+   48 termo: termo OP_MUL fator •
 
-    IDENTIFIER         shift, and go to state 1
-    CTRL_CHECK         shift, and go to state 4
-    CTRL_REPEAT        shift, and go to state 5
-    CTRL_GIVE          shift, and go to state 6
-    DELIM_BLOCK_CLOSE  shift, and go to state 110
-
-    comando         go to state 111
-    comando_check   go to state 13
-    comando_repeat  go to state 14
-    comando_give    go to state 15
-    atribuicao      go to state 16
-    chamada_funcao  go to state 17
+    $default  reduce using rule 48 (termo)
 
 
 State 108
 
-   26 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE • bloco
+   49 termo: termo OP_DIV fator •
 
-    DELIM_BLOCK_OPEN  shift, and go to state 100
-
-    bloco  go to state 112
+    $default  reduce using rule 49 (termo)
 
 
 State 109
 
-    8 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY • DELIM_END_STATEMENT
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+   66 lista_argumentos: lista_argumentos DELIM_SEPARATOR expressao •
 
-    DELIM_END_STATEMENT  shift, and go to state 113
+    OP_ADD  shift, and go to state 74
+    OP_SUB  shift, and go to state 75
+    OP_EQ   shift, and go to state 76
+    OP_NE   shift, and go to state 77
+    OP_LT   shift, and go to state 78
+    OP_GT   shift, and go to state 79
+
+    $default  reduce using rule 66 (lista_argumentos)
 
 
 State 110
 
-   30 bloco: DELIM_BLOCK_OPEN comandos DELIM_BLOCK_CLOSE •
+   37 atribuicao: IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE OP_ASSIGN • expressao
 
-    $default  reduce using rule 30 (bloco)
+    IDENTIFIER        shift, and go to state 47
+    DELIM_PAREN_OPEN  shift, and go to state 48
+    LITERAL_INT       shift, and go to state 49
+    LITERAL_FLT       shift, and go to state 50
+    LITERAL_CHR       shift, and go to state 51
+    LITERAL_STR       shift, and go to state 52
+
+    expressao  go to state 120
+    termo      go to state 54
+    fator      go to state 55
 
 
 State 111
 
-   32 comandos: comandos comando •
+   30 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN • bloco
+   31              | CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN • bloco CTRL_OTHERWISE bloco
 
-    $default  reduce using rule 32 (comandos)
+    DELIM_BLOCK_OPEN  shift, and go to state 121
+
+    bloco  go to state 122
 
 
 State 112
 
-   26 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco •
+   32 comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE • bloco
 
-    $default  reduce using rule 26 (comando_check)
+    DELIM_BLOCK_OPEN  shift, and go to state 121
+
+    bloco  go to state 123
 
 
 State 113
 
-    8 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT •
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+   62 acesso_variavel: IDENTIFIER DELIM_BRACKET_OPEN expressao • DELIM_BRACKET_CLOSE
 
-    $default  reduce using rule 8 (declaracao_variavel)
+    OP_ADD               shift, and go to state 74
+    OP_SUB               shift, and go to state 75
+    OP_EQ                shift, and go to state 76
+    OP_NE                shift, and go to state 77
+    OP_LT                shift, and go to state 78
+    OP_GT                shift, and go to state 79
+    DELIM_BRACKET_CLOSE  shift, and go to state 124
+
+
+State 114
+
+   10 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS • DECL_ARRAY DELIM_END_STATEMENT
+
+    DECL_ARRAY  shift, and go to state 125
+
+
+State 115
+
+   13 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER $@2 DELIM_PAREN_OPEN parametros $@3 • DELIM_PAREN_CLOSE bloco
+
+    DELIM_PAREN_CLOSE  shift, and go to state 126
+
+
+State 116
+
+   17 lista_parametros: lista_parametros DELIM_SEPARATOR • parametro
+
+    TYPE_INT   shift, and go to state 11
+    TYPE_FLT   shift, and go to state 12
+    TYPE_CHR   shift, and go to state 13
+    TYPE_STR   shift, and go to state 14
+    TYPE_VOID  shift, and go to state 15
+
+    parametro  go to state 127
+    tipo       go to state 96
+
+
+State 117
+
+   18 parametro: tipo IDENTIFIER •
+
+    $default  reduce using rule 18 (parametro)
+
+
+State 118
+
+   57 fator: IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE •
+
+    $default  reduce using rule 57 (fator)
+
+
+State 119
+
+   51 fator: IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE •
+
+    $default  reduce using rule 51 (fator)
+
+
+State 120
+
+   37 atribuicao: IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE OP_ASSIGN expressao •
+   41 expressao: expressao • OP_ADD termo
+   42          | expressao • OP_SUB termo
+   43          | expressao • OP_GT termo
+   44          | expressao • OP_LT termo
+   45          | expressao • OP_EQ termo
+   46          | expressao • OP_NE termo
+
+    OP_ADD  shift, and go to state 74
+    OP_SUB  shift, and go to state 75
+    OP_EQ   shift, and go to state 76
+    OP_NE   shift, and go to state 77
+    OP_LT   shift, and go to state 78
+    OP_GT   shift, and go to state 79
+
+    $default  reduce using rule 37 (atribuicao)
+
+
+State 121
+
+   35 bloco: DELIM_BLOCK_OPEN • lista_comandos DELIM_BLOCK_CLOSE
+
+    $default  reduce using rule 5 (lista_comandos)
+
+    lista_comandos  go to state 128
+
+
+State 122
+
+   30 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco •
+   31              | CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco • CTRL_OTHERWISE bloco
+
+    CTRL_OTHERWISE  shift, and go to state 129
+
+    $default  reduce using rule 30 (comando_check)
+
+
+State 123
+
+   32 comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco •
+
+    $default  reduce using rule 32 (comando_repeat)
+
+
+State 124
+
+   62 acesso_variavel: IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE •
+
+    $default  reduce using rule 62 (acesso_variavel)
+
+
+State 125
+
+   10 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY • DELIM_END_STATEMENT
+
+    DELIM_END_STATEMENT  shift, and go to state 130
+
+
+State 126
+
+   13 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER $@2 DELIM_PAREN_OPEN parametros $@3 DELIM_PAREN_CLOSE • bloco
+
+    DELIM_BLOCK_OPEN  shift, and go to state 121
+
+    bloco  go to state 131
+
+
+State 127
+
+   17 lista_parametros: lista_parametros DELIM_SEPARATOR parametro •
+
+    $default  reduce using rule 17 (lista_parametros)
+
+
+State 128
+
+    6 lista_comandos: lista_comandos • comando
+   35 bloco: DELIM_BLOCK_OPEN lista_comandos • DELIM_BLOCK_CLOSE
+
+    IDENTIFIER         shift, and go to state 18
+    DECL_CREATE        shift, and go to state 5
+    CTRL_CHECK         shift, and go to state 19
+    CTRL_REPEAT        shift, and go to state 20
+    CTRL_GIVE          shift, and go to state 21
+    DELIM_BLOCK_CLOSE  shift, and go to state 132
+    "print"            shift, and go to state 22
+    "scan"             shift, and go to state 23
+
+    declaracao_variavel  go to state 24
+    comando              go to state 25
+    comando_check        go to state 26
+    comando_repeat       go to state 27
+    comando_give         go to state 28
+    atribuicao           go to state 29
+    chamada_funcao       go to state 30
+
+
+State 129
+
+   31 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE • bloco
+
+    DELIM_BLOCK_OPEN  shift, and go to state 121
+
+    bloco  go to state 133
+
+
+State 130
+
+   10 declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT •
+
+    $default  reduce using rule 10 (declaracao_variavel)
+
+
+State 131
+
+   13 declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER $@2 DELIM_PAREN_OPEN parametros $@3 DELIM_PAREN_CLOSE bloco •
+
+    $default  reduce using rule 13 (declaracao_funcao)
+
+
+State 132
+
+   35 bloco: DELIM_BLOCK_OPEN lista_comandos DELIM_BLOCK_CLOSE •
+
+    $default  reduce using rule 35 (bloco)
+
+
+State 133
+
+   31 comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco •
+
+    $default  reduce using rule 31 (comando_check)

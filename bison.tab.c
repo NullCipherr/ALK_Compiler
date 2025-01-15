@@ -73,6 +73,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "types.h"
+#include "semantic.h"
 
 // Protótipos de funções
 const char* tipoParaString(TipoVariavel tipo);
@@ -89,6 +90,11 @@ int yylex(void);
 
 FILE* arvore_arquivo = NULL;
 int nivel_arvore = 0;
+
+AnalisadorSemantico* analisador;
+
+int num_argumentos = 0;
+int num_parametros = 0;
 
 void iniciar_arquivo_arvore() {
     arvore_arquivo = fopen("arvore_sintatica.txt", "w");
@@ -115,7 +121,7 @@ void mostrarAnaliseGramatical(const char* regra) {
 }
 
 
-#line 119 "bison.tab.c"
+#line 125 "bison.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -185,29 +191,35 @@ enum yysymbol_kind_t
   YYSYMBOL_LITERAL_FLT = 39,               /* LITERAL_FLT  */
   YYSYMBOL_LITERAL_CHR = 40,               /* LITERAL_CHR  */
   YYSYMBOL_LITERAL_STR = 41,               /* LITERAL_STR  */
-  YYSYMBOL_YYACCEPT = 42,                  /* $accept  */
-  YYSYMBOL_programa = 43,                  /* programa  */
-  YYSYMBOL_declaracoes = 44,               /* declaracoes  */
-  YYSYMBOL_declaracao = 45,                /* declaracao  */
-  YYSYMBOL_declaracao_variavel = 46,       /* declaracao_variavel  */
-  YYSYMBOL_declaracao_funcao = 47,         /* declaracao_funcao  */
-  YYSYMBOL_parametros = 48,                /* parametros  */
-  YYSYMBOL_lista_parametros = 49,          /* lista_parametros  */
-  YYSYMBOL_parametro = 50,                 /* parametro  */
-  YYSYMBOL_tipo = 51,                      /* tipo  */
-  YYSYMBOL_comando = 52,                   /* comando  */
-  YYSYMBOL_comando_check = 53,             /* comando_check  */
-  YYSYMBOL_comando_repeat = 54,            /* comando_repeat  */
-  YYSYMBOL_comando_give = 55,              /* comando_give  */
-  YYSYMBOL_bloco = 56,                     /* bloco  */
-  YYSYMBOL_comandos = 57,                  /* comandos  */
-  YYSYMBOL_atribuicao = 58,                /* atribuicao  */
-  YYSYMBOL_expressao = 59,                 /* expressao  */
-  YYSYMBOL_termo = 60,                     /* termo  */
-  YYSYMBOL_fator = 61,                     /* fator  */
-  YYSYMBOL_chamada_funcao = 62,            /* chamada_funcao  */
-  YYSYMBOL_argumentos = 63,                /* argumentos  */
-  YYSYMBOL_lista_argumentos = 64           /* lista_argumentos  */
+  YYSYMBOL_BUILT_IN_PRINT = 42,            /* "print"  */
+  YYSYMBOL_BUILT_IN_SCAN = 43,             /* "scan"  */
+  YYSYMBOL_YYACCEPT = 44,                  /* $accept  */
+  YYSYMBOL_programa = 45,                  /* programa  */
+  YYSYMBOL_46_1 = 46,                      /* $@1  */
+  YYSYMBOL_lista_declaracoes = 47,         /* lista_declaracoes  */
+  YYSYMBOL_lista_comandos = 48,            /* lista_comandos  */
+  YYSYMBOL_declaracao = 49,                /* declaracao  */
+  YYSYMBOL_declaracao_variavel = 50,       /* declaracao_variavel  */
+  YYSYMBOL_declaracao_funcao = 51,         /* declaracao_funcao  */
+  YYSYMBOL_52_2 = 52,                      /* $@2  */
+  YYSYMBOL_53_3 = 53,                      /* $@3  */
+  YYSYMBOL_parametros = 54,                /* parametros  */
+  YYSYMBOL_lista_parametros = 55,          /* lista_parametros  */
+  YYSYMBOL_parametro = 56,                 /* parametro  */
+  YYSYMBOL_tipo = 57,                      /* tipo  */
+  YYSYMBOL_comando = 58,                   /* comando  */
+  YYSYMBOL_comando_check = 59,             /* comando_check  */
+  YYSYMBOL_comando_repeat = 60,            /* comando_repeat  */
+  YYSYMBOL_comando_give = 61,              /* comando_give  */
+  YYSYMBOL_bloco = 62,                     /* bloco  */
+  YYSYMBOL_atribuicao = 63,                /* atribuicao  */
+  YYSYMBOL_expressao = 64,                 /* expressao  */
+  YYSYMBOL_termo = 65,                     /* termo  */
+  YYSYMBOL_fator = 66,                     /* fator  */
+  YYSYMBOL_chamada_funcao = 67,            /* chamada_funcao  */
+  YYSYMBOL_acesso_variavel = 68,           /* acesso_variavel  */
+  YYSYMBOL_argumentos = 69,                /* argumentos  */
+  YYSYMBOL_lista_argumentos = 70           /* lista_argumentos  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -324,7 +336,7 @@ typedef int yytype_uint16;
 
 
 /* Stored state numbers (used for stacks). */
-typedef yytype_int8 yy_state_t;
+typedef yytype_uint8 yy_state_t;
 
 /* State numbers in computations.  */
 typedef int yy_state_fast_t;
@@ -533,21 +545,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  31
+#define YYFINAL  3
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   149
+#define YYLAST   187
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  42
+#define YYNTOKENS  44
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  23
+#define YYNNTS  27
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  57
+#define YYNRULES  67
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  114
+#define YYNSTATES  134
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   296
+#define YYMAXUTOK   298
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -590,19 +602,20 @@ static const yytype_int8 yytranslate[] =
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41
+      35,    36,    37,    38,    39,    40,    41,    42,    43
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   128,   128,   132,   133,   137,   138,   139,   143,   157,
-     162,   164,   169,   170,   174,   175,   180,   184,   185,   186,
-     187,   191,   192,   193,   194,   195,   199,   201,   206,   211,
-     213,   218,   223,   224,   228,   230,   235,   240,   245,   250,
-     251,   252,   253,   257,   261,   265,   272,   276,   280,   284,
-     288,   292,   294,   298,   303,   304,   308,   309
+       0,   142,   142,   142,   151,   152,   156,   157,   161,   162,
+     166,   176,   188,   196,   187,   209,   213,   220,   225,   233,
+     241,   242,   243,   244,   245,   249,   250,   251,   252,   253,
+     254,   258,   262,   269,   274,   283,   290,   297,   308,   324,
+     338,   343,   348,   353,   358,   363,   368,   373,   381,   385,
+     389,   396,   409,   428,   429,   430,   431,   432,   433,   450,
+     465,   470,   478,   489,   509,   513,   520,   525
 };
 #endif
 
@@ -627,11 +640,12 @@ static const char *const yytname[] =
   "DELIM_PAREN_CLOSE", "DELIM_BRACKET_OPEN", "DELIM_BRACKET_CLOSE",
   "DELIM_BLOCK_OPEN", "DELIM_BLOCK_CLOSE", "DELIM_END_STATEMENT",
   "DELIM_SEPARATOR", "LITERAL_INT", "LITERAL_FLT", "LITERAL_CHR",
-  "LITERAL_STR", "$accept", "programa", "declaracoes", "declaracao",
-  "declaracao_variavel", "declaracao_funcao", "parametros",
+  "LITERAL_STR", "\"print\"", "\"scan\"", "$accept", "programa", "$@1",
+  "lista_declaracoes", "lista_comandos", "declaracao",
+  "declaracao_variavel", "declaracao_funcao", "$@2", "$@3", "parametros",
   "lista_parametros", "parametro", "tipo", "comando", "comando_check",
-  "comando_repeat", "comando_give", "bloco", "comandos", "atribuicao",
-  "expressao", "termo", "fator", "chamada_funcao", "argumentos",
+  "comando_repeat", "comando_give", "bloco", "atribuicao", "expressao",
+  "termo", "fator", "chamada_funcao", "acesso_variavel", "argumentos",
   "lista_argumentos", YY_NULLPTR
 };
 
@@ -642,12 +656,12 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-32)
+#define YYPACT_NINF (-108)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
 
-#define YYTABLE_NINF (-1)
+#define YYTABLE_NINF (-57)
 
 #define yytable_value_is_error(Yyn) \
   0
@@ -656,18 +670,20 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-       2,    -2,   115,   141,   -23,    -4,     5,    43,     2,   -32,
-     -32,   -32,   -32,   -32,   -32,   -32,   -32,    -1,     6,     6,
-       6,   -32,   -32,   -32,   -32,    45,    50,    51,     6,    36,
-       1,   -32,   -32,   -32,    40,     6,   -32,   -32,   -32,   -32,
-      31,     4,   -32,   -32,    35,   109,    34,    53,    -7,    55,
-      57,    73,     6,   -32,    48,    85,     6,     6,     6,     6,
-       6,     6,   -32,     6,     6,   -32,   -32,     6,     6,    44,
-     115,   115,    77,    97,   -32,   -32,     4,     4,     4,     4,
-       4,     4,   -32,   -32,   109,    52,    59,    64,    60,   -32,
-      93,    72,    74,    74,   -32,    99,    74,   115,   -32,    74,
-     -32,    95,   -32,   104,   -32,   -32,   -32,     3,    74,    91,
-     -32,   -32,   -32,   -32
+    -108,    10,  -108,  -108,     0,   179,   179,    17,  -108,  -108,
+    -108,  -108,  -108,  -108,  -108,  -108,    14,    35,    12,   -17,
+      24,    43,    50,    61,  -108,  -108,  -108,  -108,  -108,    56,
+      57,    -8,  -108,    25,    25,    25,    25,    25,    71,    13,
+      25,    85,  -108,  -108,    25,    65,    74,    -5,    25,  -108,
+    -108,  -108,     9,   147,    23,  -108,   147,   147,    80,    76,
+      69,    99,    25,  -108,    47,   111,    82,    90,    58,    91,
+     179,    25,    25,   123,    31,    31,    31,    31,    31,    31,
+      31,    31,  -108,    25,   105,   109,   135,  -108,  -108,    25,
+    -108,  -108,   124,  -108,    96,  -108,   132,   110,    79,  -108,
+    -108,    23,    23,    23,    23,    23,    23,  -108,  -108,   147,
+      25,   102,   102,    89,   134,   115,   179,  -108,  -108,  -108,
+     147,  -108,   133,  -108,  -108,   117,   102,  -108,     5,   102,
+    -108,  -108,  -108,  -108
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -675,115 +691,129 @@ static const yytype_int16 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     0,     0,     0,     0,     0,     2,     3,
-       5,     6,     7,    21,    22,    24,    23,     0,     0,     0,
-      54,    17,    18,    19,    20,     0,     0,     0,     0,     0,
-       0,     1,     4,    25,    46,     0,    47,    48,    49,    50,
-       0,    36,    43,    52,     0,    56,     0,    55,     0,     0,
-       0,     0,     0,    30,     0,     0,     0,     0,     0,     0,
-       0,     0,    34,     0,     0,    35,    53,     0,     0,     0,
-      12,    12,     0,     0,    29,    51,    37,    38,    39,    40,
-      41,    42,    44,    45,    57,     0,     0,     0,    13,    14,
-       0,     0,     0,     0,     8,     0,     0,     0,    16,     0,
-      32,    26,    28,     0,    11,    15,    10,     0,     0,     0,
-      31,    33,    27,     9
+       2,     0,     4,     1,     6,     0,     0,     3,     5,     8,
+       9,    20,    21,    22,    23,    24,     0,     0,     0,     0,
+       0,     0,     0,     0,    30,     7,    25,    26,    29,     0,
+       0,     0,    12,     0,     0,    64,     0,     0,     0,     0,
+       0,     0,    27,    28,     0,     0,     0,    51,     0,    53,
+      54,    55,    41,    37,    40,    48,    39,    66,     0,    65,
+       0,     0,     0,    35,     0,     0,    62,     0,     0,     0,
+      15,    64,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,    59,     0,     0,     0,     0,    34,    60,     0,
+      61,    10,     0,    13,    16,    17,     0,     0,     0,    57,
+      56,    42,    43,    46,    47,    45,    44,    49,    50,    67,
+       0,     0,     0,     0,     0,     0,     0,    19,    58,    52,
+      38,     6,    31,    33,    63,     0,     0,    18,     0,     0,
+      11,    14,    36,    32
 };
 
 /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int8 yypgoto[] =
+static const yytype_int16 yypgoto[] =
 {
-     -32,   -32,   -32,   123,   -32,   -32,    61,   -32,    37,    27,
-      26,   -32,   -32,   -32,   -10,   -32,   -32,   -18,    83,   -31,
-       0,   -32,   -32
+    -108,  -108,  -108,  -108,    26,  -108,   153,  -108,  -108,  -108,
+    -108,  -108,    42,    52,  -108,  -108,  -108,  -108,  -107,  -108,
+     -33,   103,     1,  -108,  -108,    88,  -108
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     7,     8,     9,    10,    11,    87,    88,    89,    90,
-      12,    13,    14,    15,   101,   107,    16,    40,    41,    42,
-      43,    46,    47
+       0,     1,     2,     4,     7,     8,    24,    10,    46,   115,
+      93,    94,    95,    96,    25,    26,    27,    28,   122,    29,
+      57,    54,    55,    30,    67,    58,    59
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
    positive, shift that token.  If negative, reduce the rule whose
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
-static const yytype_int8 yytable[] =
+static const yytype_int16 yytable[] =
 {
-      17,    44,    45,    68,    34,     1,     1,    28,    17,    34,
-      51,     2,    54,    29,     3,     4,     4,    55,     5,     5,
-       6,     6,    18,    19,    30,    69,    63,    64,    20,    25,
-      27,    35,    82,    83,    73,    33,    35,    53,   110,    36,
-      37,    38,    39,    31,    36,    37,    38,    39,    48,    84,
-      85,    56,    57,    49,    50,    56,    57,    58,    59,    60,
-      61,    58,    59,    60,    61,    66,    52,    62,    56,    57,
-      20,    65,    56,    57,    58,    59,    60,    61,    58,    59,
-      60,    61,    86,   102,    74,    70,   104,    71,    94,   106,
-      67,    92,    95,    56,    57,    96,    98,    97,   112,    58,
-      59,    60,    61,    99,    72,    56,    57,    17,   100,   103,
-     108,    58,    59,    60,    61,   109,    75,    56,    57,    21,
-      22,    23,    24,    58,    59,    60,    61,   113,    93,    56,
-      57,    32,    91,   111,   105,    58,    59,    60,    61,    76,
-      77,    78,    79,    80,    81,    21,    22,    23,    24,    26
+      53,    56,    44,    60,    61,   123,    64,    65,    18,     5,
+       3,    68,     6,    37,     5,    73,    47,    31,    19,   131,
+      18,    20,   133,    21,    45,    71,     5,    72,    47,    86,
+      19,   -56,   -56,    20,    47,    21,    33,    34,    32,    98,
+     132,    38,    35,    48,    36,    80,    81,    22,    23,    63,
+     109,    49,    50,    51,    52,    48,   113,    16,    17,    22,
+      23,    48,    39,    49,    50,    51,    52,    74,    75,    49,
+      50,    51,   100,    76,    77,    78,    79,   120,    74,    75,
+      40,   107,   108,    87,    76,    77,    78,    79,    66,    74,
+      75,    41,    42,    43,    91,    76,    77,    78,    79,    74,
+      75,    62,    84,    69,    70,    76,    77,    78,    79,    74,
+      75,    82,   119,    83,    89,    76,    77,    78,    79,    74,
+      75,    90,   124,   111,    92,    76,    77,    78,    79,   110,
+      85,    74,    75,   116,   114,   117,   121,    76,    77,    78,
+      79,   118,    88,    74,    75,   125,   126,   128,   129,    76,
+      77,    78,    79,   130,    99,    74,    75,     9,   127,    97,
+       0,    76,    77,    78,    79,     0,   112,    74,    75,     0,
+       0,     0,     0,    76,    77,    78,    79,   101,   102,   103,
+     104,   105,   106,    11,    12,    13,    14,    15
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_int16 yycheck[] =
 {
-       0,    19,    20,    10,     3,     3,     3,    30,     8,     3,
-      28,     9,    30,    17,    12,    13,    13,    35,    16,    16,
-      18,    18,    24,    25,    19,    32,    22,    23,    30,     2,
-       3,    30,    63,    64,    52,    36,    30,    36,    35,    38,
-      39,    40,    41,     0,    38,    39,    40,    41,     3,    67,
-      68,    20,    21,     3,     3,    20,    21,    26,    27,    28,
-      29,    26,    27,    28,    29,    31,    30,    36,    20,    21,
-      30,    36,    20,    21,    26,    27,    28,    29,    26,    27,
-      28,    29,    38,    93,    36,    30,    96,    30,    36,    99,
-      37,    14,    33,    20,    21,    31,     3,    37,   108,    26,
-      27,    28,    29,    31,    31,    20,    21,   107,    34,    10,
-      15,    26,    27,    28,    29,    11,    31,    20,    21,     4,
-       5,     6,     7,    26,    27,    28,    29,    36,    31,    20,
-      21,     8,    71,   107,    97,    26,    27,    28,    29,    56,
-      57,    58,    59,    60,    61,     4,     5,     6,     7,     8
+      33,    34,    10,    36,    37,   112,    39,    40,     3,     9,
+       0,    44,    12,    30,     9,    48,     3,     3,    13,   126,
+       3,    16,   129,    18,    32,    30,     9,    32,     3,    62,
+      13,    22,    23,    16,     3,    18,    24,    25,     3,    72,
+      35,    17,    30,    30,    32,    22,    23,    42,    43,    36,
+      83,    38,    39,    40,    41,    30,    89,     5,     6,    42,
+      43,    30,    19,    38,    39,    40,    41,    20,    21,    38,
+      39,    40,    41,    26,    27,    28,    29,   110,    20,    21,
+      30,    80,    81,    36,    26,    27,    28,    29,     3,    20,
+      21,    30,    36,    36,    36,    26,    27,    28,    29,    20,
+      21,    30,    33,    38,    30,    26,    27,    28,    29,    20,
+      21,    31,    33,    37,    32,    26,    27,    28,    29,    20,
+      21,    31,    33,    14,    33,    26,    27,    28,    29,    24,
+      31,    20,    21,    37,    10,     3,    34,    26,    27,    28,
+      29,    31,    31,    20,    21,    11,    31,   121,    15,    26,
+      27,    28,    29,    36,    31,    20,    21,     4,   116,    71,
+      -1,    26,    27,    28,    29,    -1,    31,    20,    21,    -1,
+      -1,    -1,    -1,    26,    27,    28,    29,    74,    75,    76,
+      77,    78,    79,     4,     5,     6,     7,     8
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     9,    12,    13,    16,    18,    43,    44,    45,
-      46,    47,    52,    53,    54,    55,    58,    62,    24,    25,
-      30,     4,     5,     6,     7,    51,     8,    51,    30,    17,
-      19,     0,    45,    36,     3,    30,    38,    39,    40,    41,
-      59,    60,    61,    62,    59,    59,    63,    64,     3,     3,
-       3,    59,    30,    36,    59,    59,    20,    21,    26,    27,
-      28,    29,    36,    22,    23,    36,    31,    37,    10,    32,
-      30,    30,    31,    59,    36,    31,    60,    60,    60,    60,
-      60,    60,    61,    61,    59,    59,    38,    48,    49,    50,
-      51,    48,    14,    31,    36,    33,    31,    37,     3,    31,
-      34,    56,    56,    10,    56,    50,    56,    57,    15,    11,
-      35,    52,    56,    36
+       0,    45,    46,     0,    47,     9,    12,    48,    49,    50,
+      51,     4,     5,     6,     7,     8,    57,    57,     3,    13,
+      16,    18,    42,    43,    50,    58,    59,    60,    61,    63,
+      67,     3,     3,    24,    25,    30,    32,    30,    17,    19,
+      30,    30,    36,    36,    10,    32,    52,     3,    30,    38,
+      39,    40,    41,    64,    65,    66,    64,    64,    69,    70,
+      64,    64,    30,    36,    64,    64,     3,    68,    64,    38,
+      30,    30,    32,    64,    20,    21,    26,    27,    28,    29,
+      22,    23,    31,    37,    33,    31,    64,    36,    31,    32,
+      31,    36,    33,    54,    55,    56,    57,    69,    64,    31,
+      41,    65,    65,    65,    65,    65,    65,    66,    66,    64,
+      24,    14,    31,    64,    10,    53,    37,     3,    31,    33,
+      64,    34,    62,    62,    33,    11,    31,    56,    48,    15,
+      36,    62,    35,    62
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    42,    43,    44,    44,    45,    45,    45,    46,    46,
-      47,    47,    48,    48,    49,    49,    50,    51,    51,    51,
-      51,    52,    52,    52,    52,    52,    53,    53,    54,    55,
-      55,    56,    57,    57,    58,    58,    59,    59,    59,    59,
-      59,    59,    59,    60,    60,    60,    61,    61,    61,    61,
-      61,    61,    61,    62,    63,    63,    64,    64
+       0,    44,    46,    45,    47,    47,    48,    48,    49,    49,
+      50,    50,    52,    53,    51,    54,    54,    55,    55,    56,
+      57,    57,    57,    57,    57,    58,    58,    58,    58,    58,
+      58,    59,    59,    60,    61,    61,    62,    63,    63,    63,
+      64,    64,    64,    64,    64,    64,    64,    64,    65,    65,
+      65,    66,    66,    66,    66,    66,    66,    66,    66,    67,
+      67,    67,    68,    68,    69,    69,    70,    70
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     1,     2,     1,     1,     1,     6,     9,
-       7,     7,     0,     1,     1,     3,     2,     1,     1,     1,
-       1,     1,     1,     1,     1,     2,     6,     8,     6,     4,
-       3,     3,     0,     2,     4,     4,     1,     3,     3,     3,
-       3,     3,     3,     1,     3,     3,     1,     1,     1,     1,
-       1,     3,     1,     4,     0,     1,     1,     3
+       0,     2,     0,     3,     0,     2,     0,     2,     1,     1,
+       6,     9,     0,     0,     9,     0,     1,     1,     3,     2,
+       1,     1,     1,     1,     1,     1,     1,     2,     2,     1,
+       1,     6,     8,     6,     4,     3,     3,     3,     6,     3,
+       1,     1,     3,     3,     3,     3,     3,     3,     1,     3,
+       3,     1,     4,     1,     1,     1,     1,     3,     4,     4,
+       4,     4,     1,     4,     0,     1,     1,     3
 };
 
 
@@ -1246,381 +1276,538 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 2: /* programa: declaracoes  */
-#line 128 "bison.y"
-                     { mostrarAnaliseGramatical("Programa → Declarações"); }
-#line 1253 "bison.tab.c"
+  case 2: /* $@1: %empty  */
+#line 142 "bison.y"
+      { 
+        analisador = iniciar_analisador_semantico();
+        mudar_escopo(analisador, "global");
+      }
+#line 1286 "bison.tab.c"
     break;
 
-  case 3: /* declaracoes: declaracao  */
-#line 132 "bison.y"
-                     { mostrarAnaliseGramatical("Declarações → Declaração"); }
-#line 1259 "bison.tab.c"
-    break;
-
-  case 4: /* declaracoes: declaracoes declaracao  */
-#line 133 "bison.y"
-                             { mostrarAnaliseGramatical("Declarações → Declarações Declaração"); }
-#line 1265 "bison.tab.c"
-    break;
-
-  case 5: /* declaracao: declaracao_variavel  */
-#line 137 "bison.y"
-                          { mostrarAnaliseGramatical("Declaração → Declaração Variável"); }
-#line 1271 "bison.tab.c"
-    break;
-
-  case 6: /* declaracao: declaracao_funcao  */
-#line 138 "bison.y"
-                          { mostrarAnaliseGramatical("Declaração → Declaração Função"); }
-#line 1277 "bison.tab.c"
-    break;
-
-  case 7: /* declaracao: comando  */
-#line 139 "bison.y"
-                         { mostrarAnaliseGramatical("Declaração → Comando"); }
-#line 1283 "bison.tab.c"
-    break;
-
-  case 8: /* declaracao_variavel: DECL_CREATE tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT  */
-#line 144 "bison.y"
+  case 10: /* declaracao_variavel: DECL_CREATE tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT  */
+#line 167 "bison.y"
         {
-            mostrarAnaliseGramatical("Declaração → create tipo id as expressão");
-            printf("\n╔═════════════════ VERIFICAÇÃO DE TIPOS ═════════════════╗\n");
-            printf("║ Variável: %-10s  Tipo Declarado: %-15s ║\n", 
-                   (yyvsp[-3].id).nome,
-                   tipoParaString((yyvsp[-4].tipo)));
-            printf("║ Expressão retorna: %-35s ║\n", 
-                   tipoParaString((yyvsp[-1].tipo)));
-            if ((yyvsp[-4].tipo) != (yyvsp[-1].tipo)) {
-                printf("║ AVISO: Possível perda de precisão na atribuição      ║\n");
+            if (!inserir_simbolo(analisador, (yyvsp[-3].id).nome, (yyvsp[-4].tipo))) {
+                YYERROR;
             }
-            printf("╚═══════════════════════════════════════════════════════════╝\n");
+            // Verificar compatibilidade de tipos na atribuição
+            if (!verificar_compatibilidade_tipos(analisador, (yyvsp[-4].tipo), (yyvsp[-1].tipo), (yyvsp[-3].id).nome)) {
+                YYERROR;
+            }
         }
-#line 1301 "bison.tab.c"
+#line 1300 "bison.tab.c"
     break;
 
-  case 9: /* declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT  */
-#line 158 "bison.y"
-        { mostrarAnaliseGramatical("Declaração Array → create tipo id[tamanho] as array;"); }
-#line 1307 "bison.tab.c"
+  case 11: /* declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT  */
+#line 178 "bison.y"
+        {
+            int tamanho = atoi((yyvsp[-4].literal).valor);
+            if (!inserir_vetor(analisador, (yyvsp[-6].id).nome, (yyvsp[-7].tipo), tamanho)) {
+                YYERROR;
+            }
+        }
+#line 1311 "bison.tab.c"
     break;
 
-  case 10: /* declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco  */
-#line 163 "bison.y"
-        { mostrarAnaliseGramatical("Declaração Função → function tipo id(parâmetros) bloco"); }
-#line 1313 "bison.tab.c"
+  case 12: /* $@2: %empty  */
+#line 188 "bison.y"
+        {
+            // Criar novo escopo para a função
+            char escopo_funcao[256];
+            snprintf(escopo_funcao, sizeof(escopo_funcao), "funcao_%s", (yyvsp[0].id).nome);
+            mudar_escopo(analisador, escopo_funcao);
+            inserir_funcao(analisador, (yyvsp[0].id).nome, (yyvsp[-1].tipo));
+        }
+#line 1323 "bison.tab.c"
     break;
 
-  case 11: /* declaracao_funcao: DECL_FUNCTION TYPE_VOID IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco  */
-#line 165 "bison.y"
-        { mostrarAnaliseGramatical("Declaração Função → function void id(parâmetros) bloco"); }
-#line 1319 "bison.tab.c"
+  case 13: /* $@3: %empty  */
+#line 196 "bison.y"
+        {
+            // Registrar o número de parâmetros
+            registrar_parametros_funcao(analisador, (yyvsp[-3].id).nome, num_parametros);
+        }
+#line 1332 "bison.tab.c"
     break;
 
-  case 12: /* parametros: %empty  */
-#line 169 "bison.y"
-                    { mostrarAnaliseGramatical("Parâmetros → vazio"); }
-#line 1325 "bison.tab.c"
+  case 14: /* declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER $@2 DELIM_PAREN_OPEN parametros $@3 DELIM_PAREN_CLOSE bloco  */
+#line 201 "bison.y"
+        {
+            // Voltar ao escopo global após a função
+            mudar_escopo(analisador, "global");
+        }
+#line 1341 "bison.tab.c"
     break;
 
-  case 13: /* parametros: lista_parametros  */
-#line 170 "bison.y"
-                       { mostrarAnaliseGramatical("Parâmetros → Lista de Parâmetros"); }
-#line 1331 "bison.tab.c"
+  case 15: /* parametros: %empty  */
+#line 209 "bison.y"
+        { 
+            mostrarAnaliseGramatical("Parâmetros → vazio");
+            num_parametros = 0;
+        }
+#line 1350 "bison.tab.c"
     break;
 
-  case 14: /* lista_parametros: parametro  */
-#line 174 "bison.y"
-                    { mostrarAnaliseGramatical("Lista Parâmetros → Parâmetro"); }
-#line 1337 "bison.tab.c"
+  case 16: /* parametros: lista_parametros  */
+#line 214 "bison.y"
+        { 
+            mostrarAnaliseGramatical("Parâmetros → Lista Parâmetros");
+        }
+#line 1358 "bison.tab.c"
     break;
 
-  case 15: /* lista_parametros: lista_parametros DELIM_SEPARATOR parametro  */
-#line 176 "bison.y"
-        { mostrarAnaliseGramatical("Lista Parâmetros → Lista Parâmetros, Parâmetro"); }
-#line 1343 "bison.tab.c"
-    break;
-
-  case 16: /* parametro: tipo IDENTIFIER  */
-#line 180 "bison.y"
-                      { mostrarAnaliseGramatical("Parâmetro → Tipo Identificador"); }
-#line 1349 "bison.tab.c"
-    break;
-
-  case 17: /* tipo: TYPE_INT  */
-#line 184 "bison.y"
-                 { (yyval.tipo) = TIPO_INT; }
-#line 1355 "bison.tab.c"
-    break;
-
-  case 18: /* tipo: TYPE_FLT  */
-#line 185 "bison.y"
-                 { (yyval.tipo) = TIPO_FLOAT; }
-#line 1361 "bison.tab.c"
-    break;
-
-  case 19: /* tipo: TYPE_CHR  */
-#line 186 "bison.y"
-                 { (yyval.tipo) = TIPO_CHAR; }
+  case 17: /* lista_parametros: parametro  */
+#line 221 "bison.y"
+        { 
+            mostrarAnaliseGramatical("Lista Parâmetros → Parâmetro");
+            num_parametros = 1;
+        }
 #line 1367 "bison.tab.c"
     break;
 
-  case 20: /* tipo: TYPE_STR  */
-#line 187 "bison.y"
-                 { (yyval.tipo) = TIPO_STRING; }
-#line 1373 "bison.tab.c"
+  case 18: /* lista_parametros: lista_parametros DELIM_SEPARATOR parametro  */
+#line 226 "bison.y"
+        { 
+            mostrarAnaliseGramatical("Lista Parâmetros → Lista Parâmetros , Parâmetro");
+            num_parametros++;
+        }
+#line 1376 "bison.tab.c"
     break;
 
-  case 21: /* comando: comando_check  */
-#line 191 "bison.y"
-                      { mostrarAnaliseGramatical("Comando → Check"); }
-#line 1379 "bison.tab.c"
-    break;
-
-  case 22: /* comando: comando_repeat  */
-#line 192 "bison.y"
-                      { mostrarAnaliseGramatical("Comando → Repeat"); }
+  case 19: /* parametro: tipo IDENTIFIER  */
+#line 234 "bison.y"
+        {
+            mostrarAnaliseGramatical("Parâmetro → Tipo Identificador");
+            inserir_parametro(analisador, (yyvsp[0].id).nome, (yyvsp[-1].tipo));
+        }
 #line 1385 "bison.tab.c"
     break;
 
-  case 23: /* comando: atribuicao  */
-#line 193 "bison.y"
-                     { mostrarAnaliseGramatical("Comando → Atribuição"); }
+  case 20: /* tipo: TYPE_INT  */
+#line 241 "bison.y"
+                 { (yyval.tipo) = TIPO_INT; }
 #line 1391 "bison.tab.c"
     break;
 
-  case 24: /* comando: comando_give  */
-#line 194 "bison.y"
-                     { mostrarAnaliseGramatical("Comando → Give"); }
+  case 21: /* tipo: TYPE_FLT  */
+#line 242 "bison.y"
+                 { (yyval.tipo) = TIPO_FLOAT; }
 #line 1397 "bison.tab.c"
     break;
 
-  case 25: /* comando: chamada_funcao DELIM_END_STATEMENT  */
-#line 195 "bison.y"
-                                         { mostrarAnaliseGramatical("Comando → Chamada Função;"); }
+  case 22: /* tipo: TYPE_CHR  */
+#line 243 "bison.y"
+                 { (yyval.tipo) = TIPO_CHAR; }
 #line 1403 "bison.tab.c"
     break;
 
-  case 26: /* comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco  */
-#line 200 "bison.y"
-        { mostrarAnaliseGramatical("Check → check (expressão) then bloco"); }
+  case 23: /* tipo: TYPE_STR  */
+#line 244 "bison.y"
+                 { (yyval.tipo) = TIPO_STRING; }
 #line 1409 "bison.tab.c"
     break;
 
-  case 27: /* comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco  */
-#line 202 "bison.y"
-        { mostrarAnaliseGramatical("Check → check (expressão) then bloco otherwise bloco"); }
+  case 24: /* tipo: TYPE_VOID  */
+#line 245 "bison.y"
+                 { (yyval.tipo) = TIPO_VOID; }
 #line 1415 "bison.tab.c"
     break;
 
-  case 28: /* comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco  */
-#line 207 "bison.y"
-        { mostrarAnaliseGramatical("Repeat → repeat while (expressão) bloco"); }
-#line 1421 "bison.tab.c"
-    break;
-
-  case 29: /* comando_give: CTRL_GIVE CTRL_BACK expressao DELIM_END_STATEMENT  */
-#line 212 "bison.y"
-        { mostrarAnaliseGramatical("Give → give back expressão;"); }
-#line 1427 "bison.tab.c"
-    break;
-
-  case 30: /* comando_give: CTRL_GIVE CTRL_BACK DELIM_END_STATEMENT  */
-#line 214 "bison.y"
-        { mostrarAnaliseGramatical("Give → give back;"); }
-#line 1433 "bison.tab.c"
-    break;
-
-  case 31: /* bloco: DELIM_BLOCK_OPEN comandos DELIM_BLOCK_CLOSE  */
-#line 219 "bison.y"
-        { mostrarAnaliseGramatical("Bloco → { comandos }"); }
-#line 1439 "bison.tab.c"
-    break;
-
-  case 32: /* comandos: %empty  */
-#line 223 "bison.y"
-                     { mostrarAnaliseGramatical("Comandos → vazio"); }
-#line 1445 "bison.tab.c"
-    break;
-
-  case 33: /* comandos: comandos comando  */
-#line 224 "bison.y"
-                       { mostrarAnaliseGramatical("Comandos → Comandos Comando"); }
-#line 1451 "bison.tab.c"
-    break;
-
-  case 34: /* atribuicao: IDENTIFIER OP_ASSIGN expressao DELIM_END_STATEMENT  */
-#line 229 "bison.y"
-        { mostrarAnaliseGramatical("Atribuição → id = expressão;"); }
-#line 1457 "bison.tab.c"
-    break;
-
-  case 35: /* atribuicao: IDENTIFIER OP_ADD_ASSIGN expressao DELIM_END_STATEMENT  */
-#line 231 "bison.y"
-        { mostrarAnaliseGramatical("Atribuição → id += expressão;"); }
-#line 1463 "bison.tab.c"
-    break;
-
-  case 36: /* expressao: termo  */
-#line 236 "bison.y"
-        { 
-            mostrarAnaliseGramatical("Expressão → Termo");
-            (yyval.tipo) = (yyvsp[0].tipo);
+  case 31: /* comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco  */
+#line 259 "bison.y"
+        {
+            mostrarAnaliseGramatical("Check → check ( Expressão ) then Bloco");
         }
-#line 1472 "bison.tab.c"
+#line 1423 "bison.tab.c"
     break;
 
-  case 37: /* expressao: expressao OP_ADD termo  */
-#line 241 "bison.y"
-        { 
-            mostrarAnaliseGramatical("Expressão → Expressão plus Termo");
-            (yyval.tipo) = verificarTipos((yyvsp[-2].tipo), "plus", (yyvsp[0].tipo));
+  case 32: /* comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco  */
+#line 263 "bison.y"
+        {
+            mostrarAnaliseGramatical("Check → check ( Expressão ) then Bloco otherwise Bloco");
+        }
+#line 1431 "bison.tab.c"
+    break;
+
+  case 33: /* comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco  */
+#line 270 "bison.y"
+        { mostrarAnaliseGramatical("Repeat → repeat while (expressão) bloco"); }
+#line 1437 "bison.tab.c"
+    break;
+
+  case 34: /* comando_give: CTRL_GIVE CTRL_BACK expressao DELIM_END_STATEMENT  */
+#line 275 "bison.y"
+        {
+            mostrarAnaliseGramatical("Give → give back expressão;");
+            // Verificar se o tipo de retorno corresponde ao tipo da função
+            if (analisador->escopo_atual != NULL && 
+                strncmp(analisador->escopo_atual, "funcao_", 7) == 0) {
+                // Lógica de verificação do tipo de retorno
+            }
+        }
+#line 1450 "bison.tab.c"
+    break;
+
+  case 35: /* comando_give: CTRL_GIVE CTRL_BACK DELIM_END_STATEMENT  */
+#line 284 "bison.y"
+        {
+            mostrarAnaliseGramatical("Give → give back;");
+        }
+#line 1458 "bison.tab.c"
+    break;
+
+  case 36: /* bloco: DELIM_BLOCK_OPEN lista_comandos DELIM_BLOCK_CLOSE  */
+#line 291 "bison.y"
+        {
+            mostrarAnaliseGramatical("Bloco → { Lista Comandos }");
+        }
+#line 1466 "bison.tab.c"
+    break;
+
+  case 37: /* atribuicao: IDENTIFIER OP_ASSIGN expressao  */
+#line 298 "bison.y"
+        {
+            mostrarAnaliseGramatical("Atribuição → Identificador = Expressão");
+            SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-2].id).nome);
+            if (simbolo == NULL) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[-2].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+            }
         }
 #line 1481 "bison.tab.c"
     break;
 
-  case 38: /* expressao: expressao OP_SUB termo  */
-#line 246 "bison.y"
-        { 
-            mostrarAnaliseGramatical("Expressão → Expressão minus Termo");
-            (yyval.tipo) = verificarTipos((yyvsp[-2].tipo), "minus", (yyvsp[0].tipo));
+  case 38: /* atribuicao: IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE OP_ASSIGN expressao  */
+#line 309 "bison.y"
+        {
+            mostrarAnaliseGramatical("Atribuição → Identificador[Expressão] = Expressão");
+            SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-5].id).nome);
+            if (simbolo == NULL) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[-5].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+            } else if (simbolo->tipo != TIPO_VETOR) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não é um vetor                         ║\n", (yyvsp[-5].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+            }
         }
-#line 1490 "bison.tab.c"
+#line 1501 "bison.tab.c"
     break;
 
-  case 39: /* expressao: expressao OP_EQ termo  */
-#line 250 "bison.y"
-                             { mostrarAnaliseGramatical("Expressão → Expressão equals Termo"); }
-#line 1496 "bison.tab.c"
+  case 39: /* atribuicao: IDENTIFIER OP_ADD_ASSIGN expressao  */
+#line 325 "bison.y"
+        {
+            mostrarAnaliseGramatical("Atribuição → Identificador += Expressão");
+            SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-2].id).nome);
+            if (simbolo == NULL) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[-2].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+            }
+        }
+#line 1516 "bison.tab.c"
     break;
 
-  case 40: /* expressao: expressao OP_NE termo  */
-#line 251 "bison.y"
-                             { mostrarAnaliseGramatical("Expressão → Expressão not_equals Termo"); }
-#line 1502 "bison.tab.c"
-    break;
-
-  case 41: /* expressao: expressao OP_LT termo  */
-#line 252 "bison.y"
-                             { mostrarAnaliseGramatical("Expressão → Expressão is_less_than Termo"); }
-#line 1508 "bison.tab.c"
-    break;
-
-  case 42: /* expressao: expressao OP_GT termo  */
-#line 253 "bison.y"
-                             { mostrarAnaliseGramatical("Expressão → Expressão is_greater_than Termo"); }
-#line 1514 "bison.tab.c"
-    break;
-
-  case 43: /* termo: fator  */
-#line 258 "bison.y"
+  case 40: /* expressao: termo  */
+#line 339 "bison.y"
         { 
+            mostrarAnaliseGramatical("Expressão → Termo");
             (yyval.tipo) = (yyvsp[0].tipo);
         }
-#line 1522 "bison.tab.c"
+#line 1525 "bison.tab.c"
     break;
 
-  case 44: /* termo: termo OP_MUL fator  */
-#line 262 "bison.y"
-        { 
-            (yyval.tipo) = verificarTipos((yyvsp[-2].tipo), "times", (yyvsp[0].tipo));
+  case 41: /* expressao: LITERAL_STR  */
+#line 344 "bison.y"
+        {
+            mostrarAnaliseGramatical("Expressão → String Literal");
+            (yyval.tipo) = TIPO_STRING;
         }
-#line 1530 "bison.tab.c"
+#line 1534 "bison.tab.c"
     break;
 
-  case 45: /* termo: termo OP_DIV fator  */
-#line 266 "bison.y"
+  case 42: /* expressao: expressao OP_ADD termo  */
+#line 349 "bison.y"
         { 
-            (yyval.tipo) = verificarTipos((yyvsp[-2].tipo), "divided_by", (yyvsp[0].tipo));
+            mostrarAnaliseGramatical("Expressão → Expressão plus Termo");
+            (yyval.tipo) = verificar_tipos_operacao(analisador, (yyvsp[-2].tipo), (yyvsp[0].tipo), "plus");
         }
-#line 1538 "bison.tab.c"
+#line 1543 "bison.tab.c"
     break;
 
-  case 46: /* fator: IDENTIFIER  */
-#line 273 "bison.y"
+  case 43: /* expressao: expressao OP_SUB termo  */
+#line 354 "bison.y"
         { 
-            (yyval.tipo) = (yyvsp[0].id).tipo;
+            mostrarAnaliseGramatical("Expressão → Expressão minus Termo");
+            (yyval.tipo) = verificar_tipos_operacao(analisador, (yyvsp[-2].tipo), (yyvsp[0].tipo), "minus");
         }
-#line 1546 "bison.tab.c"
+#line 1552 "bison.tab.c"
     break;
 
-  case 47: /* fator: LITERAL_INT  */
-#line 277 "bison.y"
+  case 44: /* expressao: expressao OP_GT termo  */
+#line 359 "bison.y"
         { 
+            mostrarAnaliseGramatical("Expressão → Expressão is_greater_than Termo");
+            (yyval.tipo) = TIPO_INT;  // Operações relacionais retornam tipo booleano (int)
+        }
+#line 1561 "bison.tab.c"
+    break;
+
+  case 45: /* expressao: expressao OP_LT termo  */
+#line 364 "bison.y"
+        { 
+            mostrarAnaliseGramatical("Expressão → Expressão is_less_than Termo");
             (yyval.tipo) = TIPO_INT;
-        }
-#line 1554 "bison.tab.c"
-    break;
-
-  case 48: /* fator: LITERAL_FLT  */
-#line 281 "bison.y"
-        { 
-            (yyval.tipo) = TIPO_FLOAT;
-        }
-#line 1562 "bison.tab.c"
-    break;
-
-  case 49: /* fator: LITERAL_CHR  */
-#line 285 "bison.y"
-        { 
-            (yyval.tipo) = TIPO_CHAR;
         }
 #line 1570 "bison.tab.c"
     break;
 
-  case 50: /* fator: LITERAL_STR  */
-#line 289 "bison.y"
+  case 46: /* expressao: expressao OP_EQ termo  */
+#line 369 "bison.y"
         { 
-            (yyval.tipo) = TIPO_STRING;
+            mostrarAnaliseGramatical("Expressão → Expressão equals Termo");
+            (yyval.tipo) = TIPO_INT;
         }
-#line 1578 "bison.tab.c"
+#line 1579 "bison.tab.c"
     break;
 
-  case 51: /* fator: DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE  */
-#line 293 "bison.y"
-        { mostrarAnaliseGramatical("Fator → (Expressão)"); }
-#line 1584 "bison.tab.c"
+  case 47: /* expressao: expressao OP_NE termo  */
+#line 374 "bison.y"
+        { 
+            mostrarAnaliseGramatical("Expressão → Expressão not_equals Termo");
+            (yyval.tipo) = TIPO_INT;
+        }
+#line 1588 "bison.tab.c"
     break;
 
-  case 52: /* fator: chamada_funcao  */
-#line 294 "bison.y"
-                     { mostrarAnaliseGramatical("Fator → Chamada Função"); }
-#line 1590 "bison.tab.c"
-    break;
-
-  case 53: /* chamada_funcao: IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE  */
-#line 299 "bison.y"
-        { mostrarAnaliseGramatical("Chamada Função → id(Argumentos)"); }
+  case 48: /* termo: fator  */
+#line 382 "bison.y"
+        { 
+            (yyval.tipo) = (yyvsp[0].tipo);
+        }
 #line 1596 "bison.tab.c"
     break;
 
-  case 54: /* argumentos: %empty  */
-#line 303 "bison.y"
-                    { mostrarAnaliseGramatical("Argumentos → vazio"); }
-#line 1602 "bison.tab.c"
+  case 49: /* termo: termo OP_MUL fator  */
+#line 386 "bison.y"
+        { 
+            (yyval.tipo) = verificar_tipos_operacao(analisador, (yyvsp[-2].tipo), (yyvsp[0].tipo), "times");
+        }
+#line 1604 "bison.tab.c"
     break;
 
-  case 55: /* argumentos: lista_argumentos  */
-#line 304 "bison.y"
-                       { mostrarAnaliseGramatical("Argumentos → Lista de Argumentos"); }
-#line 1608 "bison.tab.c"
+  case 50: /* termo: termo OP_DIV fator  */
+#line 390 "bison.y"
+        { 
+            (yyval.tipo) = verificar_tipos_operacao(analisador, (yyvsp[-2].tipo), (yyvsp[0].tipo), "divided_by");
+        }
+#line 1612 "bison.tab.c"
     break;
 
-  case 56: /* lista_argumentos: expressao  */
-#line 308 "bison.y"
-                    { mostrarAnaliseGramatical("Lista Argumentos → Expressão"); }
-#line 1614 "bison.tab.c"
+  case 51: /* fator: IDENTIFIER  */
+#line 397 "bison.y"
+        { 
+            SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[0].id).nome);
+            if (simbolo == NULL) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[0].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+                (yyval.tipo) = TIPO_ERRO;
+            } else {
+                (yyval.tipo) = simbolo->tipo;
+            }
+        }
+#line 1629 "bison.tab.c"
     break;
 
-  case 57: /* lista_argumentos: lista_argumentos DELIM_SEPARATOR expressao  */
-#line 310 "bison.y"
-        { mostrarAnaliseGramatical("Lista Argumentos → Lista Argumentos, Expressão"); }
-#line 1620 "bison.tab.c"
+  case 52: /* fator: IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE  */
+#line 410 "bison.y"
+        {
+            SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-3].id).nome);
+            if (simbolo == NULL) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[-3].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+                (yyval.tipo) = TIPO_ERRO;
+            } else if (simbolo->tipo != TIPO_VETOR) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não é um vetor                         ║\n", (yyvsp[-3].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+                (yyval.tipo) = TIPO_ERRO;
+            } else {
+                (yyval.tipo) = simbolo->info.vetor.tipo_base;
+            }
+        }
+#line 1652 "bison.tab.c"
+    break;
+
+  case 53: /* fator: LITERAL_INT  */
+#line 428 "bison.y"
+                    { (yyval.tipo) = TIPO_INT; }
+#line 1658 "bison.tab.c"
+    break;
+
+  case 54: /* fator: LITERAL_FLT  */
+#line 429 "bison.y"
+                    { (yyval.tipo) = TIPO_FLOAT; }
+#line 1664 "bison.tab.c"
+    break;
+
+  case 55: /* fator: LITERAL_CHR  */
+#line 430 "bison.y"
+                    { (yyval.tipo) = TIPO_CHAR; }
+#line 1670 "bison.tab.c"
+    break;
+
+  case 56: /* fator: LITERAL_STR  */
+#line 431 "bison.y"
+                    { (yyval.tipo) = TIPO_STRING; }
+#line 1676 "bison.tab.c"
+    break;
+
+  case 57: /* fator: DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE  */
+#line 432 "bison.y"
+                                                   { (yyval.tipo) = (yyvsp[-1].tipo); }
+#line 1682 "bison.tab.c"
+    break;
+
+  case 58: /* fator: IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE  */
+#line 434 "bison.y"
+        {
+            SimboloEntrada* func = buscar_simbolo(analisador, (yyvsp[-3].id).nome);
+            if (func == NULL || func->tipo != TIPO_FUNCAO) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Função '%s' não declarada                             ║\n", (yyvsp[-3].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+                (yyval.tipo) = TIPO_ERRO;
+            } else {
+                verificar_chamada_funcao(analisador, (yyvsp[-3].id).nome, num_argumentos);
+                (yyval.tipo) = func->info.funcao.tipo_retorno;
+            }
+        }
+#line 1700 "bison.tab.c"
+    break;
+
+  case 59: /* chamada_funcao: IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE  */
+#line 451 "bison.y"
+        {
+            mostrarAnaliseGramatical("Chamada Função → Identificador ( Argumentos )");
+            SimboloEntrada* func = buscar_simbolo(analisador, (yyvsp[-3].id).nome);
+            if (func == NULL || func->tipo != TIPO_FUNCAO) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Função '%s' não declarada                             ║\n", (yyvsp[-3].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+                (yyval.tipo) = TIPO_ERRO;
+            } else {
+                verificar_chamada_funcao(analisador, (yyvsp[-3].id).nome, num_argumentos);
+                (yyval.tipo) = func->info.funcao.tipo_retorno;
+            }
+        }
+#line 1719 "bison.tab.c"
+    break;
+
+  case 60: /* chamada_funcao: "print" DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE  */
+#line 466 "bison.y"
+        {
+            mostrarAnaliseGramatical("Chamada Função → print ( Expressão )");
+            (yyval.tipo) = TIPO_VOID;
+        }
+#line 1728 "bison.tab.c"
+    break;
+
+  case 61: /* chamada_funcao: "scan" DELIM_PAREN_OPEN acesso_variavel DELIM_PAREN_CLOSE  */
+#line 471 "bison.y"
+        {
+            mostrarAnaliseGramatical("Chamada Função → scan ( Acesso Variável )");
+            (yyval.tipo) = TIPO_VOID;
+        }
+#line 1737 "bison.tab.c"
+    break;
+
+  case 62: /* acesso_variavel: IDENTIFIER  */
+#line 479 "bison.y"
+        {
+            mostrarAnaliseGramatical("Acesso Variável → Identificador");
+            SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[0].id).nome);
+            if (simbolo == NULL) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[0].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+            }
+        }
+#line 1752 "bison.tab.c"
+    break;
+
+  case 63: /* acesso_variavel: IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE  */
+#line 490 "bison.y"
+        {
+            mostrarAnaliseGramatical("Acesso Variável → Identificador [ Expressão ]");
+            SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-3].id).nome);
+            if (simbolo == NULL) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[-3].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+            } else if (simbolo->tipo != TIPO_VETOR) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não é um vetor                         ║\n", (yyvsp[-3].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n");
+                analisador->num_erros++;
+            }
+        }
+#line 1772 "bison.tab.c"
+    break;
+
+  case 64: /* argumentos: %empty  */
+#line 509 "bison.y"
+        { 
+            mostrarAnaliseGramatical("Argumentos → vazio");
+            num_argumentos = 0;
+        }
+#line 1781 "bison.tab.c"
+    break;
+
+  case 65: /* argumentos: lista_argumentos  */
+#line 514 "bison.y"
+        { 
+            mostrarAnaliseGramatical("Argumentos → Lista Argumentos");
+        }
+#line 1789 "bison.tab.c"
+    break;
+
+  case 66: /* lista_argumentos: expressao  */
+#line 521 "bison.y"
+        { 
+            mostrarAnaliseGramatical("Lista Argumentos → Expressão");
+            num_argumentos = 1;
+        }
+#line 1798 "bison.tab.c"
+    break;
+
+  case 67: /* lista_argumentos: lista_argumentos DELIM_SEPARATOR expressao  */
+#line 526 "bison.y"
+        { 
+            mostrarAnaliseGramatical("Lista Argumentos → Lista Argumentos , Expressão");
+            num_argumentos++;
+        }
+#line 1807 "bison.tab.c"
     break;
 
 
-#line 1624 "bison.tab.c"
+#line 1811 "bison.tab.c"
 
       default: break;
     }
@@ -1813,7 +2000,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 313 "bison.y"
+#line 532 "bison.y"
 
 
 // Implementação das funções
@@ -1879,24 +2066,15 @@ void yyerror(const char *s) {
 
 int main(void) {
     printf("\n╔════════════════════ COMPILADOR C-2024 ════════════════════╗\n");
-    printf("║                                                           ║\n");
     
     if (getenv("GERAR_ARVORE")) {
         iniciar_arquivo_arvore();
     }
     
-    int resultado;
-    if (getenv("ANALISE_LEXICA")) {
-        printf("║              Iniciando Análise Léxica                   ║\n");
-        printf("║                                                           ║\n");
-        printf("╚═══════════════════════════════════════════════════════════╝\n\n");
-        analise_lexica();
-        resultado = 0;
-    } else {
-        printf("║              Iniciando Análise Sintática                 ║\n");
-        printf("║                                                           ║\n");
-        printf("╚═══════════════════════════════════════════════════════════╝\n\n");
-        resultado = yyparse();
+    int resultado = yyparse();
+    
+    if (analisador != NULL) {
+        finalizar_analisador_semantico(analisador);
     }
     
     if (getenv("GERAR_ARVORE")) {

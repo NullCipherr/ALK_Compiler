@@ -1,0 +1,38 @@
+// Inclui todos os aspectos anteriores em um único programa
+create int max_alunos as 5;
+create float nota_minima as 6.0;
+create string mensagem_aprovado as "Aprovado";
+create string mensagem_reprovado as "Reprovado";
+
+// Vetor para armazenar notas
+create float notas[5] as array;
+
+// Função para calcular média
+function float calcular_media(float n1, float n2) {
+    give back (n1 plus n2) divided_by 2.0;
+}
+
+// Função para verificar aprovação
+function void verificar_aprovacao(float media) {
+    check (media is_greater_than nota_minima) then {
+        print(mensagem_aprovado);
+    } otherwise {
+        print(mensagem_reprovado);
+    }
+}
+
+// Programa principal
+create int i as 0;
+repeat while (i is_less_than max_alunos) {
+    // Leitura de notas
+    scan(notas[i]);
+    i = i plus 1;
+}
+
+// Processamento das notas
+i = 0;
+repeat while (i is_less_than max_alunos) {
+    create float media_aluno as calcular_media(notas[i], notas[i plus 1]);
+    verificar_aprovacao(media_aluno);
+    i = i plus 2;
+}

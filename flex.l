@@ -126,11 +126,37 @@ COMENTARIO  "//".*
 ";"         { emitToken("DELIM_END_STATEMENT", yytext); return DELIM_END_STATEMENT; }
 ","         { emitToken("DELIM_SEPARATOR", yytext); return DELIM_SEPARATOR; }
 
-{ID}        { emitToken("IDENTIFIER", yytext); return IDENTIFIER; }
-{INTEIRO}   { emitToken("LITERAL_INT", yytext); return LITERAL_INT; }
-{FLOAT}     { emitToken("LITERAL_FLT", yytext); return LITERAL_FLT; }
-{CHAR}      { emitToken("LITERAL_CHR", yytext); return LITERAL_CHR; }
-{STRING}    { emitToken("LITERAL_STR", yytext); return LITERAL_STR; }
+"print"     { emitToken("BUILT_IN_PRINT", yytext); return BUILT_IN_PRINT; }
+"scan"      { emitToken("BUILT_IN_SCAN", yytext); return BUILT_IN_SCAN; }
+
+{ID}        { 
+    yylval.id.nome = strdup(yytext);
+    yylval.id.tipo = TIPO_ERRO;  // Será definido durante a análise semântica
+    emitToken("IDENTIFIER", yytext); 
+    return IDENTIFIER; 
+}
+{INTEIRO}   { 
+    yylval.literal.valor = strdup(yytext);
+    yylval.literal.num = atoi(yytext);
+    emitToken("LITERAL_INT", yytext); 
+    return LITERAL_INT; 
+}
+{FLOAT}     { 
+    yylval.literal.valor = strdup(yytext);
+    yylval.literal.num = atof(yytext);
+    emitToken("LITERAL_FLT", yytext); 
+    return LITERAL_FLT; 
+}
+{CHAR}      { 
+    yylval.literal.valor = strdup(yytext);
+    emitToken("LITERAL_CHR", yytext); 
+    return LITERAL_CHR; 
+}
+{STRING}    { 
+    yylval.literal.valor = strdup(yytext);
+    emitToken("LITERAL_STR", yytext); 
+    return LITERAL_STR; 
+}
 
 .           { printf("ERRO LEXICO: caractere invalido '%s' na linha %d\n", yytext, linha); }
 

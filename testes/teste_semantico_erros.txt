@@ -1,0 +1,72 @@
+// Declarações globais com erros
+create int max_alunos as 3;
+// create float max_alunos as 5.0;  // Erro: variável já declarada
+// create string mensagem;  // Erro: falta inicialização
+// create char status as 'And';  // Erro: tipo incompatível (string em char)
+
+// Vetores com erros
+create float notas[-1] as array;  // Erro: tamanho negativo
+create int valores[2.5] as array;  // Erro: tamanho não inteiro
+create char letras[] as array;    // Erro: tamanho não especificado
+
+// Função com erros de tipo
+function float calcular_media(float nota1, int nota2) {
+    create int media as nota1 plus nota2;  // Erro: atribuição de float para int
+    give back "aprovado";  // Erro: retorno string em função float
+}
+
+// Função com erro de parâmetros
+function void imprimir(string msg) {
+    print(msg);
+    give back 42;  // Erro: retorno em função void
+}
+
+// Programa principal com erros
+print(mensagem_inexistente);  // Erro: variável não declarada
+
+// Erro de tipo em expressão
+create int soma as "teste" plus 10;  // Erro: operação inválida com string
+
+// Erro de acesso a vetor
+notas[3.14] = 10.0;  // Erro: índice não inteiro
+notas[10] = 5.0;     // Erro: índice fora dos limites
+
+// Erro de chamada de função
+calcular_media(10);      // Erro: número incorreto de argumentos
+calcular_media("7", 8);  // Erro: tipo incorreto de argumento
+
+// Erro de escopo
+{
+    create int temp as 0;
+}
+print(temp);  // Erro: variável fora de escopo
+
+// Erro em estrutura de controle
+check ("teste") then {  // Erro: condição não booleana
+    print("erro");
+}
+
+// Erro de operação relacional
+check (5 plus "3" is_greater_than 10) then {  // Erro: operação com tipos incompatíveis
+    print("maior");
+}
+
+// Erro de atribuição
+max_alunos = "três";  // Erro: atribuição de string em int
+
+// Erro de operador +=
+"teste" += 5;  // Erro: operação inválida com string
+
+// Erro de função void em expressão
+create int resultado as imprimir("teste");  // Erro: função void em expressão
+
+// Erro de recursão infinita
+function int loop() {
+    give back loop();  // Aviso: possível recursão infinita
+}
+
+// Erro de função não declarada
+create float valor as funcao_inexistente(10);  // Erro: função não existe
+
+// Erro de scan
+scan(10);  // Erro: scan espera uma variável, não um literal

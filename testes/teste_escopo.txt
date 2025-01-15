@@ -1,0 +1,18 @@
+create int global as 100;
+
+function void teste_escopo() {
+    create int local as 50;
+    global = global plus local;  // OK: acesso a variável global
+    
+    check (local is_greater_than 0) then {
+        create int mais_local as 25;
+        local = local plus mais_local;
+    }
+    
+    // mais_local = 30;  // Deve gerar erro: fora do escopo
+}
+
+function void outro_teste() {
+    create int local as 30;  // OK: escopo diferente
+    // local2 = 40;  // Deve gerar erro: variável não declarada
+}

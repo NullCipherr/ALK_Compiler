@@ -8,6 +8,8 @@ typedef enum {
     TIPO_CHAR,
     TIPO_STRING,
     TIPO_VOID,
+    TIPO_FUNCAO,
+    TIPO_VETOR,
     TIPO_ERRO
 } TipoVariavel;
 

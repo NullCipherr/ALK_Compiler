@@ -92,7 +92,9 @@ extern int yydebug;
     LITERAL_INT = 293,             /* LITERAL_INT  */
     LITERAL_FLT = 294,             /* LITERAL_FLT  */
     LITERAL_CHR = 295,             /* LITERAL_CHR  */
-    LITERAL_STR = 296              /* LITERAL_STR  */
+    LITERAL_STR = 296,             /* LITERAL_STR  */
+    BUILT_IN_PRINT = 297,          /* "print"  */
+    BUILT_IN_SCAN = 298            /* "scan"  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -101,15 +103,19 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 101 "bison.y"
+#line 107 "bison.y"
 
     struct {
         char* nome;
         TipoVariavel tipo;
     } id;
     TipoVariavel tipo;
+    struct {
+        char* valor;
+        int num;
+    } literal;
 
-#line 113 "bison.tab.h"
+#line 119 "bison.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

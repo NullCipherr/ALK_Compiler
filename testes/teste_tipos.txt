@@ -1,0 +1,18 @@
+// Teste de declarações básicas e tipos
+create int numero as 42;
+create float pi as 3.14159;
+create char letra as 'A';
+create string mensagem as "Olá, mundo!";
+
+// Teste de conversões implícitas
+create float resultado as numero plus pi;
+create int truncado as pi;  // Deve gerar aviso de perda de precisão
+
+// Teste de operações entre tipos
+create float soma as numero plus pi;
+create float multiplicacao as numero times pi;
+create float divisao as numero divided_by pi;
+
+// Teste de operações inválidas
+create string erro1 as mensagem plus numero;  // Deve gerar erro
+create int erro2 as letra plus numero;        // Deve gerar erro
