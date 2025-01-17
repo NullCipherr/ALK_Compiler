@@ -1,72 +1,57 @@
-CC=gcc
-CFLAGS=-Wall
+CC = gcc
+CFLAGS = -Wall -Isrc
 
-COMPILER=compilador
-BISON_FILE=bison.y
-FLEX_FILE=flex.l
-SEMANTIC_FILE=semantic.c
+# Diretórios
+BIN_DIR = bin
+SRC_DIR = src
+BUILD_DIR = build
+TESTS_DIR = tests
+
+# Arquivos principais
+COMPILER = $(BIN_DIR)/compilador
+BISON_FILE = $(SRC_DIR)/bison.y
+FLEX_FILE = $(SRC_DIR)/flex.l
+SEMANTIC_FILE = $(SRC_DIR)/semantic.c
 
 # Lista de objetos necessários
-OBJS=lex.yy.o bison.tab.o semantic.o
+OBJS = $(BUILD_DIR)/lex.yy.o $(BUILD_DIR)/bison.tab.o $(BUILD_DIR)/semantic.o
 
-all: $(COMPILER)
+# Regra principal para criar os diretórios e o compilador
+all: $(BIN_DIR) $(BUILD_DIR) $(COMPILER)
+
+# Criação do diretório bin
+$(BIN_DIR):
+	mkdir -p $@
+
+# Criação do diretório build
+$(BUILD_DIR):
+	mkdir -p $@
 
 # Regra principal para criar o compilador
 $(COMPILER): $(OBJS)
-	$(CC) $(CFLAGS) -o $(COMPILER) $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS)
 
 # Regra para criar o objeto do analisador léxico
-lex.yy.o: lex.yy.c
-	$(CC) $(CFLAGS) -c lex.yy.c
+$(BUILD_DIR)/lex.yy.o: $(BUILD_DIR)/lex.yy.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Regra para criar o objeto do analisador sintático
-bison.tab.o: bison.tab.c
-	$(CC) $(CFLAGS) -c bison.tab.c
+$(BUILD_DIR)/bison.tab.o: $(BUILD_DIR)/bison.tab.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Regra para criar o objeto do analisador semântico
-semantic.o: $(SEMANTIC_FILE) semantic.h
-	$(CC) $(CFLAGS) -c $(SEMANTIC_FILE)
+$(BUILD_DIR)/semantic.o: $(SEMANTIC_FILE) $(SRC_DIR)/semantic.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Regra para gerar o código do flex
-lex.yy.c: $(FLEX_FILE) bison.tab.h
-	flex $(FLEX_FILE)
+$(BUILD_DIR)/lex.yy.c: $(FLEX_FILE) $(BUILD_DIR)/bison.tab.h
+	flex -o $@ $<
 
 # Regra para gerar o código do bison
-bison.tab.c bison.tab.h: $(BISON_FILE)
-	bison -v -d $(BISON_FILE)
-
-# Regras de teste
-test-lex: $(COMPILER)
-	@echo "\n=== Executando teste léxico ==="
-	@echo "Arquivo de entrada: test_code.txt"
-	@echo "----------------------------------------"
-	ANALISE_LEXICA=1 ./$(COMPILER) < test_code.txt
-
-test-bison: $(COMPILER)
-	@echo "\n=== Executando teste sintático ==="
-	@echo "Arquivo de entrada: test_code.txt"
-	@echo "----------------------------------------"
-	./$(COMPILER) < test_code.txt
-
-test-semantic: $(COMPILER)
-	@echo "\n=== Executando teste semântico ==="
-	@echo "Arquivo de entrada: test_code.txt"
-	@echo "----------------------------------------"
-	ANALISE_SEMANTICA=1 ./$(COMPILER) < test_code.txt
-
-test-all: $(COMPILER)
-	@echo "\n=== Executando todos os testes ==="
-	@for teste in testes/teste_*.txt; do \
-		echo "\nTestando $$teste:"; \
-		echo "----------------------------------------"; \
-		./$(COMPILER) < $$teste; \
-	done
-
-tree: bison.tab.c
-	@echo "\n=== Gerando árvore sintática ==="
-	@echo "Árvore gerada em bison.output"
-	cat bison.output
+$(BUILD_DIR)/bison.tab.c $(BUILD_DIR)/bison.tab.h: $(BISON_FILE)
+	bison -v -d -o $(BUILD_DIR)/bison.tab.c $(BISON_FILE)
 
 # Limpeza
 clean:
-	rm -f $(COMPILER) $(OBJS) lex.yy.c bison.tab.c bison.tab.h bison.output
+	rm -rf $(BIN_DIR) $(BUILD_DIR)
+	@echo "Todos os arquivos gerados foram removidos."

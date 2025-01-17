@@ -67,7 +67,7 @@
 
 
 /* First part of user prologue.  */
-#line 53 "bison.y"
+#line 53 "src/bison.y"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -121,7 +121,7 @@ void mostrarAnaliseGramatical(const char* regra) {
 }
 
 
-#line 125 "bison.tab.c"
+#line 125 "build/bison.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -1277,16 +1277,16 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* $@1: %empty  */
-#line 142 "bison.y"
+#line 142 "src/bison.y"
       { 
         analisador = iniciar_analisador_semantico();
         mudar_escopo(analisador, "global");
       }
-#line 1286 "bison.tab.c"
+#line 1286 "build/bison.tab.c"
     break;
 
   case 10: /* declaracao_variavel: DECL_CREATE tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT  */
-#line 167 "bison.y"
+#line 167 "src/bison.y"
         {
             if (!inserir_simbolo(analisador, (yyvsp[-3].id).nome, (yyvsp[-4].tipo))) {
                 YYERROR;
@@ -1296,22 +1296,22 @@ yyreduce:
                 YYERROR;
             }
         }
-#line 1300 "bison.tab.c"
+#line 1300 "build/bison.tab.c"
     break;
 
   case 11: /* declaracao_variavel: DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT  */
-#line 178 "bison.y"
+#line 178 "src/bison.y"
         {
             int tamanho = atoi((yyvsp[-4].literal).valor);
             if (!inserir_vetor(analisador, (yyvsp[-6].id).nome, (yyvsp[-7].tipo), tamanho)) {
                 YYERROR;
             }
         }
-#line 1311 "bison.tab.c"
+#line 1311 "build/bison.tab.c"
     break;
 
   case 12: /* $@2: %empty  */
-#line 188 "bison.y"
+#line 188 "src/bison.y"
         {
             // Criar novo escopo para a função
             char escopo_funcao[256];
@@ -1319,125 +1319,125 @@ yyreduce:
             mudar_escopo(analisador, escopo_funcao);
             inserir_funcao(analisador, (yyvsp[0].id).nome, (yyvsp[-1].tipo));
         }
-#line 1323 "bison.tab.c"
+#line 1323 "build/bison.tab.c"
     break;
 
   case 13: /* $@3: %empty  */
-#line 196 "bison.y"
+#line 196 "src/bison.y"
         {
             // Registrar o número de parâmetros
             registrar_parametros_funcao(analisador, (yyvsp[-3].id).nome, num_parametros);
         }
-#line 1332 "bison.tab.c"
+#line 1332 "build/bison.tab.c"
     break;
 
   case 14: /* declaracao_funcao: DECL_FUNCTION tipo IDENTIFIER $@2 DELIM_PAREN_OPEN parametros $@3 DELIM_PAREN_CLOSE bloco  */
-#line 201 "bison.y"
+#line 201 "src/bison.y"
         {
             // Voltar ao escopo global após a função
             mudar_escopo(analisador, "global");
         }
-#line 1341 "bison.tab.c"
+#line 1341 "build/bison.tab.c"
     break;
 
   case 15: /* parametros: %empty  */
-#line 209 "bison.y"
+#line 209 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Parâmetros → vazio");
             num_parametros = 0;
         }
-#line 1350 "bison.tab.c"
+#line 1350 "build/bison.tab.c"
     break;
 
   case 16: /* parametros: lista_parametros  */
-#line 214 "bison.y"
+#line 214 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Parâmetros → Lista Parâmetros");
         }
-#line 1358 "bison.tab.c"
+#line 1358 "build/bison.tab.c"
     break;
 
   case 17: /* lista_parametros: parametro  */
-#line 221 "bison.y"
+#line 221 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Lista Parâmetros → Parâmetro");
             num_parametros = 1;
         }
-#line 1367 "bison.tab.c"
+#line 1367 "build/bison.tab.c"
     break;
 
   case 18: /* lista_parametros: lista_parametros DELIM_SEPARATOR parametro  */
-#line 226 "bison.y"
+#line 226 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Lista Parâmetros → Lista Parâmetros , Parâmetro");
             num_parametros++;
         }
-#line 1376 "bison.tab.c"
+#line 1376 "build/bison.tab.c"
     break;
 
   case 19: /* parametro: tipo IDENTIFIER  */
-#line 234 "bison.y"
+#line 234 "src/bison.y"
         {
             mostrarAnaliseGramatical("Parâmetro → Tipo Identificador");
             inserir_parametro(analisador, (yyvsp[0].id).nome, (yyvsp[-1].tipo));
         }
-#line 1385 "bison.tab.c"
+#line 1385 "build/bison.tab.c"
     break;
 
   case 20: /* tipo: TYPE_INT  */
-#line 241 "bison.y"
+#line 241 "src/bison.y"
                  { (yyval.tipo) = TIPO_INT; }
-#line 1391 "bison.tab.c"
+#line 1391 "build/bison.tab.c"
     break;
 
   case 21: /* tipo: TYPE_FLT  */
-#line 242 "bison.y"
+#line 242 "src/bison.y"
                  { (yyval.tipo) = TIPO_FLOAT; }
-#line 1397 "bison.tab.c"
+#line 1397 "build/bison.tab.c"
     break;
 
   case 22: /* tipo: TYPE_CHR  */
-#line 243 "bison.y"
+#line 243 "src/bison.y"
                  { (yyval.tipo) = TIPO_CHAR; }
-#line 1403 "bison.tab.c"
+#line 1403 "build/bison.tab.c"
     break;
 
   case 23: /* tipo: TYPE_STR  */
-#line 244 "bison.y"
+#line 244 "src/bison.y"
                  { (yyval.tipo) = TIPO_STRING; }
-#line 1409 "bison.tab.c"
+#line 1409 "build/bison.tab.c"
     break;
 
   case 24: /* tipo: TYPE_VOID  */
-#line 245 "bison.y"
+#line 245 "src/bison.y"
                  { (yyval.tipo) = TIPO_VOID; }
-#line 1415 "bison.tab.c"
+#line 1415 "build/bison.tab.c"
     break;
 
   case 31: /* comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco  */
-#line 259 "bison.y"
+#line 259 "src/bison.y"
         {
             mostrarAnaliseGramatical("Check → check ( Expressão ) then Bloco");
         }
-#line 1423 "bison.tab.c"
+#line 1423 "build/bison.tab.c"
     break;
 
   case 32: /* comando_check: CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco  */
-#line 263 "bison.y"
+#line 263 "src/bison.y"
         {
             mostrarAnaliseGramatical("Check → check ( Expressão ) then Bloco otherwise Bloco");
         }
-#line 1431 "bison.tab.c"
+#line 1431 "build/bison.tab.c"
     break;
 
   case 33: /* comando_repeat: CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco  */
-#line 270 "bison.y"
+#line 270 "src/bison.y"
         { mostrarAnaliseGramatical("Repeat → repeat while (expressão) bloco"); }
-#line 1437 "bison.tab.c"
+#line 1437 "build/bison.tab.c"
     break;
 
   case 34: /* comando_give: CTRL_GIVE CTRL_BACK expressao DELIM_END_STATEMENT  */
-#line 275 "bison.y"
+#line 275 "src/bison.y"
         {
             mostrarAnaliseGramatical("Give → give back expressão;");
             // Verificar se o tipo de retorno corresponde ao tipo da função
@@ -1446,27 +1446,27 @@ yyreduce:
                 // Lógica de verificação do tipo de retorno
             }
         }
-#line 1450 "bison.tab.c"
+#line 1450 "build/bison.tab.c"
     break;
 
   case 35: /* comando_give: CTRL_GIVE CTRL_BACK DELIM_END_STATEMENT  */
-#line 284 "bison.y"
+#line 284 "src/bison.y"
         {
             mostrarAnaliseGramatical("Give → give back;");
         }
-#line 1458 "bison.tab.c"
+#line 1458 "build/bison.tab.c"
     break;
 
   case 36: /* bloco: DELIM_BLOCK_OPEN lista_comandos DELIM_BLOCK_CLOSE  */
-#line 291 "bison.y"
+#line 291 "src/bison.y"
         {
             mostrarAnaliseGramatical("Bloco → { Lista Comandos }");
         }
-#line 1466 "bison.tab.c"
+#line 1466 "build/bison.tab.c"
     break;
 
   case 37: /* atribuicao: IDENTIFIER OP_ASSIGN expressao  */
-#line 298 "bison.y"
+#line 298 "src/bison.y"
         {
             mostrarAnaliseGramatical("Atribuição → Identificador = Expressão");
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-2].id).nome);
@@ -1477,11 +1477,11 @@ yyreduce:
                 analisador->num_erros++;
             }
         }
-#line 1481 "bison.tab.c"
+#line 1481 "build/bison.tab.c"
     break;
 
   case 38: /* atribuicao: IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE OP_ASSIGN expressao  */
-#line 309 "bison.y"
+#line 309 "src/bison.y"
         {
             mostrarAnaliseGramatical("Atribuição → Identificador[Expressão] = Expressão");
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-5].id).nome);
@@ -1497,11 +1497,11 @@ yyreduce:
                 analisador->num_erros++;
             }
         }
-#line 1501 "bison.tab.c"
+#line 1501 "build/bison.tab.c"
     break;
 
   case 39: /* atribuicao: IDENTIFIER OP_ADD_ASSIGN expressao  */
-#line 325 "bison.y"
+#line 325 "src/bison.y"
         {
             mostrarAnaliseGramatical("Atribuição → Identificador += Expressão");
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-2].id).nome);
@@ -1512,107 +1512,107 @@ yyreduce:
                 analisador->num_erros++;
             }
         }
-#line 1516 "bison.tab.c"
+#line 1516 "build/bison.tab.c"
     break;
 
   case 40: /* expressao: termo  */
-#line 339 "bison.y"
+#line 339 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Expressão → Termo");
             (yyval.tipo) = (yyvsp[0].tipo);
         }
-#line 1525 "bison.tab.c"
+#line 1525 "build/bison.tab.c"
     break;
 
   case 41: /* expressao: LITERAL_STR  */
-#line 344 "bison.y"
+#line 344 "src/bison.y"
         {
             mostrarAnaliseGramatical("Expressão → String Literal");
             (yyval.tipo) = TIPO_STRING;
         }
-#line 1534 "bison.tab.c"
+#line 1534 "build/bison.tab.c"
     break;
 
   case 42: /* expressao: expressao OP_ADD termo  */
-#line 349 "bison.y"
+#line 349 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Expressão → Expressão plus Termo");
             (yyval.tipo) = verificar_tipos_operacao(analisador, (yyvsp[-2].tipo), (yyvsp[0].tipo), "plus");
         }
-#line 1543 "bison.tab.c"
+#line 1543 "build/bison.tab.c"
     break;
 
   case 43: /* expressao: expressao OP_SUB termo  */
-#line 354 "bison.y"
+#line 354 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Expressão → Expressão minus Termo");
             (yyval.tipo) = verificar_tipos_operacao(analisador, (yyvsp[-2].tipo), (yyvsp[0].tipo), "minus");
         }
-#line 1552 "bison.tab.c"
+#line 1552 "build/bison.tab.c"
     break;
 
   case 44: /* expressao: expressao OP_GT termo  */
-#line 359 "bison.y"
+#line 359 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Expressão → Expressão is_greater_than Termo");
             (yyval.tipo) = TIPO_INT;  // Operações relacionais retornam tipo booleano (int)
         }
-#line 1561 "bison.tab.c"
+#line 1561 "build/bison.tab.c"
     break;
 
   case 45: /* expressao: expressao OP_LT termo  */
-#line 364 "bison.y"
+#line 364 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Expressão → Expressão is_less_than Termo");
             (yyval.tipo) = TIPO_INT;
         }
-#line 1570 "bison.tab.c"
+#line 1570 "build/bison.tab.c"
     break;
 
   case 46: /* expressao: expressao OP_EQ termo  */
-#line 369 "bison.y"
+#line 369 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Expressão → Expressão equals Termo");
             (yyval.tipo) = TIPO_INT;
         }
-#line 1579 "bison.tab.c"
+#line 1579 "build/bison.tab.c"
     break;
 
   case 47: /* expressao: expressao OP_NE termo  */
-#line 374 "bison.y"
+#line 374 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Expressão → Expressão not_equals Termo");
             (yyval.tipo) = TIPO_INT;
         }
-#line 1588 "bison.tab.c"
+#line 1588 "build/bison.tab.c"
     break;
 
   case 48: /* termo: fator  */
-#line 382 "bison.y"
+#line 382 "src/bison.y"
         { 
             (yyval.tipo) = (yyvsp[0].tipo);
         }
-#line 1596 "bison.tab.c"
+#line 1596 "build/bison.tab.c"
     break;
 
   case 49: /* termo: termo OP_MUL fator  */
-#line 386 "bison.y"
+#line 386 "src/bison.y"
         { 
             (yyval.tipo) = verificar_tipos_operacao(analisador, (yyvsp[-2].tipo), (yyvsp[0].tipo), "times");
         }
-#line 1604 "bison.tab.c"
+#line 1604 "build/bison.tab.c"
     break;
 
   case 50: /* termo: termo OP_DIV fator  */
-#line 390 "bison.y"
+#line 390 "src/bison.y"
         { 
             (yyval.tipo) = verificar_tipos_operacao(analisador, (yyvsp[-2].tipo), (yyvsp[0].tipo), "divided_by");
         }
-#line 1612 "bison.tab.c"
+#line 1612 "build/bison.tab.c"
     break;
 
   case 51: /* fator: IDENTIFIER  */
-#line 397 "bison.y"
+#line 397 "src/bison.y"
         { 
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[0].id).nome);
             if (simbolo == NULL) {
@@ -1625,11 +1625,11 @@ yyreduce:
                 (yyval.tipo) = simbolo->tipo;
             }
         }
-#line 1629 "bison.tab.c"
+#line 1629 "build/bison.tab.c"
     break;
 
   case 52: /* fator: IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE  */
-#line 410 "bison.y"
+#line 410 "src/bison.y"
         {
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-3].id).nome);
             if (simbolo == NULL) {
@@ -1648,41 +1648,41 @@ yyreduce:
                 (yyval.tipo) = simbolo->info.vetor.tipo_base;
             }
         }
-#line 1652 "bison.tab.c"
+#line 1652 "build/bison.tab.c"
     break;
 
   case 53: /* fator: LITERAL_INT  */
-#line 428 "bison.y"
+#line 428 "src/bison.y"
                     { (yyval.tipo) = TIPO_INT; }
-#line 1658 "bison.tab.c"
+#line 1658 "build/bison.tab.c"
     break;
 
   case 54: /* fator: LITERAL_FLT  */
-#line 429 "bison.y"
+#line 429 "src/bison.y"
                     { (yyval.tipo) = TIPO_FLOAT; }
-#line 1664 "bison.tab.c"
+#line 1664 "build/bison.tab.c"
     break;
 
   case 55: /* fator: LITERAL_CHR  */
-#line 430 "bison.y"
+#line 430 "src/bison.y"
                     { (yyval.tipo) = TIPO_CHAR; }
-#line 1670 "bison.tab.c"
+#line 1670 "build/bison.tab.c"
     break;
 
   case 56: /* fator: LITERAL_STR  */
-#line 431 "bison.y"
+#line 431 "src/bison.y"
                     { (yyval.tipo) = TIPO_STRING; }
-#line 1676 "bison.tab.c"
+#line 1676 "build/bison.tab.c"
     break;
 
   case 57: /* fator: DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE  */
-#line 432 "bison.y"
+#line 432 "src/bison.y"
                                                    { (yyval.tipo) = (yyvsp[-1].tipo); }
-#line 1682 "bison.tab.c"
+#line 1682 "build/bison.tab.c"
     break;
 
   case 58: /* fator: IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE  */
-#line 434 "bison.y"
+#line 434 "src/bison.y"
         {
             SimboloEntrada* func = buscar_simbolo(analisador, (yyvsp[-3].id).nome);
             if (func == NULL || func->tipo != TIPO_FUNCAO) {
@@ -1696,11 +1696,11 @@ yyreduce:
                 (yyval.tipo) = func->info.funcao.tipo_retorno;
             }
         }
-#line 1700 "bison.tab.c"
+#line 1700 "build/bison.tab.c"
     break;
 
   case 59: /* chamada_funcao: IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE  */
-#line 451 "bison.y"
+#line 451 "src/bison.y"
         {
             mostrarAnaliseGramatical("Chamada Função → Identificador ( Argumentos )");
             SimboloEntrada* func = buscar_simbolo(analisador, (yyvsp[-3].id).nome);
@@ -1715,29 +1715,29 @@ yyreduce:
                 (yyval.tipo) = func->info.funcao.tipo_retorno;
             }
         }
-#line 1719 "bison.tab.c"
+#line 1719 "build/bison.tab.c"
     break;
 
   case 60: /* chamada_funcao: "print" DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE  */
-#line 466 "bison.y"
+#line 466 "src/bison.y"
         {
             mostrarAnaliseGramatical("Chamada Função → print ( Expressão )");
             (yyval.tipo) = TIPO_VOID;
         }
-#line 1728 "bison.tab.c"
+#line 1728 "build/bison.tab.c"
     break;
 
   case 61: /* chamada_funcao: "scan" DELIM_PAREN_OPEN acesso_variavel DELIM_PAREN_CLOSE  */
-#line 471 "bison.y"
+#line 471 "src/bison.y"
         {
             mostrarAnaliseGramatical("Chamada Função → scan ( Acesso Variável )");
             (yyval.tipo) = TIPO_VOID;
         }
-#line 1737 "bison.tab.c"
+#line 1737 "build/bison.tab.c"
     break;
 
   case 62: /* acesso_variavel: IDENTIFIER  */
-#line 479 "bison.y"
+#line 479 "src/bison.y"
         {
             mostrarAnaliseGramatical("Acesso Variável → Identificador");
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[0].id).nome);
@@ -1748,11 +1748,11 @@ yyreduce:
                 analisador->num_erros++;
             }
         }
-#line 1752 "bison.tab.c"
+#line 1752 "build/bison.tab.c"
     break;
 
   case 63: /* acesso_variavel: IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE  */
-#line 490 "bison.y"
+#line 490 "src/bison.y"
         {
             mostrarAnaliseGramatical("Acesso Variável → Identificador [ Expressão ]");
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-3].id).nome);
@@ -1768,46 +1768,46 @@ yyreduce:
                 analisador->num_erros++;
             }
         }
-#line 1772 "bison.tab.c"
+#line 1772 "build/bison.tab.c"
     break;
 
   case 64: /* argumentos: %empty  */
-#line 509 "bison.y"
+#line 509 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Argumentos → vazio");
             num_argumentos = 0;
         }
-#line 1781 "bison.tab.c"
+#line 1781 "build/bison.tab.c"
     break;
 
   case 65: /* argumentos: lista_argumentos  */
-#line 514 "bison.y"
+#line 514 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Argumentos → Lista Argumentos");
         }
-#line 1789 "bison.tab.c"
+#line 1789 "build/bison.tab.c"
     break;
 
   case 66: /* lista_argumentos: expressao  */
-#line 521 "bison.y"
+#line 521 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Lista Argumentos → Expressão");
             num_argumentos = 1;
         }
-#line 1798 "bison.tab.c"
+#line 1798 "build/bison.tab.c"
     break;
 
   case 67: /* lista_argumentos: lista_argumentos DELIM_SEPARATOR expressao  */
-#line 526 "bison.y"
+#line 526 "src/bison.y"
         { 
             mostrarAnaliseGramatical("Lista Argumentos → Lista Argumentos , Expressão");
             num_argumentos++;
         }
-#line 1807 "bison.tab.c"
+#line 1807 "build/bison.tab.c"
     break;
 
 
-#line 1811 "bison.tab.c"
+#line 1811 "build/bison.tab.c"
 
       default: break;
     }
@@ -2000,7 +2000,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 532 "bison.y"
+#line 532 "src/bison.y"
 
 
 // Implementação das funções

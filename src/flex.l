@@ -1,28 +1,52 @@
-/*******************************************************************************
- * Analisador Léxico - Compilador
- * 
- * Estrutura do Analisador:
- * 1. CATEGORIAS DE TOKENS:
- *    - Tipos (TYPE):           TYPE_INT, TYPE_FLT, TYPE_CHR, TYPE_STR
- *    - Controle (CTRL):        CTRL_IF, CTRL_ELSE, CTRL_WHILE, CTRL_RETURN, CTRL_VOID
- *    - Operadores (OP):        OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_ASSIGN, OP_EQ, OP_NE, OP_LT, OP_GT
- *    - Delimitadores (DELIM):  DELIM_PAREN_OPEN/CLOSE, DELIM_BRACKET_OPEN/CLOSE, 
- *                              DELIM_BLOCK_OPEN/CLOSE, DELIM_END_STATEMENT, DELIM_SEPARATOR
- *    - Identificadores/Literais: IDENTIFIER, LITERAL_INT, LITERAL_FLT, LITERAL_CHR, LITERAL_STR
+/*
+ * Trabalho Prático – Parte 1
+ * Disciplina: Compiladores
+ * Aluno: Andrei Costa, Kananda Caroline, Leonardo Ribeiro Goulart
  *
- * 2. PADRÕES REGEX:
- *    DIGITO:  [0-9]
- *    LETRA:   [a-zA-Z]
- *    ID:      {LETRA}({LETRA}|{DIGITO}|"_")*
- *    INTEIRO: {DIGITO}+
- *    FLOAT:   {DIGITO}+"."{DIGITO}+
- *    CHAR:    '.'
- *    STRING:  "[^"]*"
+ * Especificação: Implementação da análise léxica para um compilador de uma
+ * linguagem personalizada. Esta etapa reconhece os seguintes elementos:
  *
- * 3. FORMATO DOS TOKENS:
- *    CATEGORIA_SUBTIPO
- *    Exemplo: TYPE_INT, CTRL_IF, OP_ADD, DELIM_PAREN_OPEN, LITERAL_INT
- ******************************************************************************/
+ * 1. **Tipos de Variáveis**:
+ *    - Implementado: Reconhece os tipos "int", "float", "char" e "string" como palavras reservadas.
+ *      Tokens: TYPE_INT, TYPE_FLT, TYPE_CHR, TYPE_STR.
+ *    - Implementado: Reconhece literais associados a esses tipos:
+ *      - Literais inteiros (e.g., "123") com o token LITERAL_INT.
+ *      - Literais float (e.g., "123.45") com o token LITERAL_FLT.
+ *      - Literais char (e.g., "'a'") com o token LITERAL_CHR.
+ *      - Literais string (e.g., "\"Hello\"") com o token LITERAL_STR.
+ *
+ * 2. **Vetores**:
+ *    - Implementado: Reconhece e manipula vetores utilizando o token "array".
+ *      Token: DECL_ARRAY.
+ *
+ * 3. **Estruturas de Decisão**:
+ *    - Implementado: Reconhece estruturas de decisão básicas com os tokens:
+ *      - CTRL_CHECK ("check") para a condição.
+ *      - CTRL_THEN ("then") para o bloco de execução.
+ *
+ * 4. **Estruturas de Repetição**:
+ *    - Implementado: Reconhece estruturas de repetição com os tokens:
+ *      - CTRL_REPEAT ("repeat") para laços do tipo "repita".
+ *      - CTRL_WHILE ("while") para laços condicionais.
+ *
+ * 5. **Palavras e Funções Reservadas**:
+ *    - Implementado: Reconhece palavras reservadas associadas à declaração e manipulação de variáveis e funções:
+ *      - DECL_CREATE ("create"), DECL_AS ("as"), DECL_FUNCTION ("function").
+ *    - Implementado: Reconhece funções nativas como:
+ *      - BUILT_IN_PRINT ("print") e BUILT_IN_SCAN ("scan").
+ *    - Implementado: Reconhece operadores, delimitadores e outras palavras reservadas para construção do programa:
+ *      - Operadores: OP_ADD ("plus"), OP_SUB ("minus"), OP_MUL ("times"), OP_DIV ("divided_by"), OP_ASSIGN ("="), etc.
+ *      - Delimitadores: DELIM_PAREN_OPEN ("("), DELIM_PAREN_CLOSE (")"), DELIM_BLOCK_OPEN ("{"), DELIM_BLOCK_CLOSE ("}"), etc.
+ *
+ * 6. **Chamadas de Sub-rotinas**:
+ *    - Implementado: Reconhece funções definidas pelo usuário com o token DECL_FUNCTION.
+ *      Exemplo: "function" seguido por um identificador.
+ *
+ * Observação:
+ * Este arquivo implementa apenas a análise léxica. As próximas etapas do compilador (análise sintática e semântica) 
+ * deverão expandir esta base para maior funcionalidade.
+ */
+
 
 %{
 #include <stdio.h>

@@ -1,0 +1,98 @@
+// Programa de exemplo: Sistema de Notas
+// Demonstração de todas as funcionalidades sem erros semânticos
+
+// Declarações globais simples primeiro
+create int max_alunos as 3;
+create float nota_aprovacao as 7.0;
+create string cabecalho as "=== Sistema de Notas ===";
+create char status_aprovado as 'A';
+create char status_reprovado as 'R';
+
+// Vetores globais
+create float notas1[3] as array;
+create float notas2[3] as array;
+create string nomes[3] as array;
+create char status[3] as array;
+
+// Depois as funções
+function float calcular_media(float nota1, float nota2) {
+    create float media as (nota1 plus nota2) divided_by 2.0;
+    give back media;
+}
+
+// Função para determinar status
+function char obter_status(float media) {
+    check (media is_greater_than nota_aprovacao) then {
+        give back status_aprovado;
+    } otherwise {
+        give back status_reprovado;
+    }
+}
+
+// Função para imprimir resultado
+function void imprimir_resultado(string nome, float media, char status) {
+    print(nome);
+    print(" - Media: ");
+    print(media);
+    print(" - Status: ");
+    print(status);
+}
+
+// Programa principal
+print(cabecalho);
+
+// Inicialização do contador
+create int i as 0;
+
+// Entrada de dados
+repeat while (i is_less_than max_alunos) {
+    print("Digite o nome do aluno: ");
+    scan(nomes[i]);
+    
+    print("Digite a primeira nota: ");
+    scan(notas1[i]);
+    
+    print("Digite a segunda nota: ");
+    scan(notas2[i]);
+    
+    // Cálculo da média e status
+    create float media_aluno as calcular_media(notas1[i], notas2[i]);
+    status[i] = obter_status(media_aluno);
+    
+    // Impressão do resultado individual
+    imprimir_resultado(nomes[i], media_aluno, status[i]);
+    
+    // Incremento do contador
+    i = i plus 1;
+}
+
+// Estatísticas finais
+create int aprovados as 0;
+create int reprovados as 0;
+
+i = 0;  // Reinicialização do contador
+
+// Contagem de aprovações/reprovações
+repeat while (i is_less_than max_alunos) {
+    check (status[i] equals status_aprovado) then {
+        aprovados = aprovados plus 1;
+    } otherwise {
+        reprovados = reprovados plus 1;
+    }
+    i = i plus 1;
+}
+
+// Impressão das estatísticas
+print("=== Estatisticas ===");
+print("Total de alunos: ");
+print(max_alunos);
+print("Aprovados: ");
+print(aprovados);
+print("Reprovados: ");
+print(reprovados);
+
+// Cálculo e impressão da taxa de aprovação
+create float taxa_aprovacao as (aprovados times 100.0) divided_by max_alunos;
+print("Taxa de aprovacao: ");
+print(taxa_aprovacao);
+print("%");
