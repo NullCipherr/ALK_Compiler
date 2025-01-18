@@ -1,62 +1,15 @@
-/*******************************************************************************
- * Analisador Sintático - Compilador
- * 
- * Este arquivo implementa a análise sintática de uma linguagem de programação
- * simples usando Bison. A gramática suporta as seguintes estruturas:
- *
- * 1. ESTRUTURAS PRINCIPAIS:
- *    - Declarações de funções
- *    - Declarações de variáveis
- *    - Estruturas de controle (if, while)
- *    - Expressões aritméticas
- *    - Chamadas de função
- *    - Comandos de atribuição
- *
- * 2. REGRAS GRAMATICAIS PRINCIPAIS:
- *    programa        → declaracoes
- *    declaracoes     → declaracao | declaracoes declaracao
- *    declaracao      → declaracao_funcao | declaracao_variavel
- *    bloco           → { comandos }
- *    comando         → declaracao_variavel | atribuicao | comando_if | 
- *                      comando_while | comando_return | chamada_funcao
- *    expressao       → termo | expressao + termo | expressao - termo
- *
- * 3. TIPOS SUPORTADOS:
- *    - int:    números inteiros
- *    - float:  números de ponto flutuante
- *    - char:   caracteres
- *    - string: cadeias de caracteres
- *    - void:   tipo vazio (apenas para funções)
- *
- * 4. OPERADORES:
- *    Aritméticos: +, -, *, /
- *    Relacionais: ==, !=, <, >
- *    Atribuição:  =
- *
- * 5. EXEMPLO DE PROGRAMA VÁLIDO:
- *    int soma(int a, int b) {
- *        return a + b;
- *    }
- *
- *    void main() {
- *        int x = 10;
- *        int y = 20;
- *        int resultado;
- *        resultado = soma(x, y);
- *    }
- *
- * 6. INTEGRAÇÃO:
- *    Este analisador sintático trabalha em conjunto com o analisador léxico
- *    implementado em Flex (flex.l), recebendo os tokens gerados por ele.
- ******************************************************************************/
-
 %{
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "types.h"
 
-
+// Definição da estrutura para representar a árvore
+typedef struct Nodo {
+    char* nome;              // Nome do nó (regra sintática)
+    struct Nodo** filhos;    // Array de filhos (subárvores)
+    int num_filhos;          // Número de filhos
+} Nodo;
 
 // Protótipos de funções
 const char* tipoParaString(TipoVariavel tipo);
@@ -71,17 +24,40 @@ extern char* yytext;
 void yyerror(const char *s);
 int yylex(void);
 
+// Função para criar um novo nodo
+Nodo* criarNodo(char* nome, int num_filhos) {
+    Nodo* nodo = (Nodo*)malloc(sizeof(Nodo));
+    nodo->nome = nome;
+    nodo->num_filhos = num_filhos;
+    nodo->filhos = (Nodo**)malloc(num_filhos * sizeof(Nodo*));  // Alocação para os filhos
+    return nodo;
+}
+
+// Função para exibir a árvore sintática
+void exibirArvore(Nodo* nodo, int nivel) {
+    if (nodo == NULL) return;
+    
+    // Exibe o nome do nodo com indentação
+    for (int i = 0; i < nivel; i++) {
+        printf("  ");  // Indenta
+    }
+    printf("%s\n", nodo->nome);
+    
+    // Recursivamente exibe os filhos do nodo
+    for (int i = 0; i < nodo->num_filhos; i++) {
+        exibirArvore(nodo->filhos[i], nivel + 1);
+    }
+}
+
 %}
 
 %union {
-    struct {
-        char* nome;
-        TipoVariavel tipo;
-    } id;
-    TipoVariavel tipo;
+    struct Nodo* nodo;
+    char* texto;  // Para tipos de texto como identificadores
+    TipoVariavel tipo;  // Para tipos de variáveis
 }
 
-%token <id> IDENTIFIER
+%token <texto> IDENTIFIER
 %token <tipo> TYPE_INT TYPE_FLT TYPE_CHR TYPE_STR TYPE_VOID
 %token DECL_CREATE DECL_AS DECL_ARRAY DECL_FUNCTION
 %token CTRL_CHECK CTRL_THEN CTRL_OTHERWISE CTRL_REPEAT CTRL_WHILE
@@ -100,147 +76,254 @@ int yylex(void);
 %%
 
 programa
-    : declaracoes    { mostrarAnaliseGramatical("Programa → Declarações"); }
+    : declaracoes {
+        Nodo* nodo = criarNodo("Programa", 1);
+        nodo->filhos[0] = $1;  // Declarações
+        exibirArvore(nodo, 0);
+        liberarArvore(nodo);
+    }
     ;
 
 declaracoes
-    : declaracao     { mostrarAnaliseGramatical("Declarações → Declaração"); }
-    | declaracoes declaracao { mostrarAnaliseGramatical("Declarações → Declarações Declaração"); }
+    : declaracao {
+        Nodo* nodo = criarNodo("Declaração", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
+    | declaracoes declaracao {
+        Nodo* nodo = criarNodo("Declarações", 2);
+        nodo->filhos[0] = $1;
+        nodo->filhos[1] = $2;
+        $$ = nodo;
+    }
     ;
 
 declaracao
-    : declaracao_variavel { mostrarAnaliseGramatical("Declaração → Declaração Variável"); }
-    | declaracao_funcao   { mostrarAnaliseGramatical("Declaração → Declaração Função"); }
-    | comando            { mostrarAnaliseGramatical("Declaração → Comando"); }
+    : declaracao_variavel {
+        Nodo* nodo = criarNodo("Declaração Variável", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
+    | declaracao_funcao {
+        Nodo* nodo = criarNodo("Declaração Função", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
+    | comando {
+        Nodo* nodo = criarNodo("Comando", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
     ;
 
 declaracao_variavel
-    : DECL_CREATE tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT
-        {
-            mostrarAnaliseGramatical("Declaração → create tipo id as expressão");
-            printf("\n╔═════════════════ VERIFICAÇÃO DE TIPOS ═════════════════╗\n");
-            printf("║ Variável: %-10s  Tipo Declarado: %-15s ║\n", 
-                   $3.nome, 
-                   tipoParaString($2));
-            printf("║ Expressão retorna: %-35s ║\n", 
-                   tipoParaString($5));
-            if ($2 != $5) {
-                printf("║ AVISO: Possível perda de precisão na atribuição      ║\n");
-            }
-            printf("╚═══════════════════════════════════════════════════════════╝\n");
-        }
-    | DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT
-        { mostrarAnaliseGramatical("Declaração Array → create tipo id[tamanho] as array;"); }
+    : DECL_CREATE tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT {
+        Nodo* nodo = criarNodo("Declaração Variável", 3);
+        nodo->filhos[0] = $2;  // Tipo
+        nodo->filhos[1] = $3;  // Identificador
+        nodo->filhos[2] = $5;  // Expressão
+        $$ = nodo;
+    }
+    | DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE DECL_AS DECL_ARRAY DELIM_END_STATEMENT {
+        Nodo* nodo = criarNodo("Declaração Array", 4);
+        nodo->filhos[0] = $2;  // Tipo
+        nodo->filhos[1] = $3;  // Identificador
+        nodo->filhos[2] = $5;  // Tamanho do array
+        $$ = nodo;
+    }
     ;
 
 declaracao_funcao
-    : DECL_FUNCTION tipo IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco
-        { mostrarAnaliseGramatical("Declaração Função → function tipo id(parâmetros) bloco"); }
-    | DECL_FUNCTION TYPE_VOID IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco
-        { mostrarAnaliseGramatical("Declaração Função → function void id(parâmetros) bloco"); }
+    : DECL_FUNCTION tipo IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco {
+        Nodo* nodo = criarNodo("Declaração Função", 4);
+        nodo->filhos[0] = $2;  // Tipo
+        nodo->filhos[1] = $3;  // Identificador
+        nodo->filhos[2] = $4;  // Parâmetros
+        nodo->filhos[3] = $6;  // Bloco
+        $$ = nodo;
+    }
+    | DECL_FUNCTION TYPE_VOID IDENTIFIER DELIM_PAREN_OPEN parametros DELIM_PAREN_CLOSE bloco {
+        Nodo* nodo = criarNodo("Declaração Função", 4);
+        nodo->filhos[0] = $2;  // Tipo
+        nodo->filhos[1] = $3;  // Identificador
+        nodo->filhos[2] = $4;  // Parâmetros
+        nodo->filhos[3] = $6;  // Bloco
+        $$ = nodo;
+    }
     ;
 
 parametros
-    : /* vazio */   { mostrarAnaliseGramatical("Parâmetros → vazio"); }
-    | lista_parametros { mostrarAnaliseGramatical("Parâmetros → Lista de Parâmetros"); }
+    : /* vazio */ {
+        Nodo* nodo = criarNodo("Parâmetros", 0);
+        $$ = nodo;
+    }
+    | lista_parametros {
+        Nodo* nodo = criarNodo("Lista de Parâmetros", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
     ;
 
 lista_parametros
-    : parametro     { mostrarAnaliseGramatical("Lista Parâmetros → Parâmetro"); }
-    | lista_parametros DELIM_SEPARATOR parametro
-        { mostrarAnaliseGramatical("Lista Parâmetros → Lista Parâmetros, Parâmetro"); }
+    : parametro {
+        Nodo* nodo = criarNodo("Parâmetro", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
+    | lista_parametros DELIM_SEPARATOR parametro {
+        Nodo* nodo = criarNodo("Lista de Parâmetros", 2);
+        nodo->filhos[0] = $1;
+        nodo->filhos[1] = $3;
+        $$ = nodo;
+    }
     ;
 
 parametro
-    : tipo IDENTIFIER { mostrarAnaliseGramatical("Parâmetro → Tipo Identificador"); }
+    : tipo IDENTIFIER {
+        Nodo* nodo = criarNodo("Parâmetro", 2);
+        nodo->filhos[0] = $1;  // Tipo
+        nodo->filhos[1] = $2;  // Identificador
+        $$ = nodo;
+    }
     ;
 
 tipo
-    : TYPE_INT   { $$ = TIPO_INT; }
-    | TYPE_FLT   { $$ = TIPO_FLOAT; }
-    | TYPE_CHR   { $$ = TIPO_CHAR; }
-    | TYPE_STR   { $$ = TIPO_STRING; }
+    : TYPE_INT {
+        Nodo* nodo = criarNodo("Tipo", 0);
+        $$ = nodo;
+    }
+    | TYPE_FLT {
+        Nodo* nodo = criarNodo("Tipo", 0);
+        $$ = nodo;
+    }
+    | TYPE_CHR {
+        Nodo* nodo = criarNodo("Tipo", 0);
+        $$ = nodo;
+    }
+    | TYPE_STR {
+        Nodo* nodo = criarNodo("Tipo", 0);
+        $$ = nodo;
+    }
     ;
 
 comando
-    : comando_check   { mostrarAnaliseGramatical("Comando → Check"); }
-    | comando_repeat  { mostrarAnaliseGramatical("Comando → Repeat"); }
-    | atribuicao     { mostrarAnaliseGramatical("Comando → Atribuição"); }
-    | comando_give   { mostrarAnaliseGramatical("Comando → Give"); }
-    | chamada_funcao DELIM_END_STATEMENT { mostrarAnaliseGramatical("Comando → Chamada Função;"); }
+    : comando_check {
+        Nodo* nodo = criarNodo("Comando Check", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
+    | comando_repeat {
+        Nodo* nodo = criarNodo("Comando Repeat", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
+    | atribuicao {
+        Nodo* nodo = criarNodo("Comando Atribuição", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
+    | comando_give {
+        Nodo* nodo = criarNodo("Comando Give", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
+    | chamada_funcao DELIM_END_STATEMENT {
+        Nodo* nodo = criarNodo("Chamada Função", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
     ;
 
 comando_check
-    : CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco
-        { mostrarAnaliseGramatical("Check → check (expressão) then bloco"); }
-    | CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco
-        { mostrarAnaliseGramatical("Check → check (expressão) then bloco otherwise bloco"); }
+    : CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco {
+        Nodo* nodo = criarNodo("Check", 3);
+        nodo->filhos[0] = $3;  // Expressão
+        nodo->filhos[1] = $5;  // Bloco
+        $$ = nodo;
+    }
+    | CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco {
+        Nodo* nodo = criarNodo("Check com Else", 4);
+        nodo->filhos[0] = $3;  // Expressão
+        nodo->filhos[1] = $5;  // Bloco Then
+        nodo->filhos[2] = $7;  // Bloco Otherwise
+        $$ = nodo;
+    }
     ;
 
 comando_repeat
-    : CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco
-        { mostrarAnaliseGramatical("Repeat → repeat while (expressão) bloco"); }
+    : CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco {
+        Nodo* nodo = criarNodo("Repeat While", 3);
+        nodo->filhos[0] = $3;  // Expressão
+        nodo->filhos[1] = $5;  // Bloco
+        $$ = nodo;
+    }
     ;
 
 comando_give
-    : CTRL_GIVE CTRL_BACK expressao DELIM_END_STATEMENT
-        { mostrarAnaliseGramatical("Give → give back expressão;"); }
-    | CTRL_GIVE CTRL_BACK DELIM_END_STATEMENT
-        { mostrarAnaliseGramatical("Give → give back;"); }
+    : CTRL_GIVE CTRL_BACK expressao DELIM_END_STATEMENT {
+        Nodo* nodo = criarNodo("Give Back", 1);
+        nodo->filhos[0] = $3;  // Expressão
+        $$ = nodo;
+    }
+    | CTRL_GIVE CTRL_BACK DELIM_END_STATEMENT {
+        Nodo* nodo = criarNodo("Give Back (sem expressão)", 0);
+        $$ = nodo;
+    }
     ;
 
 bloco
-    : DELIM_BLOCK_OPEN comandos DELIM_BLOCK_CLOSE
-        { mostrarAnaliseGramatical("Bloco → { comandos }"); }
+    : DELIM_BLOCK_OPEN comandos DELIM_BLOCK_CLOSE {
+        Nodo* nodo = criarNodo("Bloco", 1);
+        nodo->filhos[0] = $2;  // Comandos dentro do bloco
+        $$ = nodo;
+    }
     ;
 
 comandos
-    : /* vazio */    { mostrarAnaliseGramatical("Comandos → vazio"); }
-    | comandos comando { mostrarAnaliseGramatical("Comandos → Comandos Comando"); }
+    : comando {
+        Nodo* nodo = criarNodo("Comando", 1);
+        nodo->filhos[0] = $1;
+        $$ = nodo;
+    }
+    | comandos comando {
+        Nodo* nodo = criarNodo("Comandos", 2);
+        nodo->filhos[0] = $1;
+        nodo->filhos[1] = $2;
+        $$ = nodo;
+    }
     ;
 
 atribuicao
-    : IDENTIFIER OP_ASSIGN expressao DELIM_END_STATEMENT
-        { mostrarAnaliseGramatical("Atribuição → id = expressão;"); }
-    | IDENTIFIER OP_ADD_ASSIGN expressao DELIM_END_STATEMENT
-        { mostrarAnaliseGramatical("Atribuição → id += expressão;"); }
+    : IDENTIFIER OP_ASSIGN expressao DELIM_END_STATEMENT {
+        Nodo* nodo = criarNodo("Atribuição", 2);
+        nodo->filhos[0] = $1;  // Identificador
+        nodo->filhos[1] = $3;  // Expressão
+        $$ = nodo;
+    }
     ;
 
 expressao
-    : termo
-        { 
-            mostrarAnaliseGramatical("Expressão → Termo");
-            $$ = $1;
-        }
-    | expressao OP_ADD termo
-        { 
-            mostrarAnaliseGramatical("Expressão → Expressão plus Termo");
-            $$ = verificarTipos($1, "plus", $3);
-        }
-    | expressao OP_SUB termo
-        { 
-            mostrarAnaliseGramatical("Expressão → Expressão minus Termo");
-            $$ = verificarTipos($1, "minus", $3);
-        }
-    | expressao OP_EQ termo  { mostrarAnaliseGramatical("Expressão → Expressão equals Termo"); }
-    | expressao OP_NE termo  { mostrarAnaliseGramatical("Expressão → Expressão not_equals Termo"); }
-    | expressao OP_LT termo  { mostrarAnaliseGramatical("Expressão → Expressão is_less_than Termo"); }
-    | expressao OP_GT termo  { mostrarAnaliseGramatical("Expressão → Expressão is_greater_than Termo"); }
+    : termo {
+        $$ = $1;
+    }
+    | expressao OP_ADD termo {
+        $$ = $1;  // Expressão somada ao termo
+    }
+    | expressao OP_SUB termo {
+        $$ = $1;  // Expressão subtraída pelo termo
+    }
     ;
 
 termo
-    : fator
-        { 
-            $$ = $1;
-        }
-    | termo OP_MUL fator
-        { 
-            $$ = verificarTipos($1, "times", $3);
-        }
-    | termo OP_DIV fator
-        { 
-            $$ = verificarTipos($1, "divided_by", $3);
-        }
+    : fator {
+        $$ = $1;
+    }
+    | termo OP_MUL fator {
+        $$ = $1;  // Termo multiplicado pelo fator
+    }
+    | termo OP_DIV fator {
+        $$ = $1;  // Termo dividido pelo fator
+    }
     ;
 
 fator
@@ -268,97 +351,115 @@ fator
         { mostrarAnaliseGramatical("Fator → (Expressão)"); }
     | chamada_funcao { mostrarAnaliseGramatical("Fator → Chamada Função"); }
     ;
-
+    
 chamada_funcao
     : IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE
         { mostrarAnaliseGramatical("Chamada Função → id(Argumentos)"); }
     ;
-
 argumentos
     : /* vazio */   { mostrarAnaliseGramatical("Argumentos → vazio"); }
     | lista_argumentos { mostrarAnaliseGramatical("Argumentos → Lista de Argumentos"); }
     ;
-
+chamada_funcao
+    : IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE
+        { mostrarAnaliseGramatical("Chamada Função → id(Argumentos)"); }
+    ;
 lista_argumentos
     : expressao     { mostrarAnaliseGramatical("Lista Argumentos → Expressão"); }
     | lista_argumentos DELIM_SEPARATOR expressao
         { mostrarAnaliseGramatical("Lista Argumentos → Lista Argumentos, Expressão"); }
     ;
-
 %%
 
-// Implementação das funções
-const char* tipoParaString(TipoVariavel tipo) {
-    switch(tipo) {
-        case TIPO_INT: return "int";
-        case TIPO_FLOAT: return "float";
-        case TIPO_CHAR: return "char";
-        case TIPO_STRING: return "string";
-        case TIPO_VOID: return "void";
-        default: return "erro";
-    }
-}
-
-void mostrarAnaliseTipos(const char* operacao, TipoVariavel tipo1, TipoVariavel tipo2, TipoVariavel resultado) {
-    printf("║ Análise de Tipos: %-15s %-6s %s %-6s = %-6s ║\n",
-           operacao,
-           tipoParaString(tipo1),
-           operacao,
-           tipoParaString(tipo2),
-           tipoParaString(resultado));
-}
-
-TipoVariavel verificarTipos(TipoVariavel tipo1, const char* operador, TipoVariavel tipo2) {
-    printf("\n╔════════════════════ ANÁLISE DE TIPOS ════════════════════╗\n");
-    
-    if (tipo1 == TIPO_INT && tipo2 == TIPO_INT) {
-        if (strcmp(operador, "plus") == 0) {
-            mostrarAnaliseTipos("Adição", tipo1, tipo2, TIPO_INT);
-            return TIPO_INT;
-        }
-    }
-    else if (tipo1 == TIPO_FLOAT || tipo2 == TIPO_FLOAT) {
-        if (strcmp(operador, "plus") == 0) {
-            mostrarAnaliseTipos("Adição", tipo1, tipo2, TIPO_FLOAT);
-            return TIPO_FLOAT;
-        }
-    }
-    
-    printf("║ ERRO: Tipos incompatíveis para operação %-20s ║\n", operador);
-    printf("╚═══════════════════════════════════════════════════════════╝\n");
-    return TIPO_ERRO;
-}
-
-void mostrarAnaliseGramatical(const char* regra) {
-    printf("║ Regra: %-53s ║\n", regra);
-}
-
+// Implementação das funções auxiliares
 void yyerror(const char *s) {
-    printf("\n╔══════════════════════ ERRO SINTÁTICO ══════════════════════╗\n");
-    printf("║ Linha: %-52d ║\n", linha);
-    printf("║ Erro:  %-52s ║\n", s);
-    printf("║ Nao se esperava:  %-52s ║\n", yytext);
-    printf("║                                                             ║\n");
-    printf("║ Contexto do Erro:                                          ║\n");
-    printf("║ - Verificar tipos dos operandos                           ║\n");
-    printf("║ - Verificar sintaxe da expressão                          ║\n");
-    printf("║ - Verificar declaração de variáveis                       ║\n");
-    printf("╚═══════════════════════════════════════════════════════════════╝\n");
+    fprintf(stderr, "Erro: %s\n", s);
 }
 
-int main(void) {
-    printf("\n╔════════════════════ COMPILADOR C-2024 ════════════════════╗\n");
-    printf("║                                                           ║\n");
-    if (getenv("ANALISE_LEXICA")) {
-        printf("║              Iniciando Análise Léxica                   ║\n");
-        printf("║                                                           ║\n");
-        printf("╚═══════════════════════════════════════════════════════════╝\n\n");
-        analise_lexica();
-        return 0;
-    } else {
-        printf("║              Iniciando Análise Sintática                 ║\n");
-        printf("║                                                           ║\n");
-        printf("╚═══════════════════════════════════════════════════════════╝\n\n");
-        return yyparse();
+int yylex(void) {
+    return 0;
+}
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "types.h"
+
+// Função para liberar memória de uma árvore
+void liberarArvore(Nodo* nodo) {
+    if (nodo == NULL) return;
+    for (int i = 0; i < nodo->num_filhos; i++) {
+        liberarArvore(nodo->filhos[i]);
     }
+    free(nodo->filhos);
+    free(nodo);
+}
+
+// Função para exibir a análise gramatical
+void mostrarAnaliseGramatical(const char* regra) {
+    printf("Analisando a regra: %s\n", regra);
+}
+
+// Função para exibir a análise de tipos
+void mostrarAnaliseTipos(const char* operacao, TipoVariavel tipo1, TipoVariavel tipo2, TipoVariavel resultado) {
+    printf("Operação: %s\n", operacao);
+    printf("Tipo 1: %s\n", tipoParaString(tipo1));
+    printf("Tipo 2: %s\n", tipoParaString(tipo2));
+    printf("Resultado: %s\n", tipoParaString(resultado));
+}
+
+// Função para converter tipo para string
+const char* tipoParaString(TipoVariavel tipo) {
+    switch (tipo) {
+        case TIPO_INT: return "Inteiro";
+        case TIPO_FLT: return "Flutuante";
+        case TIPO_CHR: return "Caractere";
+        case TIPO_STR: return "String";
+        case TIPO_VOID: return "Vazio";
+        default: return "Desconhecido";
+    }
+}
+
+// Função para verificar se os tipos são compatíveis
+TipoVariavel verificarTipos(TipoVariavel tipo1, const char* operador, TipoVariavel tipo2) {
+    // Simples exemplo de verificação para operações aritméticas
+    if (operador == NULL) return tipo1;  // Se não há operador, retornamos o tipo 1 (atribuição)
+    
+    if (strcmp(operador, "+") == 0 || strcmp(operador, "-") == 0 || strcmp(operador, "*") == 0 || strcmp(operador, "/") == 0) {
+        // Operações aritméticas: só permitem tipos numéricos
+        if (tipo1 == TIPO_INT || tipo1 == TIPO_FLT) {
+            if (tipo2 == TIPO_INT || tipo2 == TIPO_FLT) {
+                // Se ambos os tipos são válidos, podemos realizar a operação
+                return (tipo1 == TIPO_FLT || tipo2 == TIPO_FLT) ? TIPO_FLT : TIPO_INT;
+            }
+        }
+    } else if (strcmp(operador, "=") == 0) {
+        // Operação de atribuição
+        if (tipo1 == tipo2) {
+            return tipo1;  // Tipos devem ser compatíveis
+        }
+    }
+    
+    // Se nenhum caso for atendido, retorno um tipo desconhecido
+    return TIPO_VOID;
+}
+
+// Função de erro lexicamente
+void yyerror(const char* s) {
+    fprintf(stderr, "Erro: %s\n", s);
+}
+
+int yylex(void) {
+    // Esta função é gerada automaticamente pelo flex.
+    return 0;  // Placeholder, já que a análise lexical é feita pelo flex
+}
+
+int main() {
+    // Exemplo de código que invoca o parser gerado pelo Bison
+    printf("Iniciando análise...\n");
+    
+    yyparse();  // Função gerada pelo Bison para análise sintática
+
+    printf("Análise concluída!\n");
+    return 0;
 }
