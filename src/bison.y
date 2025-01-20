@@ -1,18 +1,18 @@
-/*******************************************************************************
- * Analisador Sintático - Compilador
- * 
- * Este arquivo implementa a análise sintática de uma linguagem de programação
- * simples usando Bison. A gramática suporta as seguintes estruturas:
+/*
+ * Trabalho Prático – Parte 2
+ * Disciplina: Compiladores
+ * Aluno: Andrei Costa, Kananda Caroline, Leonardo Ribeiro Goulart
  *
- * 1. ESTRUTURAS PRINCIPAIS:
- *    - Declarações de funções
- *    - Declarações de variáveis
- *    - Estruturas de controle (if, while)
- *    - Expressões aritméticas
- *    - Chamadas de função
- *    - Comandos de atribuição
+ * Especificação: Implementação da análise sintática para um compilador de uma
+ * linguagem personalizada. Esta etapa realiza:
  *
- * 2. REGRAS GRAMATICAIS PRINCIPAIS:
+ * 1. **Análise Sintática Ascendente**:
+ *    - Implementado: Recebe os tokens gerados pela análise léxica (flex.l)
+ *    - Implementado: Utiliza gramática livre de contexto para reconhecer a estrutura do programa
+ *    - Implementado: Gera árvore sintática durante a análise
+ *    - Implementado: Apresenta a árvore sintática em arquivo de saída (arvore_sintatica.txt)
+ *
+ * 2. **Regras Gramaticais Principais**:
  *    programa        → declaracoes
  *    declaracoes     → declaracao | declaracoes declaracao
  *    declaracao      → declaracao_funcao | declaracao_variavel
@@ -21,34 +21,32 @@
  *                      comando_while | comando_return | chamada_funcao
  *    expressao       → termo | expressao + termo | expressao - termo
  *
- * 3. TIPOS SUPORTADOS:
- *    - int:    números inteiros
- *    - float:  números de ponto flutuante
- *    - char:   caracteres
- *    - string: cadeias de caracteres
- *    - void:   tipo vazio (apenas para funções)
+ * 3. **Estruturas Reconhecidas**:
+ *    - Implementado: Declarações de variáveis e funções
+ *      Exemplo: "create int x as 10;"
+ *              "function int soma(int a, int b) { ... }"
+ *    
+ *    - Implementado: Estruturas de controle
+ *      Exemplo: "check (x equals 10) then { ... }"
+ *              "repeat while (x is_less_than 10) { ... }"
+ *    
+ *    - Implementado: Expressões e operações
+ *      Exemplo: "x = a plus b times c"
+ *              "y = (a minus b) divided_by 2"
  *
- * 4. OPERADORES:
- *    Aritméticos: +, -, *, /
- *    Relacionais: ==, !=, <, >
- *    Atribuição:  =
+ * 4. **Integração com Análise Léxica**:
+ *    - Implementado: Recebe e processa todos os tokens definidos em flex.l
+ *    - Implementado: Mantém consistência com tipos, operadores e estruturas da etapa léxica
  *
- * 5. EXEMPLO DE PROGRAMA VÁLIDO:
- *    int soma(int a, int b) {
- *        return a + b;
- *    }
+ * 5. **Saída e Depuração**:
+ *    - Implementado: Gera árvore sintática em formato visual
+ *    - Implementado: Apresenta mensagens de erro sintático detalhadas
+ *    - Implementado: Mantém rastreamento de linha/coluna para erros
  *
- *    void main() {
- *        int x = 10;
- *        int y = 20;
- *        int resultado;
- *        resultado = soma(x, y);
- *    }
- *
- * 6. INTEGRAÇÃO:
- *    Este analisador sintático trabalha em conjunto com o analisador léxico
- *    implementado em Flex (flex.l), recebendo os tokens gerados por ele.
- ******************************************************************************/
+ * Observação:
+ * Este arquivo implementa a análise sintática ascendente usando Bison, gerando
+ * uma árvore sintática que será utilizada nas próximas etapas do compilador.
+ */
 
 %{
 #include <stdio.h>
@@ -56,11 +54,9 @@
 #include <string.h>
 #include "types.h"
 #include "semantic.h"
+#include "ast.h"
 
 // Protótipos de funções
-const char* tipoParaString(TipoVariavel tipo);
-const char* nomeVariavel(const char* nome);
-TipoVariavel verificarTipos(TipoVariavel tipo1, const char* operador, TipoVariavel tipo2);
 void mostrarAnaliseGramatical(const char* regra);
 void mostrarAnaliseTipos(const char* operacao, TipoVariavel tipo1, TipoVariavel tipo2, TipoVariavel resultado);
 extern void analise_lexica(void);  
@@ -77,6 +73,8 @@ AnalisadorSemantico* analisador;
 
 int num_argumentos = 0;
 int num_parametros = 0;
+
+NoArvore* raiz_ast = NULL;  // Raiz da árvore sintática
 
 void iniciar_arquivo_arvore() {
     arvore_arquivo = fopen("arvore_sintatica.txt", "w");
@@ -114,6 +112,7 @@ void mostrarAnaliseGramatical(const char* regra) {
         char* valor;
         int num;
     } literal;
+    struct NoArvore* no;  // Novo campo para nós da árvore
 }
 
 %token <id> IDENTIFIER
@@ -132,9 +131,29 @@ void mostrarAnaliseGramatical(const char* regra) {
 %token BUILT_IN_PRINT "print"
 %token BUILT_IN_SCAN "scan"
 
-%type <tipo> expressao termo fator tipo
+%type <no> programa
+%type <no> lista_declaracoes
+%type <no> lista_comandos
+%type <no> declaracao
+%type <no> declaracao_variavel
+%type <no> declaracao_funcao
+%type <no> comando
+%type <no> comando_check
+%type <no> comando_repeat
+%type <no> comando_give
+%type <no> atribuicao
+%type <no> bloco
+%type <no> expressao
+%type <no> termo
+%type <no> fator
+%type <no> argumentos
+%type <no> lista_argumentos
+%type <no> parametros
+%type <no> lista_parametros
+%type <no> parametro
+%type <tipo> tipo
+%type <no> chamada_funcao
 %type <id> acesso_variavel
-%type <tipo> chamada_funcao
 
 %%
 
@@ -145,21 +164,66 @@ programa
       }
       lista_declaracoes
       lista_comandos
+      {
+          // Combina declarações e comandos em uma única lista
+          NoArvore* lista_completa = $2;
+          if (lista_completa != NULL) {
+              NoArvore* ultimo = lista_completa;
+              while (ultimo->proximo != NULL) {
+                  ultimo = ultimo->proximo;
+              }
+              ultimo->proximo = $3;
+          } else {
+              lista_completa = $3;
+          }
+          raiz_ast = criar_no_programa(lista_completa);
+          if (arvore_arquivo != NULL) {
+              imprimir_arvore(raiz_ast, arvore_arquivo, 0);
+          }
+      }
     ;
 
 lista_declaracoes
     : /* vazio */
+        { $$ = NULL; }
     | lista_declaracoes declaracao
+        { 
+            if ($1 == NULL) {
+                $$ = $2;
+            } else {
+                NoArvore* ultimo = $1;
+                while (ultimo->proximo != NULL) {
+                    ultimo = ultimo->proximo;
+                }
+                ultimo->proximo = $2;
+                $$ = $1;
+            }
+        }
     ;
 
 lista_comandos
     : /* vazio */
+        { $$ = NULL; }
     | lista_comandos comando
+        {
+            if ($1 == NULL) {
+                $$ = $2;
+            } else {
+                NoArvore* ultimo = $1;
+                while (ultimo->proximo != NULL) {
+                    ultimo = ultimo->proximo;
+                }
+                ultimo->proximo = $2;
+                $$ = $1;
+            }
+        }
     ;
 
 declaracao
     : declaracao_variavel
+        { $$ = $1; }
     | declaracao_funcao
+        { $$ = $1; }
     ;
 
 declaracao_variavel
@@ -168,10 +232,12 @@ declaracao_variavel
             if (!inserir_simbolo(analisador, $3.nome, $2)) {
                 YYERROR;
             }
-            // Verificar compatibilidade de tipos na atribuição
-            if (!verificar_compatibilidade_tipos(analisador, $2, $5, $3.nome)) {
+            // Verificar o tipo da expressão através do analisador semântico
+            SimboloEntrada* simbolo = buscar_simbolo(analisador, $3.nome);
+            if (!verificar_compatibilidade_tipos(analisador, $2, simbolo->tipo, $3.nome)) {
                 YYERROR;
             }
+            $$ = criar_no_declaracao_var($3.nome, $2, $5);
         }
     | DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE 
       DECL_AS DECL_ARRAY DELIM_END_STATEMENT
@@ -180,6 +246,8 @@ declaracao_variavel
             if (!inserir_vetor(analisador, $3.nome, $2, tamanho)) {
                 YYERROR;
             }
+            NoArvore* literal = criar_no_literal($5.valor, TIPO_INT);
+            $$ = criar_no_declaracao_var($3.nome, TIPO_VETOR, literal);
         }
     ;
 
@@ -201,6 +269,7 @@ declaracao_funcao
         {
             // Voltar ao escopo global após a função
             mudar_escopo(analisador, "global");
+            $$ = criar_no_declaracao_func($3.nome, $2, $6, $9);
         }
     ;
 
@@ -246,28 +315,36 @@ tipo
     ;
 
 comando
-    : comando_check
-    | comando_repeat
+    : declaracao_variavel
+        { $$ = $1; }
     | atribuicao DELIM_END_STATEMENT
+        { $$ = $1; }
     | chamada_funcao DELIM_END_STATEMENT
+        { $$ = $1; }
     | comando_give
-    | declaracao_variavel
+        { $$ = $1; }
+    | comando_check
+        { $$ = $1; }
+    | comando_repeat
+        { $$ = $1; }
     ;
 
 comando_check
     : CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco
         {
-            mostrarAnaliseGramatical("Check → check ( Expressão ) then Bloco");
+            $$ = criar_no_if($3, $6, NULL);
         }
     | CTRL_CHECK DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE CTRL_THEN bloco CTRL_OTHERWISE bloco
         {
-            mostrarAnaliseGramatical("Check → check ( Expressão ) then Bloco otherwise Bloco");
+            $$ = criar_no_if($3, $6, $8);
         }
     ;
 
 comando_repeat
     : CTRL_REPEAT CTRL_WHILE DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE bloco
-        { mostrarAnaliseGramatical("Repeat → repeat while (expressão) bloco"); }
+        {
+            $$ = criar_no_while($4, $6);
+        }
     ;
 
 comando_give
@@ -336,24 +413,14 @@ atribuicao
 
 expressao
     : termo
-        { 
-            mostrarAnaliseGramatical("Expressão → Termo");
-            $$ = $1;
-        }
-    | LITERAL_STR
-        {
-            mostrarAnaliseGramatical("Expressão → String Literal");
-            $$ = TIPO_STRING;
-        }
+        { $$ = $1; }
     | expressao OP_ADD termo
         { 
-            mostrarAnaliseGramatical("Expressão → Expressão plus Termo");
-            $$ = verificar_tipos_operacao(analisador, $1, $3, "plus");
+            $$ = criar_no_expressao("plus", $1, $3);
         }
     | expressao OP_SUB termo
         { 
-            mostrarAnaliseGramatical("Expressão → Expressão minus Termo");
-            $$ = verificar_tipos_operacao(analisador, $1, $3, "minus");
+            $$ = criar_no_expressao("minus", $1, $3);
         }
     | expressao OP_GT termo
         { 
@@ -379,16 +446,14 @@ expressao
 
 termo
     : fator
-        { 
-            $$ = $1;
-        }
+        { $$ = $1; }
     | termo OP_MUL fator
         { 
-            $$ = verificar_tipos_operacao(analisador, $1, $3, "times");
+            $$ = criar_no_expressao("times", $1, $3);
         }
     | termo OP_DIV fator
         { 
-            $$ = verificar_tipos_operacao(analisador, $1, $3, "divided_by");
+            $$ = criar_no_expressao("divided_by", $1, $3);
         }
     ;
 
@@ -401,9 +466,9 @@ fator
                 printf("║ Variável '%s' não declarada                          ║\n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n");
                 analisador->num_erros++;
-                $$ = TIPO_ERRO;
+                $$ = criar_no_identificador($1.nome, TIPO_ERRO);
             } else {
-                $$ = simbolo->tipo;
+                $$ = criar_no_identificador($1.nome, simbolo->tipo);
             }
         }
     | IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE
@@ -414,22 +479,27 @@ fator
                 printf("║ Variável '%s' não declarada                          ║\n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n");
                 analisador->num_erros++;
-                $$ = TIPO_ERRO;
+                $$ = criar_no_identificador($1.nome, TIPO_ERRO);
             } else if (simbolo->tipo != TIPO_VETOR) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
                 printf("║ Variável '%s' não é um vetor                         ║\n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n");
                 analisador->num_erros++;
-                $$ = TIPO_ERRO;
+                $$ = criar_no_identificador($1.nome, TIPO_ERRO);
             } else {
-                $$ = simbolo->info.vetor.tipo_base;
+                $$ = criar_no_identificador($1.nome, simbolo->info.vetor.tipo_base);
             }
         }
-    | LITERAL_INT   { $$ = TIPO_INT; }
-    | LITERAL_FLT   { $$ = TIPO_FLOAT; }
-    | LITERAL_CHR   { $$ = TIPO_CHAR; }
-    | LITERAL_STR   { $$ = TIPO_STRING; }
-    | DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE { $$ = $2; }
+    | LITERAL_INT
+        { $$ = criar_no_literal($1.valor, TIPO_INT); }
+    | LITERAL_FLT
+        { $$ = criar_no_literal($1.valor, TIPO_FLOAT); }
+    | LITERAL_CHR
+        { $$ = criar_no_literal($1.valor, TIPO_CHAR); }
+    | LITERAL_STR
+        { $$ = criar_no_literal($1.valor, TIPO_STRING); }
+    | DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE
+        { $$ = $2; }
     | IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE
         {
             SimboloEntrada* func = buscar_simbolo(analisador, $1.nome);
@@ -438,10 +508,10 @@ fator
                 printf("║ Função '%s' não declarada                             ║\n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n");
                 analisador->num_erros++;
-                $$ = TIPO_ERRO;
+                $$ = NULL;
             } else {
                 verificar_chamada_funcao(analisador, $1.nome, num_argumentos);
-                $$ = func->info.funcao.tipo_retorno;
+                $$ = criar_no_chamada_func($1.nome, $3);
             }
         }
     ;
@@ -449,28 +519,27 @@ fator
 chamada_funcao
     : IDENTIFIER DELIM_PAREN_OPEN argumentos DELIM_PAREN_CLOSE
         {
-            mostrarAnaliseGramatical("Chamada Função → Identificador ( Argumentos )");
             SimboloEntrada* func = buscar_simbolo(analisador, $1.nome);
             if (func == NULL || func->tipo != TIPO_FUNCAO) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
                 printf("║ Função '%s' não declarada                             ║\n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n");
                 analisador->num_erros++;
-                $$ = TIPO_ERRO;
+                $$ = NULL;
             } else {
                 verificar_chamada_funcao(analisador, $1.nome, num_argumentos);
-                $$ = func->info.funcao.tipo_retorno;
+                $$ = criar_no_chamada_func($1.nome, $3);
             }
         }
     | BUILT_IN_PRINT DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE
         {
             mostrarAnaliseGramatical("Chamada Função → print ( Expressão )");
-            $$ = TIPO_VOID;
+            $$ = criar_no_chamada_func("print", $3);
         }
     | BUILT_IN_SCAN DELIM_PAREN_OPEN acesso_variavel DELIM_PAREN_CLOSE
         {
             mostrarAnaliseGramatical("Chamada Função → scan ( Acesso Variável )");
-            $$ = TIPO_VOID;
+            $$ = criar_no_chamada_func("scan", criar_no_identificador($3.nome, $3.tipo));
         }
     ;
 
@@ -531,18 +600,6 @@ lista_argumentos
 
 %%
 
-// Implementação das funções
-const char* tipoParaString(TipoVariavel tipo) {
-    switch(tipo) {
-        case TIPO_INT: return "int";
-        case TIPO_FLOAT: return "float";
-        case TIPO_CHAR: return "char";
-        case TIPO_STRING: return "string";
-        case TIPO_VOID: return "void";
-        default: return "erro";
-    }
-}
-
 void mostrarAnaliseTipos(const char* operacao, TipoVariavel tipo1, TipoVariavel tipo2, TipoVariavel resultado) {
     printf("║ Análise de Tipos: %-15s %-6s %s %-6s = %-6s ║\n",
            operacao,
@@ -595,19 +652,24 @@ void yyerror(const char *s) {
 int main(void) {
     printf("\n╔════════════════════ COMPILADOR C-2024 ════════════════════╗\n");
     
-    if (getenv("GERAR_ARVORE")) {
-        iniciar_arquivo_arvore();
-    }
+    iniciar_arquivo_arvore();
     
     int resultado = yyparse();
     
-    if (analisador != NULL) {
-        finalizar_analisador_semantico(analisador);
+    if (raiz_ast != NULL) {
+        if (arvore_arquivo != NULL) {
+            imprimir_arvore(raiz_ast, arvore_arquivo, 0);
+        }
+        liberar_arvore(raiz_ast);
+        raiz_ast = NULL;
     }
     
-    if (getenv("GERAR_ARVORE")) {
-        fechar_arquivo_arvore();
+    if (analisador != NULL) {
+        finalizar_analisador_semantico(analisador);
+        analisador = NULL;
     }
+    
+    fechar_arquivo_arvore();
     
     return resultado;
 }

@@ -9,7 +9,7 @@ function void teste_escopo() {
         local = local plus mais_local;
     }
     
-    // mais_local = 30;  // Deve gerar erro: fora do escopo
+    mais_local = 30;  // Deve gerar erro: fora do escopo
 }
 
 function void outro_teste() {

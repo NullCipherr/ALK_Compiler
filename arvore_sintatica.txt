@@ -1,0 +1,91 @@
+└─ Parâmetro → Tipo Identificador
+└─ Lista Parâmetros → Parâmetro
+└─ Parâmetro → Tipo Identificador
+└─ Lista Parâmetros → Lista Parâmetros , Parâmetro
+└─ Parâmetros → Lista Parâmetros
+└─ Give → give back expressão;
+└─ Bloco → { Lista Comandos }
+└─ Parâmetro → Tipo Identificador
+└─ Lista Parâmetros → Parâmetro
+└─ Parâmetros → Lista Parâmetros
+└─ Expressão → Expressão is_greater_than Termo
+└─ Give → give back expressão;
+└─ Bloco → { Lista Comandos }
+└─ Give → give back expressão;
+└─ Bloco → { Lista Comandos }
+└─ Bloco → { Lista Comandos }
+└─ Parâmetro → Tipo Identificador
+└─ Lista Parâmetros → Parâmetro
+└─ Parâmetro → Tipo Identificador
+└─ Lista Parâmetros → Lista Parâmetros , Parâmetro
+└─ Parâmetro → Tipo Identificador
+└─ Lista Parâmetros → Lista Parâmetros , Parâmetro
+└─ Parâmetros → Lista Parâmetros
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Bloco → { Lista Comandos }
+└─ Chamada Função → print ( Expressão )
+└─ Expressão → Expressão is_less_than Termo
+└─ Chamada Função → print ( Expressão )
+└─ Acesso Variável → Identificador [ Expressão ]
+└─ Chamada Função → scan ( Acesso Variável )
+└─ Chamada Função → print ( Expressão )
+└─ Acesso Variável → Identificador [ Expressão ]
+└─ Chamada Função → scan ( Acesso Variável )
+└─ Chamada Função → print ( Expressão )
+└─ Acesso Variável → Identificador [ Expressão ]
+└─ Chamada Função → scan ( Acesso Variável )
+└─ Lista Argumentos → Expressão
+└─ Lista Argumentos → Lista Argumentos , Expressão
+└─ Argumentos → Lista Argumentos
+└─ Lista Argumentos → Expressão
+└─ Argumentos → Lista Argumentos
+└─ Atribuição → Identificador[Expressão] = Expressão
+└─ Lista Argumentos → Expressão
+└─ Lista Argumentos → Lista Argumentos , Expressão
+└─ Lista Argumentos → Lista Argumentos , Expressão
+└─ Argumentos → Lista Argumentos
+└─ Atribuição → Identificador = Expressão
+└─ Bloco → { Lista Comandos }
+└─ Atribuição → Identificador = Expressão
+└─ Expressão → Expressão is_less_than Termo
+└─ Expressão → Expressão equals Termo
+└─ Atribuição → Identificador = Expressão
+└─ Bloco → { Lista Comandos }
+└─ Atribuição → Identificador = Expressão
+└─ Bloco → { Lista Comandos }
+└─ Atribuição → Identificador = Expressão
+└─ Bloco → { Lista Comandos }
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+└─ Chamada Função → print ( Expressão )
+Programa
+  Declaração Variável: max_alunos (tipo: inteiro)
+    Literal: 3 (tipo: inteiro)
+  Declaração Variável: nota_aprovacao (tipo: real)
+    Literal: 7.0 (tipo: real)
+  Declaração Variável: cabecalho (tipo: string)
+    Literal: "=== Sistema de Notas ===" (tipo: string)
+  Declaração Variável: status_aprovado (tipo: char)
+    Literal: 'A' (tipo: char)
+  Declaração Variável: status_reprovado (tipo: char)
+    Literal: 'R' (tipo: char)
+  Declaração Variável: notas1 (tipo: vetor)
+    Literal: 3 (tipo: inteiro)
+  Declaração Variável: notas2 (tipo: vetor)
+    Literal: 3 (tipo: inteiro)
+  Declaração Variável: nomes (tipo: vetor)
+    Literal: 3 (tipo: inteiro)
+  Declaração Variável: status (tipo: vetor)
+    Literal: 3 (tipo: inteiro)
+  Declaração Função: calc
