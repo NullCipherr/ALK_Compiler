@@ -230,11 +230,17 @@ declaracao_variavel
     : DECL_CREATE tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT
         {
             if (!inserir_simbolo(analisador, $3.nome, $2)) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' já declarada                           ║\n", $3.nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 YYERROR;
             }
             // Verificar o tipo da expressão através do analisador semântico
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $3.nome);
             if (!verificar_compatibilidade_tipos(analisador, $2, simbolo->tipo, $3.nome)) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Tipo incompatível na inicialização da variável '%s'  ║\n", $3.nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 YYERROR;
             }
             $$ = criar_no_declaracao_var($3.nome, $2, $5);
@@ -243,7 +249,16 @@ declaracao_variavel
       DECL_AS DECL_ARRAY DELIM_END_STATEMENT
         {
             int tamanho = atoi($5.valor);
+            if (tamanho <= 0) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Tamanho inválido para o vetor '%s'                   ║\n", $3.nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                YYERROR;
+            }
             if (!inserir_vetor(analisador, $3.nome, $2, tamanho)) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' já declarada                           ║\n", $3.nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 YYERROR;
             }
             NoArvore* literal = criar_no_literal($5.valor, TIPO_INT);
@@ -354,12 +369,28 @@ comando_give
             // Verificar se o tipo de retorno corresponde ao tipo da função
             if (analisador->escopo_atual != NULL && 
                 strncmp(analisador->escopo_atual, "funcao_", 7) == 0) {
-                // Lógica de verificação do tipo de retorno
+                SimboloEntrada* func = buscar_simbolo(analisador, analisador->escopo_atual + 7);
+                if (func && func->info.funcao.tipo_retorno != $3->info.literal.tipo) {
+                    printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                    printf("║ Tipo de retorno incompatível na função '%s'          ║\n", analisador->escopo_atual + 7);
+                    printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                    analisador->num_erros++;
+                }
             }
         }
     | CTRL_GIVE CTRL_BACK DELIM_END_STATEMENT  // Para funções void
         {
             mostrarAnaliseGramatical("Give → give back;");
+            if (analisador->escopo_atual != NULL && 
+                strncmp(analisador->escopo_atual, "funcao_", 7) == 0) {
+                SimboloEntrada* func = buscar_simbolo(analisador, analisador->escopo_atual + 7);
+                if (func && func->info.funcao.tipo_retorno != TIPO_VOID) {
+                    printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                    printf("║ Função '%s' deve retornar um valor                   ║\n", analisador->escopo_atual + 7);
+                    printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                    analisador->num_erros++;
+                }
+            }
         }
     ;
 
@@ -380,6 +411,11 @@ atribuicao
                 printf("║ Variável '%s' não declarada                          ║\n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
+            } else if (!verificar_compatibilidade_tipos(analisador, simbolo->tipo, $3->info.literal.tipo, $1.nome)) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Tipo incompatível na atribuição para '%s'            ║\n", $1.nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                analisador->num_erros++;
             }
         }
     | IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE OP_ASSIGN expressao
@@ -396,6 +432,11 @@ atribuicao
                 printf("║ Variável '%s' não é um vetor                         ║\n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
+            } else if (!verificar_compatibilidade_tipos(analisador, simbolo->info.vetor.tipo_base, $6->info.literal.tipo, $1.nome)) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Tipo incompatível na atribuição para '%s'            ║\n", $1.nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                analisador->num_erros++;
             }
         }
     | IDENTIFIER OP_ADD_ASSIGN expressao
@@ -405,6 +446,11 @@ atribuicao
             if (simbolo == NULL) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
                 printf("║ Variável '%s' não declarada                          \n", $1.nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                analisador->num_erros++;
+            } else if (!verificar_compatibilidade_tipos(analisador, simbolo->tipo, $3->info.literal.tipo, $1.nome)) {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Tipo incompatível na operação += para '%s'           ║\n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             }
@@ -539,7 +585,15 @@ chamada_funcao
     | BUILT_IN_SCAN DELIM_PAREN_OPEN acesso_variavel DELIM_PAREN_CLOSE
         {
             mostrarAnaliseGramatical("Chamada Função → scan ( Acesso Variável )");
-            $$ = criar_no_chamada_func("scan", criar_no_identificador($3.nome, $3.tipo));
+            if ($3.tipo == TIPO_INT || $3.tipo == TIPO_FLOAT || $3.tipo == TIPO_CHAR || $3.tipo == TIPO_STRING) {
+                $$ = criar_no_chamada_func("scan", criar_no_identificador($3.nome, $3.tipo));
+            } else {
+                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Tipo inválido para scan: '%s'                        ║\n", tipoParaString($3.tipo));
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                analisador->num_erros++;
+                $$ = NULL;
+            }
         }
     ;
 
