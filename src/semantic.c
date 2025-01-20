@@ -1,3 +1,53 @@
+/*
+ * Trabalho Prático – Parte 3
+ * Disciplina: Compiladores
+ * Aluno: Andrei Costa, Kananda Caroline, Leonardo Ribeiro Goulart
+ *
+ * Especificação: Implementação da análise semântica para o compilador.
+ * Esta etapa realiza a verificação de tipos e escopo das construções da linguagem.
+ *
+ * 1. **Tipos de Dados**:
+ *    - Implementado: Verifica e valida os tipos básicos da linguagem:
+ *      - Inteiros (int)
+ *      - Reais (float)
+ *      - Caracteres (char)
+ *      - Strings (string)
+ *    - Implementado: Verifica compatibilidade em operações e atribuições
+ *
+ * 2. **Estruturas de Decisão**:
+ *    - Implementado: Verifica expressões condicionais em comandos 'check'
+ *    - Implementado: Garante que condições resultem em valores booleanos
+ *
+ * 3. **Estruturas de Repetição**:
+ *    - Implementado: Verifica expressões em laços 'repeat while'
+ *    - Implementado: Valida condições de parada
+ *
+ * 4. **Vetores**:
+ *    - Implementado: Verifica declarações de vetores:
+ *      - Validação de índices
+ *      - Verificação de tipos em acessos
+ *      - Controle de limites
+ *
+ * 5. **Funções**:
+ *    - Implementado: Gerencia chamadas de funções:
+ *      - Verificação de parâmetros
+ *      - Compatibilidade de tipos de retorno
+ *      - Controle de escopo
+ *    - Implementado: Empilhamento e desempilhamento de contextos
+ *
+ * 6. **Funções Básicas**:
+ *    - Implementado: Suporte a funções built-in:
+ *      - print: Saída formatada
+ *      - scan: Entrada de dados
+ *    - Implementado: Verificação de tipos para argumentos
+ *
+ * Observações:
+ * - A análise semântica trabalha em conjunto com a tabela de símbolos
+ * - Erros semânticos são reportados com mensagens detalhadas
+ * - O controle de escopo permite variáveis locais e globais
+ * - A verificação de tipos previne operações inválidas
+ */
+
 #include "semantic.h"
 
 AnalisadorSemantico* iniciar_analisador_semantico(void) {
