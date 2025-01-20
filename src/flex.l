@@ -61,22 +61,25 @@ int total_tokens = 0;
 // Protótipo de yylex
 int yylex(void);
 
-void emitToken(const char* token, const char* lexema) {
+void emitToken(const char* token, const char* lexema) 
+{
     total_tokens++;
     if (total_tokens == 1) {
-        printf("\n╔════════════════╦═══════╦═══════════════════════════════════════╗\n");
-        printf("║ TOKEN          ║ LINHA ║ LEXEMA                                ║\n");
-        printf("╠════════════════╬═══════╬═══════════════════════════════════════╣\n");
+        printf("\n╔════════════════════════════════╦════════════════════════════════╦════════════════════════════════╗\n");
+        printf("║ TOKEN                          ║ LINHA                          ║ LEXEMA                         ║\n");
+        printf("╠════════════════════════════════╬════════════════════════════════╬════════════════════════════════╣\n");
     }
     
-    char lexema_truncado[38];
-    strncpy(lexema_truncado, lexema, 37);
-    lexema_truncado[37] = '\0';
-    
-    printf("║ %-14s ║ %-5d ║ %-37s ║\n", 
-           token,
-           linha,
-           lexema_truncado);
+    // Trunca os valores de TOKEN e LEXEMA para evitar que ultrapassem os limites
+    char token_truncado[31];
+    char lexema_truncado[31];
+    strncpy(token_truncado, token, 30);
+    strncpy(lexema_truncado, lexema, 30);
+    token_truncado[30] = '\0';
+    lexema_truncado[30] = '\0';
+
+    // Linha da tabela
+    printf("║ %-30s ║ %-30d ║ %-30s ║\n", token_truncado, linha, lexema_truncado);
 }
 
 // Implementação da função analise_lexica
@@ -85,9 +88,9 @@ void analise_lexica(void) {
         // O processamento é feito dentro de emitToken
     }
     if (total_tokens > 0) {
-        printf("╠════════════════╩═══════╩═══════════════════════════════════════╣\n");
-        printf("║ Total de tokens processados: %-33d ║\n", total_tokens);
-        printf("╚════════════════════════════════════════════════════════════════╝\n\n");
+        printf("╠════════════════════════════════╩════════════════════════════════╩════════════════════════════════╣\n");
+        printf("║ Total de tokens processados: %-67d ║\n", total_tokens);
+        printf("╚══════════════════════════════════════════════════════════════════════════════════════════════════╝\n\n");
     }
 }
 %}
@@ -182,7 +185,20 @@ COMENTARIO  "//".*
     return LITERAL_STR; 
 }
 
-.           { printf("ERRO LEXICO: caractere invalido '%s' na linha %d\n", yytext, linha); }
+.           {
+    // Definições de cores ANSI
+    const char* GREEN = "\033[1;32m"; // Verde brilhante
+    const char* RESET = "\033[0m";    // Reseta para cor padrão
+
+    printf("%s\n╔════════════════════════════════════════════════════════════════╗%s\n", GREEN, RESET);
+    printf("%s║                       ERRO LÉXICO                              ║%s\n", GREEN, RESET);
+    printf("%s╠════════════════════════════════════════════════════════════════╣%s\n", GREEN, RESET);
+    printf("%s║ Caractere inválido encontrado: '%s'                             ║%s\n", GREEN, yytext, RESET);
+    printf("%s║ Linha: %d                                                       ║%s\n", GREEN, linha, RESET);
+    printf("%s╚════════════════════════════════════════════════════════════════╝%s\n\n", GREEN, RESET);
+}
+
+
 
 %%
 

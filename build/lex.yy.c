@@ -609,22 +609,25 @@ int total_tokens = 0;
 // Protótipo de yylex
 int yylex(void);
 
-void emitToken(const char* token, const char* lexema) {
+void emitToken(const char* token, const char* lexema) 
+{
     total_tokens++;
     if (total_tokens == 1) {
-        printf("\n╔════════════════╦═══════╦═══════════════════════════════════════╗\n");
-        printf("║ TOKEN          ║ LINHA ║ LEXEMA                                ║\n");
-        printf("╠════════════════╬═══════╬═══════════════════════════════════════╣\n");
+        printf("\n╔════════════════════════════════╦════════════════════════════════╦════════════════════════════════╗\n");
+        printf("║ TOKEN                          ║ LINHA                          ║ LEXEMA                         ║\n");
+        printf("╠════════════════════════════════╬════════════════════════════════╬════════════════════════════════╣\n");
     }
     
-    char lexema_truncado[38];
-    strncpy(lexema_truncado, lexema, 37);
-    lexema_truncado[37] = '\0';
-    
-    printf("║ %-14s ║ %-5d ║ %-37s ║\n", 
-           token,
-           linha,
-           lexema_truncado);
+    // Trunca os valores de TOKEN e LEXEMA para evitar que ultrapassem os limites
+    char token_truncado[31];
+    char lexema_truncado[31];
+    strncpy(token_truncado, token, 30);
+    strncpy(lexema_truncado, lexema, 30);
+    token_truncado[30] = '\0';
+    lexema_truncado[30] = '\0';
+
+    // Linha da tabela
+    printf("║ %-30s ║ %-30d ║ %-30s ║\n", token_truncado, linha, lexema_truncado);
 }
 
 // Implementação da função analise_lexica
@@ -633,14 +636,14 @@ void analise_lexica(void) {
         // O processamento é feito dentro de emitToken
     }
     if (total_tokens > 0) {
-        printf("╠════════════════╩═══════╩═══════════════════════════════════════╣\n");
-        printf("║ Total de tokens processados: %-33d ║\n", total_tokens);
-        printf("╚════════════════════════════════════════════════════════════════╝\n\n");
+        printf("╠════════════════════════════════╩════════════════════════════════╩════════════════════════════════╣\n");
+        printf("║ Total de tokens processados: %-67d ║\n", total_tokens);
+        printf("╚══════════════════════════════════════════════════════════════════════════════════════════════════╝\n\n");
     }
 }
-#line 642 "build/lex.yy.c"
+#line 645 "build/lex.yy.c"
 #define YY_NO_INPUT 1
-#line 644 "build/lex.yy.c"
+#line 647 "build/lex.yy.c"
 
 #define INITIAL 0
 
@@ -855,10 +858,10 @@ YY_DECL
 		}
 
 	{
-#line 108 "src/flex.l"
+#line 111 "src/flex.l"
 
 
-#line 862 "build/lex.yy.c"
+#line 865 "build/lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -917,203 +920,203 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 110 "src/flex.l"
+#line 113 "src/flex.l"
 { coluna += yyleng; }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 111 "src/flex.l"
+#line 114 "src/flex.l"
 { linha++; coluna = 1; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 112 "src/flex.l"
+#line 115 "src/flex.l"
 { /* Ignora comentários */ }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 114 "src/flex.l"
+#line 117 "src/flex.l"
 { emitToken("DECL_CREATE", yytext); return DECL_CREATE; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 115 "src/flex.l"
+#line 118 "src/flex.l"
 { emitToken("DECL_AS", yytext); return DECL_AS; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 116 "src/flex.l"
+#line 119 "src/flex.l"
 { emitToken("DECL_ARRAY", yytext); return DECL_ARRAY; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 117 "src/flex.l"
+#line 120 "src/flex.l"
 { emitToken("DECL_FUNCTION", yytext); return DECL_FUNCTION; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 119 "src/flex.l"
+#line 122 "src/flex.l"
 { emitToken("TYPE_INT", yytext); return TYPE_INT; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 120 "src/flex.l"
+#line 123 "src/flex.l"
 { emitToken("TYPE_FLT", yytext); return TYPE_FLT; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 121 "src/flex.l"
+#line 124 "src/flex.l"
 { emitToken("TYPE_CHR", yytext); return TYPE_CHR; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 122 "src/flex.l"
+#line 125 "src/flex.l"
 { emitToken("TYPE_STR", yytext); return TYPE_STR; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 123 "src/flex.l"
+#line 126 "src/flex.l"
 { emitToken("TYPE_VOID", yytext); return TYPE_VOID; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 125 "src/flex.l"
+#line 128 "src/flex.l"
 { emitToken("CTRL_CHECK", yytext); return CTRL_CHECK; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 126 "src/flex.l"
+#line 129 "src/flex.l"
 { emitToken("CTRL_THEN", yytext); return CTRL_THEN; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 127 "src/flex.l"
+#line 130 "src/flex.l"
 { emitToken("CTRL_OTHERWISE", yytext); return CTRL_OTHERWISE; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 128 "src/flex.l"
+#line 131 "src/flex.l"
 { emitToken("CTRL_REPEAT", yytext); return CTRL_REPEAT; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 129 "src/flex.l"
+#line 132 "src/flex.l"
 { emitToken("CTRL_WHILE", yytext); return CTRL_WHILE; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 130 "src/flex.l"
+#line 133 "src/flex.l"
 { emitToken("CTRL_GIVE", yytext); return CTRL_GIVE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 131 "src/flex.l"
+#line 134 "src/flex.l"
 { emitToken("CTRL_BACK", yytext); return CTRL_BACK; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 133 "src/flex.l"
+#line 136 "src/flex.l"
 { emitToken("OP_ADD", yytext); return OP_ADD; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 134 "src/flex.l"
+#line 137 "src/flex.l"
 { emitToken("OP_SUB", yytext); return OP_SUB; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 135 "src/flex.l"
+#line 138 "src/flex.l"
 { emitToken("OP_MUL", yytext); return OP_MUL; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 136 "src/flex.l"
+#line 139 "src/flex.l"
 { emitToken("OP_DIV", yytext); return OP_DIV; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 137 "src/flex.l"
+#line 140 "src/flex.l"
 { emitToken("OP_ASSIGN", yytext); return OP_ASSIGN; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 138 "src/flex.l"
+#line 141 "src/flex.l"
 { emitToken("OP_ADD_ASSIGN", yytext); return OP_ADD_ASSIGN; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 139 "src/flex.l"
+#line 142 "src/flex.l"
 { emitToken("OP_EQ", yytext); return OP_EQ; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 140 "src/flex.l"
+#line 143 "src/flex.l"
 { emitToken("OP_NE", yytext); return OP_NE; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 141 "src/flex.l"
+#line 144 "src/flex.l"
 { emitToken("OP_LT", yytext); return OP_LT; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 142 "src/flex.l"
+#line 145 "src/flex.l"
 { emitToken("OP_GT", yytext); return OP_GT; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 144 "src/flex.l"
+#line 147 "src/flex.l"
 { emitToken("DELIM_PAREN_OPEN", yytext); return DELIM_PAREN_OPEN; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 145 "src/flex.l"
+#line 148 "src/flex.l"
 { emitToken("DELIM_PAREN_CLOSE", yytext); return DELIM_PAREN_CLOSE; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 146 "src/flex.l"
+#line 149 "src/flex.l"
 { emitToken("DELIM_BRACKET_OPEN", yytext); return DELIM_BRACKET_OPEN; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 147 "src/flex.l"
+#line 150 "src/flex.l"
 { emitToken("DELIM_BRACKET_CLOSE", yytext); return DELIM_BRACKET_CLOSE; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 148 "src/flex.l"
+#line 151 "src/flex.l"
 { emitToken("DELIM_BLOCK_OPEN", yytext); return DELIM_BLOCK_OPEN; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 149 "src/flex.l"
+#line 152 "src/flex.l"
 { emitToken("DELIM_BLOCK_CLOSE", yytext); return DELIM_BLOCK_CLOSE; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 150 "src/flex.l"
+#line 153 "src/flex.l"
 { emitToken("DELIM_END_STATEMENT", yytext); return DELIM_END_STATEMENT; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 151 "src/flex.l"
+#line 154 "src/flex.l"
 { emitToken("DELIM_SEPARATOR", yytext); return DELIM_SEPARATOR; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 153 "src/flex.l"
+#line 156 "src/flex.l"
 { emitToken("BUILT_IN_PRINT", yytext); return BUILT_IN_PRINT; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 154 "src/flex.l"
+#line 157 "src/flex.l"
 { emitToken("BUILT_IN_SCAN", yytext); return BUILT_IN_SCAN; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 156 "src/flex.l"
+#line 159 "src/flex.l"
 { 
     yylval.id.nome = strdup(yytext);
     yylval.id.tipo = TIPO_ERRO;  // Será definido durante a análise semântica
@@ -1123,7 +1126,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 162 "src/flex.l"
+#line 165 "src/flex.l"
 { 
     yylval.literal.valor = strdup(yytext);
     yylval.literal.num = atoi(yytext);
@@ -1133,7 +1136,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 168 "src/flex.l"
+#line 171 "src/flex.l"
 { 
     yylval.literal.valor = strdup(yytext);
     yylval.literal.num = atof(yytext);
@@ -1143,7 +1146,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 174 "src/flex.l"
+#line 177 "src/flex.l"
 { 
     yylval.literal.valor = strdup(yytext);
     emitToken("LITERAL_CHR", yytext); 
@@ -1153,7 +1156,7 @@ YY_RULE_SETUP
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 179 "src/flex.l"
+#line 182 "src/flex.l"
 { 
     yylval.literal.valor = strdup(yytext);
     emitToken("LITERAL_STR", yytext); 
@@ -1162,15 +1165,26 @@ YY_RULE_SETUP
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 185 "src/flex.l"
-{ printf("ERRO LEXICO: caractere invalido '%s' na linha %d\n", yytext, linha); }
+#line 188 "src/flex.l"
+{
+    // Definições de cores ANSI
+    const char* GREEN = "\033[1;32m"; // Verde brilhante
+    const char* RESET = "\033[0m";    // Reseta para cor padrão
+
+    printf("%s\n╔════════════════════════════════════════════════════════════════╗%s\n", GREEN, RESET);
+    printf("%s║                       ERRO LÉXICO                              ║%s\n", GREEN, RESET);
+    printf("%s╠════════════════════════════════════════════════════════════════╣%s\n", GREEN, RESET);
+    printf("%s║ Caractere inválido encontrado: '%s'                             ║%s\n", GREEN, yytext, RESET);
+    printf("%s║ Linha: %d                                                       ║%s\n", GREEN, linha, RESET);
+    printf("%s╚════════════════════════════════════════════════════════════════╝%s\n\n", GREEN, RESET);
+}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 187 "src/flex.l"
+#line 203 "src/flex.l"
 ECHO;
 	YY_BREAK
-#line 1174 "build/lex.yy.c"
+#line 1188 "build/lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2138,7 +2152,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 187 "src/flex.l"
+#line 203 "src/flex.l"
 
 
 int yywrap(void) {

@@ -1596,7 +1596,7 @@ yyreduce:
             if (simbolo == NULL) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
                 printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[-2].id).nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             }
         }
@@ -1611,12 +1611,12 @@ yyreduce:
             if (simbolo == NULL) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
                 printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[-5].id).nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             } else if (simbolo->tipo != TIPO_VETOR) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
                 printf("║ Variável '%s' não é um vetor                         ║\n", (yyvsp[-5].id).nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             }
         }
@@ -1630,8 +1630,8 @@ yyreduce:
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-2].id).nome);
             if (simbolo == NULL) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[-2].id).nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printf("║ Variável '%s' não declarada                          \n", (yyvsp[-2].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             }
         }
@@ -1723,9 +1723,9 @@ yyreduce:
         { 
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[0].id).nome);
             if (simbolo == NULL) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[0].id).nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printf("\n╔════════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não declarada                          \n", (yyvsp[0].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
                 (yyval.no) = criar_no_identificador((yyvsp[0].id).nome, TIPO_ERRO);
             } else {
@@ -1740,14 +1740,14 @@ yyreduce:
         {
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-3].id).nome);
             if (simbolo == NULL) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[-3].id).nome);
+                printf("\n╔════════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não declarada                          \n", (yyvsp[-3].id).nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n");
                 analisador->num_erros++;
                 (yyval.no) = criar_no_identificador((yyvsp[-3].id).nome, TIPO_ERRO);
             } else if (simbolo->tipo != TIPO_VETOR) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não é um vetor                         ║\n", (yyvsp[-3].id).nome);
+                printf("\n╔════════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+                printf("║ Variável '%s' não é um vetor                         \n", (yyvsp[-3].id).nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n");
                 analisador->num_erros++;
                 (yyval.no) = criar_no_identificador((yyvsp[-3].id).nome, TIPO_ERRO);
@@ -1849,8 +1849,8 @@ yyreduce:
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[0].id).nome);
             if (simbolo == NULL) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[0].id).nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printf("║ Variável '%s' não declarada                          \n", (yyvsp[0].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             }
         }
@@ -1864,13 +1864,13 @@ yyreduce:
             SimboloEntrada* simbolo = buscar_simbolo(analisador, (yyvsp[-3].id).nome);
             if (simbolo == NULL) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          ║\n", (yyvsp[-3].id).nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printf("║ Variável '%s' não declarada                          \n", (yyvsp[-3].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             } else if (simbolo->tipo != TIPO_VETOR) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não é um vetor                         ║\n", (yyvsp[-3].id).nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printf("║ Variável '%s' não é um vetor                         \n", (yyvsp[-3].id).nome);
+                printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             }
         }
@@ -2142,7 +2142,7 @@ TipoVariavel verificarTipos(TipoVariavel tipo1, const char* operador, TipoVariav
     }
     
     printf("║ ERRO: Tipos incompatíveis para operação %-20s ║\n", operador);
-    printf("╚═══════════════════════════════════════════════════════════╝\n");
+    printf("╚═══════════════════════════════════════════════════════════╝\n\n");
     return TIPO_ERRO;
 }
 
@@ -2155,16 +2155,41 @@ void yyerror(const char *s) {
     printf("║ - Verificar tipos dos operandos                           ║\n");
     printf("║ - Verificar sintaxe da expressão                          ║\n");
     printf("║ - Verificar declaração de variáveis                       ║\n");
-    printf("╚═══════════════════════════════════════════════════════════════╝\n");
+    printf("╚═══════════════════════════════════════════════════════════════╝\n\n");
 }
 
-int main(void) {
-    printf("\n╔════════════════════ COMPILADOR C-2024 ════════════════════╗\n");
+void exibir_cabecalho() {
+    printf("\033[1;32m"); // Define a cor do texto para verde brilhante
+    printf("╔════════════════════════════════════════════════════════╗\n");
+    printf("║                COMPILADOR ALK - v1.0                   ║\n");
+    printf("╠════════════════════════════════════════════════════════╣\n");
+    printf("║     Desenvolvido para a disciplina de compiladores     ║\n");
+    printf("╚════════════════════════════════════════════════════════╝\n\n");
+    printf("\033[0m"); // Reseta as cores para o padrão
+}
+
+void exibir_rodape() {
+    printf("\033[1;34m"); // Define a cor do texto para azul brilhante
+    printf("\n╔════════════════════════════════════════════════════════╗\n");
+    printf("║      Obrigado por utilizar o Compilador ALK!           ║\n");
+    printf("╚════════════════════════════════════════════════════════╝\n\n");
+    printf("\033[0m"); // Reseta as cores para o padrão
+}
+int main(void) 
+{
+    // Exibe o cabeçalho do compilador
+    exibir_cabecalho();
     
+    // Inicializa o processo de criação da árvore de sintaxe abstrata 
     iniciar_arquivo_arvore();
+
+    // Realiza a análise léxica primeiro
+    // analise_lexica();
     
+    // Realiza a análise sintática do código fonte
     int resultado = yyparse();
     
+    // Se a árvore de sintaxe abstrata foi criada, realiza o processamento
     if (raiz_ast != NULL) {
         if (arvore_arquivo != NULL) {
             imprimir_arvore(raiz_ast, arvore_arquivo, 0);
@@ -2173,12 +2198,17 @@ int main(void) {
         raiz_ast = NULL;
     }
     
+    // Se o analisador semântico foi inicializado, finaliza o processo
     if (analisador != NULL) {
         finalizar_analisador_semantico(analisador);
         analisador = NULL;
     }
     
+    // Fecha o arquivo de saída da árvore
     fechar_arquivo_arvore();
+    
+    // Exibe o rodapé
+    exibir_rodape();
     
     return resultado;
 }

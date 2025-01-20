@@ -1,98 +1,72 @@
-// Programa de exemplo: Sistema de Notas
-// Demonstração de todas as funcionalidades sem erros semânticos
-
-// Declarações globais simples primeiro
+// Declarações globais com erros
 create int max_alunos as 3;
-create float nota_aprovacao as 7.0;
-create string cabecalho as "=== Sistema de Notas ===";
-create char status_aprovado as 'A';
-create char status_reprovado as 'R';
+// create float max_alunos as 5.0;  // Erro: variável já declarada
+// create string mensagem;  // Erro: falta inicialização
+// create char status as 'And';  // Erro: tipo incompatível (string em char)
 
-// Vetores globais
-create float notas1[3] as array;
-create float notas2[3] as array;
-create string nomes[3] as array;
-create char status[3] as array;
+// Vetores com erros
+create float notas[-1] as array;  // Erro: tamanho negativo
+// create int valores[2.5] as array;  // Erro: tamanho não inteiro
+// create char letras[] as array;    // Erro: tamanho não especificado
 
-// Depois as funções
-function float calcular_media(float nota1, float nota2) {
-    create float media as (nota1 plus nota2) divided_by 2.0;
-    give back media;
+// Função com erros de tipo
+function float calcular_media(float nota1, int nota2) {
+    create int media as nota1 plus nota2;  // Erro: atribuição de float para int (Não Implementado)
+    give back "aprovado";  // Erro: retorno string em função float
 }
 
-// Função para determinar status
-function char obter_status(float media) {
-    check (media is_greater_than nota_aprovacao) then {
-        give back status_aprovado;
-    } otherwise {
-        give back status_reprovado;
-    }
+// Função com erro de parâmetros
+function void imprimir(string msg) {
+    print(msg);
+    give back 42;  // Erro: retorno em função void (Não Implementado)
 }
 
-// Função para imprimir resultado
-function void imprimir_resultado(string nome, float media, char status) {
-    print(nome);
-    print(" - Media: ");
-    print(media);
-    print(" - Status: ");
-    print(status);
+// Programa principal com erros
+print(mensagem_inexistente);  // Erro: variável não declarada
+
+// Erro de tipo em expressão
+create int soma as "teste" plus 10;  // Erro: operação inválida com string
+
+// Erro de acesso a vetor
+notas[3.14] = 10.0;  // Erro: índice não inteiro
+notas[10] = 5.0;     // Erro: índice fora dos limites
+
+// Erro de chamada de função
+calcular_media(10);      // Erro: número incorreto de argumentos
+calcular_media("7", 8);  // Erro: tipo incorreto de argumento
+
+// Erro de escopo
+{
+    create int temp as 0;
+}
+print(temp);  // Erro: variável fora de escopo
+
+// Erro em estrutura de controle
+check ("teste") then {  // Erro: condição não booleana
+    print("erro");
 }
 
-// Programa principal
-print(cabecalho);
-
-// Inicialização do contador
-create int i as 0;
-
-// Entrada de dados
-repeat while (i is_less_than max_alunos) {
-    print("Digite o nome do aluno: ");
-    scan(nomes[i]);
-    
-    print("Digite a primeira nota: ");
-    scan(notas1[i]);
-    
-    print("Digite a segunda nota: ");
-    scan(notas2[i]);
-    
-    // Cálculo da média e status
-    create float media_aluno as calcular_media(notas1[i], notas2[i]);
-    status[i] = obter_status(media_aluno);
-    
-    // Impressão do resultado individual
-    imprimir_resultado(nomes[i], media_aluno, status[i]);
-    
-    // Incremento do contador
-    i = i plus 1;
+// Erro de operação relacional
+check (5 plus "3" is_greater_than 10) then {  // Erro: operação com tipos incompatíveis
+    print("maior");
 }
 
-// Estatísticas finais
-create int aprovados as 0;
-create int reprovados as 0;
+// Erro de atribuição
+max_alunos = "três";  // Erro: atribuição de string em int
 
-i = 0;  // Reinicialização do contador
+// Erro de operador +=
+"teste" += 5;  // Erro: operação inválida com string
 
-// Contagem de aprovações/reprovações
-repeat while (i is_less_than max_alunos) {
-    check (status[i] equals status_aprovado) then {
-        aprovados = aprovados plus 1;
-    } otherwise {
-        reprovados = reprovados plus 1;
-    }
-    i = i plus 1;
+// Erro de função void em expressão
+create int resultado as imprimir("teste");  // Erro: função void em expressão
+
+// Erro de recursão infinita
+function int loop() {
+    give back loop();  // Aviso: possível recursão infinita
 }
 
-// Impressão das estatísticas
-print("=== Estatisticas ===");
-print("Total de alunos: ");
-print(max_alunos);
-print("Aprovados: ");
-print(aprovados);
-print("Reprovados: ");
-print(reprovados);
+// Erro de função não declarada
+create float valor as funcao_inexistente(10);  // Erro: função não existe
 
-// Cálculo e impressão da taxa de aprovação
-create float taxa_aprovacao as (aprovados times 100.0) divided_by max_alunos;
-print("Taxa de aprovacao: ");
-print(taxa_aprovacao);
-print("%");
+// Erro de scan
+scan(10);  // Erro: scan espera uma variável, não um literal
