@@ -66,7 +66,7 @@ make clean
 
 ## Estrutura do projeto
 
-    ├── src/              # Código fonte
+    ├── src/             # Código fonte
     │   ├── ast.c/h      # Implementação da árvore sintática abstrata
     │   ├── bison.y      # Gramática e análise sintática
     │   ├── flex.l       # Análise léxica
