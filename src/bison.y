@@ -784,20 +784,18 @@ void yyerror(const char *s) {
 }
 
 void exibir_cabecalho() {
-    printf("\033[1;32m"); // Define a cor do texto para verde brilhante
-    printf("╔════════════════════════════════════════════════════════╗\n");
-    printf("║                COMPILADOR ALK - v1.0                   ║\n");
-    printf("╠════════════════════════════════════════════════════════╣\n");
-    printf("║     Desenvolvido para a disciplina de compiladores     ║\n");
-    printf("╚════════════════════════════════════════════════════════╝\n\n");
-    printf("\033[0m"); // Reseta as cores para o padrão
+    printf("\n╔══════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
+    printf("║                                       COMPILADOR ALK - v1.0                                      ║\n");
+    printf("╠══════════════════════════════════════════════════════════════════════════════════════════════════╣\n");
+    printf("║                       Desenvolvido para a disciplina de Compiladores - UEM                       ║\n");
+    printf("╚══════════════════════════════════════════════════════════════════════════════════════════════════╝\n\n"RESET);
 }
 
 void exibir_rodape() {
     printf("\033[1;34m"); // Define a cor do texto para azul brilhante
-    printf("\n╔════════════════════════════════════════════════════════╗\n");
-    printf("║      Obrigado por utilizar o Compilador ALK!           ║\n");
-    printf("╚════════════════════════════════════════════════════════╝\n\n");
+    printf("\n╔══════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
+    printf("║                           Obrigado por utilizar o Compilador ALK!                                ║\n");
+    printf("╚══════════════════════════════════════════════════════════════════════════════════════════════════╝\n\n");
     printf("\033[0m"); // Reseta as cores para o padrão
 }
 
