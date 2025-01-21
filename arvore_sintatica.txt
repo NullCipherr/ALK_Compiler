@@ -1,24 +1,20 @@
-└─ Parâmetro → Tipo Identificador
-└─ Lista Parâmetros → Parâmetro
-└─ Parâmetro → Tipo Identificador
-└─ Lista Parâmetros → Lista Parâmetros , Parâmetro
-└─ Parâmetros → Lista Parâmetros
-└─ Give → give back expressão;
-└─ Bloco → { Lista Comandos }
-└─ Parâmetro → Tipo Identificador
-└─ Lista Parâmetros → Parâmetro
-└─ Parâmetros → Lista Parâmetros
-└─ Chamada Função → print ( Expressão )
-└─ Give → give back expressão;
-└─ Bloco → { Lista Comandos }
-└─ Chamada Função → print ( Expressão )
-└─ Atribuição → Identificador[Expressão] = Expressão
-└─ Atribuição → Identificador[Expressão] = Expressão
-└─ Lista Argumentos → Expressão
-└─ Argumentos → Lista Argumentos
-└─ Lista Argumentos → Expressão
-└─ Lista Argumentos → Lista Argumentos , Expressão
-└─ Argumentos → Lista Argumentos
-Programa
-  Declaração Variável: max_alunos (tipo: inteiro)
-    Literal: 3 (tipo: inteiro)
+[34m└─ Parâmetro → Tipo Identificador
+[0m[34m└─ Lista Parâmetros → Parâmetro
+[0m[34m└─ Parâmetro → Tipo Identificador
+[0m[34m└─ Lista Parâmetros → Lista Parâmetros , Parâmetro
+[0m[34m└─ Parâmetros → Lista Parâmetros
+[0m[34m└─ Give → give back expressão;
+[0m[34m└─ Bloco → { Lista Comandos }
+[0m[34m└─ Parâmetro → Tipo Identificador
+[0m[34m└─ Lista Parâmetros → Parâmetro
+[0m[34m└─ Parâmetros → Lista Parâmetros
+[0m[34m└─ Chamada Função → print ( Expressão )
+[0m[34m└─ Give → give back expressão;
+[0m[34m└─ Bloco → { Lista Comandos }
+[0m[34m└─ Chamada Função → print ( Expressão )
+[0m[34m└─ Atribuição → Identificador[Expressão] = Expressão
+[0m[34m└─ Atribuição → Identificador[Expressão] = Expressão
+[0m[34m└─ Lista Argumentos → Expressão
+[0m[34m└─ Argumentos → Lista Argumentos
+[0m[34m└─ Lista Argumentos → Expressão
+[0m[34m└─ Lista A

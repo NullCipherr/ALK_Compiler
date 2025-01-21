@@ -13,7 +13,7 @@ static void imprimir_indentacao(FILE *arquivo, int nivel)
 }
 
 // Implementação das funções de criação de nós
-NoArvore *criar_no_programa(NoArvore *declaracoes)
+NoArvore *criar_no_programa(NoArvore *corpo)
 {
     NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
     if (no == NULL)
@@ -23,7 +23,7 @@ NoArvore *criar_no_programa(NoArvore *declaracoes)
     }
     no->tipo = NO_PROGRAMA;
     no->proximo = NULL;
-    no->info.declaracao_var.valor = declaracoes;
+    no->info.programa.corpo = corpo;
     return no;
 }
 
@@ -186,9 +186,9 @@ void imprimir_arvore(NoArvore *no, FILE *arquivo, int nivel)
     {
     case NO_PROGRAMA:
         fprintf(arquivo, "Programa\n");
-        if (no->info.declaracao_var.valor != NULL)
+        if (no->info.programa.corpo != NULL)
         {
-            imprimir_arvore(no->info.declaracao_var.valor, arquivo, nivel + 1);
+            imprimir_arvore(no->info.programa.corpo, arquivo, nivel + 1);
         }
         break;
 
@@ -287,6 +287,7 @@ void liberar_arvore(NoArvore *no)
         return;
 
     NoArvore *proximo = no->proximo; // Salva o próximo antes de liberar
+    no->proximo = NULL;              // Previni de ref. circulares
 
     // Libera recursivamente todos os nós
     switch (no->tipo)
@@ -295,23 +296,49 @@ void liberar_arvore(NoArvore *no)
         if (no->info.declaracao_var.nome != NULL)
         {
             free(no->info.declaracao_var.nome);
+            no->info.declaracao_var.nome = NULL;
         }
-        liberar_arvore(no->info.declaracao_var.valor);
+        if (no->info.declaracao_var.valor)
+        {
+            liberar_arvore(no->info.declaracao_var.valor);
+            no->info.declaracao_var.valor = NULL;
+        }
         break;
 
     case NO_DECLARACAO_FUNC:
-        if (no->info.declaracao_func.nome != NULL)
+        if (no->info.declaracao_func.nome)
         {
             free(no->info.declaracao_func.nome);
+            no->info.declaracao_func.nome = NULL;
         }
-        liberar_arvore(no->info.declaracao_func.parametros);
-        liberar_arvore(no->info.declaracao_func.corpo);
+        if (no->info.declaracao_func.parametros)
+        {
+            liberar_arvore(no->info.declaracao_func.parametros);
+            no->info.declaracao_func.parametros = NULL;
+        }
+        if (no->info.declaracao_func.corpo)
+        {
+            liberar_arvore(no->info.declaracao_func.corpo);
+            no->info.declaracao_func.corpo = NULL;
+        }
         break;
 
     case NO_COMANDO_IF:
-        liberar_arvore(no->info.comando_if.condicao);
-        liberar_arvore(no->info.comando_if.bloco_then);
-        liberar_arvore(no->info.comando_if.bloco_else);
+        if (no->info.comando_if.condicao)
+        {
+            liberar_arvore(no->info.comando_if.condicao);
+            no->info.comando_if.condicao = NULL;
+        }
+        if (no->info.comando_if.bloco_then)
+        {
+            liberar_arvore(no->info.comando_if.bloco_then);
+            no->info.comando_if.bloco_then = NULL;
+        }
+        if (no->info.comando_if.bloco_else)
+        {
+            liberar_arvore(no->info.comando_if.bloco_else);
+            no->info.comando_if.bloco_else = NULL;
+        }
         break;
 
     case NO_COMANDO_WHILE:
@@ -351,15 +378,29 @@ void liberar_arvore(NoArvore *no)
         break;
 
     case NO_PROGRAMA:
-        // Liberar recursos do nó programa
+        liberar_arvore(no->info.programa.corpo);
         break;
 
     case NO_BLOCO:
-        // Liberar recursos do bloco
+        if (no->info.bloco.declaracoes != NULL)
+        {
+            liberar_arvore(no->info.bloco.declaracoes);
+        }
         break;
 
     case NO_ATRIBUICAO:
-        // Liberar recursos da atribuição
+        if (no->info.atribuicao.alvo != NULL)
+        {
+            liberar_arvore(no->info.atribuicao.alvo);
+        }
+        if (no->info.atribuicao.valor != NULL)
+        {
+            liberar_arvore(no->info.atribuicao.valor);
+        }
+        break;
+
+    default:
+        fprintf(stderr, "Warning: Tipo não reconhecido: %d\n", no->tipo);
         break;
     }
 

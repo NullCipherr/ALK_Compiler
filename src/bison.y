@@ -52,6 +52,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "types.h"
 #include "semantic.h"
 #include "ast.h"
@@ -77,9 +78,13 @@ int num_parametros = 0;
 NoArvore* raiz_ast = NULL;  // Raiz da árvore sintática
 
 void iniciar_arquivo_arvore() {
+    if (arvore_arquivo != NULL) {
+        fclose(arvore_arquivo);
+    }
     arvore_arquivo = fopen("arvore_sintatica.txt", "w");
     if (arvore_arquivo == NULL) {
-        printf("Erro ao criar arquivo da árvore sintática\n");
+        fprintf(stderr, "Erro ao criar arquivo da árvore sintática: %s\n", 
+                strerror(errno));
         exit(1);
     }
 }
@@ -87,16 +92,35 @@ void iniciar_arquivo_arvore() {
 void fechar_arquivo_arvore() {
     if (arvore_arquivo != NULL) {
         fclose(arvore_arquivo);
+        arvore_arquivo = NULL;  // Reseta ponteiro depois de fechar.
     }
 }
 
+// Definindo códigos ANSI para cores
+#define RESET   "\033[0m"
+#define RED     "\033[31m"
+#define YELLOW  "\033[33m"
+#define BLUE    "\033[34m"
+
+// Função para mostrar a análise gramatical
 void mostrarAnaliseGramatical(const char* regra) {
-    printf("║ Regra: %-53s ║\n", regra);
+    // Exibindo a regra com destaque em verde
+    printf(YELLOW "╔══════════════════════════════════════════════════════════════════════════════════════════════════╗\n" RESET);
+    printf(YELLOW "║ Regra: %-91s \n" RESET, regra);
+    printf(YELLOW "╚══════════════════════════════════════════════════════════════════════════════════════════════════╝\n" RESET);
+
+    // Verificando se a árvore de arquivo está configurada
     if (arvore_arquivo != NULL) {
+        // Imprime espaços dependendo do nível da árvore
         for (int i = 0; i < nivel_arvore; i++) {
             fprintf(arvore_arquivo, "  ");
         }
-        fprintf(arvore_arquivo, "└─ %s\n", regra);
+
+        // Imprime a regra no arquivo com destaque
+        fprintf(arvore_arquivo, BLUE "└─ %s\n" RESET, regra);
+    } else {
+        // Caso a árvore de arquivo seja nula, exibe uma mensagem de erro
+        fprintf(stderr, RED "Erro: árvore de arquivo não inicializada.\n" RESET);
     }
 }
 
@@ -386,7 +410,7 @@ comando_give
                 SimboloEntrada* func = buscar_simbolo(analisador, analisador->escopo_atual + 7);
                 if (func && func->info.funcao.tipo_retorno != TIPO_VOID) {
                     printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                    printf("║ Função '%s' deve retornar um valor                   ║\n", analisador->escopo_atual + 7);
+                    printf("║ Função '%s' deve retornar um valor                   \n", analisador->escopo_atual + 7);
                     printf("╚═══════════════════════════════════════════════════════╝\n\n");
                     analisador->num_erros++;
                 }
@@ -408,12 +432,12 @@ atribuicao
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $1.nome);
             if (simbolo == NULL) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          ║\n", $1.nome);
+                printf("║ Variável '%s' não declarada                          \n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             } else if (!verificar_compatibilidade_tipos(analisador, simbolo->tipo, $3->info.literal.tipo, $1.nome)) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Tipo incompatível na atribuição para '%s'            ║\n", $1.nome);
+                printf("║ Tipo incompatível na atribuição para '%s'            \n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             }
@@ -424,17 +448,17 @@ atribuicao
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $1.nome);
             if (simbolo == NULL) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          ║\n", $1.nome);
+                printf("║ Variável '%s' não declarada                          \n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             } else if (simbolo->tipo != TIPO_VETOR) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não é um vetor                         ║\n", $1.nome);
+                printf("║ Variável '%s' não é um vetor                         \n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             } else if (!verificar_compatibilidade_tipos(analisador, simbolo->info.vetor.tipo_base, $6->info.literal.tipo, $1.nome)) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Tipo incompatível na atribuição para '%s'            ║\n", $1.nome);
+                printf("║ Tipo incompatível na atribuição para '%s'            \n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             }
@@ -450,7 +474,7 @@ atribuicao
                 analisador->num_erros++;
             } else if (!verificar_compatibilidade_tipos(analisador, simbolo->tipo, $3->info.literal.tipo, $1.nome)) {
                 printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Tipo incompatível na operação += para '%s'           ║\n", $1.nome);
+                printf("║ Tipo incompatível na operação += para '%s'           \n", $1.nome);
                 printf("╚═══════════════════════════════════════════════════════╝\n\n");
                 analisador->num_erros++;
             }
@@ -692,15 +716,15 @@ TipoVariavel verificarTipos(TipoVariavel tipo1, const char* operador, TipoVariav
 }
 
 void yyerror(const char *s) {
-    printf("\n╔══════════════════════ ERRO SINTÁTICO ══════════════════════╗\n");
-    printf("║ Linha: %-52d ║\n", linha);
-    printf("║ Erro:  %-52s ║\n", s);
-    printf("║                                                             ║\n");
+    printf(RED"\n╔══════════════════════ ERRO SINTÁTICO ══════════════════════╗\n");
+    printf("║ Linha: %-51d ║\n", linha);
+    printf("║ Erro:  %-51s ║\n", s);
+    printf("║                                                            ║\n");
     printf("║ Contexto do Erro:                                          ║\n");
-    printf("║ - Verificar tipos dos operandos                           ║\n");
-    printf("║ - Verificar sintaxe da expressão                          ║\n");
-    printf("║ - Verificar declaração de variáveis                       ║\n");
-    printf("╚═══════════════════════════════════════════════════════════════╝\n\n");
+    printf("║ - Verificar tipos dos operandos                            ║\n");
+    printf("║ - Verificar sintaxe da expressão                           ║\n");
+    printf("║ - Verificar declaração de variáveis                        ║\n");
+    printf("╚════════════════════════════════════════════════════════════╝ \n\n"RESET);
 }
 
 void exibir_cabecalho() {
@@ -720,6 +744,7 @@ void exibir_rodape() {
     printf("╚════════════════════════════════════════════════════════╝\n\n");
     printf("\033[0m"); // Reseta as cores para o padrão
 }
+
 int main(void) 
 {
     // Exibe o cabeçalho do compilador

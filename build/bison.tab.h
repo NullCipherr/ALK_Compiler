@@ -103,7 +103,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 105 "src/bison.y"
+#line 129 "src/bison.y"
 
     struct {
         char* nome;
