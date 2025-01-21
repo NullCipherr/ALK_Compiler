@@ -104,25 +104,55 @@ void fechar_arquivo_arvore() {
 
 // Função para mostrar a análise gramatical
 void mostrarAnaliseGramatical(const char* regra) {
-    // Exibindo a regra com destaque em verde
+    // Null check for input parameter
+    if (regra == NULL) {
+        fprintf(stderr, RED "Erro: regra é NULL\n" RESET);
+        return;
+    }
+
+    // Limit string length for safety
+    const size_t MAX_REGRA_LEN = 80;
+    char regra_safe[MAX_REGRA_LEN + 1];
+    strncpy(regra_safe, regra, MAX_REGRA_LEN);
+    regra_safe[MAX_REGRA_LEN] = '\0';
+
+    // Console output with length-limited format
     printf(YELLOW "╔══════════════════════════════════════════════════════════════════════════════════════════════════╗\n" RESET);
-    printf(YELLOW "║ Regra: %-91s \n" RESET, regra);
+    printf(YELLOW "║ Regra: %-80.80s \n" RESET, regra_safe);
     printf(YELLOW "╚══════════════════════════════════════════════════════════════════════════════════════════════════╝\n" RESET);
 
-    // Verificando se a árvore de arquivo está configurada
+    // File output with safety checks
     if (arvore_arquivo != NULL) {
-        // Imprime espaços dependendo do nível da árvore
-        for (int i = 0; i < nivel_arvore; i++) {
-            fprintf(arvore_arquivo, "  ");
+        // Limit indentation level
+        const int MAX_NIVEL = 100;
+        int nivel_seguro = (nivel_arvore > MAX_NIVEL) ? MAX_NIVEL : nivel_arvore;
+        
+        // Write indentation
+        for (int i = 0; i < nivel_seguro && !ferror(arvore_arquivo); i++) {
+            if (fputs("  ", arvore_arquivo) == EOF) {
+                fprintf(stderr, RED "Erro ao escrever indentação no arquivo\n" RESET);
+                return;
+            }
         }
-
-        // Imprime a regra no arquivo com destaque
-        fprintf(arvore_arquivo, "└─ %s\n", regra);
-    } else {
-        // Caso a árvore de arquivo seja nula, exibe uma mensagem de erro
-        fprintf(stderr, RED "Erro: árvore de arquivo não inicializada.\n" RESET);
+        
+        // Write rule
+        if (fprintf(arvore_arquivo, "└─ %s\n", regra_safe) < 0) {
+            fprintf(stderr, RED "Erro ao escrever regra no arquivo\n" RESET);
+            return;
+        }
     }
 }
+
+void printar_erro_semantico(const char* erro_titulo, const char* mensagem, const char* identificador) {
+    printf(BLUE"\n╔════════════════════════ ERRO SEMÂNTICO ════════════════════════╗\n");
+    printf("║ %-51s \n", erro_titulo);
+    printf("║ %-51s \n", mensagem);
+    if (identificador) {
+        printf("║ Variável: '%s'%*s\n", identificador, 34 - (int)strlen(identificador), "");
+    }
+    printf("╚════════════════════════════════════════════════════════════════╝\n\n"RESET);
+}
+
 
 %}
 
@@ -254,17 +284,13 @@ declaracao_variavel
     : DECL_CREATE tipo IDENTIFIER DECL_AS expressao DELIM_END_STATEMENT
         {
             if (!inserir_simbolo(analisador, $3.nome, $2)) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' já declarada                           ║\n", $3.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico("Variável já declarada", "A variável já foi declarada anteriormente", $3.nome);
                 YYERROR;
             }
             // Verificar o tipo da expressão através do analisador semântico
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $3.nome);
             if (!verificar_compatibilidade_tipos(analisador, $2, simbolo->tipo, $3.nome)) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Tipo incompatível na inicialização da variável '%s'  ║\n", $3.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico("Tipo incompatível", "Erro ao inicializar a variável com tipo incompatível", $3.nome);
                 YYERROR;
             }
             $$ = criar_no_declaracao_var($3.nome, $2, $5);
@@ -274,15 +300,11 @@ declaracao_variavel
         {
             int tamanho = atoi($5.valor);
             if (tamanho <= 0) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Tamanho inválido para o vetor '%s'                   ║\n", $3.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico("Tamanho inválido", "O tamanho do vetor deve ser maior que zero.",$3.nome);
                 YYERROR;
             }
             if (!inserir_vetor(analisador, $3.nome, $2, tamanho)) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' já declarada                           ║\n", $3.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico("Variável já declarada","A variável já foi declarada anteriormente.",$3.nome);
                 YYERROR;
             }
             NoArvore* literal = criar_no_literal($5.valor, TIPO_INT);
@@ -395,9 +417,11 @@ comando_give
                 strncmp(analisador->escopo_atual, "funcao_", 7) == 0) {
                 SimboloEntrada* func = buscar_simbolo(analisador, analisador->escopo_atual + 7);
                 if (func && func->info.funcao.tipo_retorno != $3->info.literal.tipo) {
-                    printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                    printf("║ Tipo de retorno incompatível na função '%s'          ║\n", analisador->escopo_atual + 7);
-                    printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                    printar_erro_semantico(
+                        "Erro de Tipo de Retorno",
+                        "Tipo de retorno incompatível na função",
+                        analisador->escopo_atual + 7
+                    );
                     analisador->num_erros++;
                 }
             }
@@ -409,9 +433,11 @@ comando_give
                 strncmp(analisador->escopo_atual, "funcao_", 7) == 0) {
                 SimboloEntrada* func = buscar_simbolo(analisador, analisador->escopo_atual + 7);
                 if (func && func->info.funcao.tipo_retorno != TIPO_VOID) {
-                    printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                    printf("║ Função '%s' deve retornar um valor                   \n", analisador->escopo_atual + 7);
-                    printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                     printar_erro_semantico(
+                        "Erro de Tipo de Retorno",
+                        "Função deve retornar um valor",
+                        analisador->escopo_atual + 7
+                    );
                     analisador->num_erros++;
                 }
             }
@@ -431,14 +457,18 @@ atribuicao
             mostrarAnaliseGramatical("Atribuição → Identificador = Expressão");
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $1.nome);
             if (simbolo == NULL) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Variável Não Declarada",
+                    "Variável não foi declarada antes do uso",
+                    $1.nome
+                );
                 analisador->num_erros++;
             } else if (!verificar_compatibilidade_tipos(analisador, simbolo->tipo, $3->info.literal.tipo, $1.nome)) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Tipo incompatível na atribuição para '%s'            \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Tipo Incompatível",
+                    "Tipo incompatível na atribuição",
+                    $1.nome
+                );
                 analisador->num_erros++;
             }
         }
@@ -447,19 +477,25 @@ atribuicao
             mostrarAnaliseGramatical("Atribuição → Identificador[Expressão] = Expressão");
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $1.nome);
             if (simbolo == NULL) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Variável Não Declarada",
+                    "Variável não foi declarada antes do uso",
+                    $1.nome
+                );
                 analisador->num_erros++;
             } else if (simbolo->tipo != TIPO_VETOR) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não é um vetor                         \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Erro de Tipo",
+                    "Variável não é um vetor",
+                    $1.nome
+                );
                 analisador->num_erros++;
             } else if (!verificar_compatibilidade_tipos(analisador, simbolo->info.vetor.tipo_base, $6->info.literal.tipo, $1.nome)) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Tipo incompatível na atribuição para '%s'            \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Tipo Incompatível",
+                    "Tipo incompatível na atribuição",
+                    $1.nome
+                );
                 analisador->num_erros++;
             }
         }
@@ -468,14 +504,18 @@ atribuicao
             mostrarAnaliseGramatical("Atribuição → Identificador += Expressão");
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $1.nome);
             if (simbolo == NULL) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Variável Não Declarada",
+                    "Variável não foi declarada antes do uso",
+                    $1.nome
+                );
                 analisador->num_erros++;
             } else if (!verificar_compatibilidade_tipos(analisador, simbolo->tipo, $3->info.literal.tipo, $1.nome)) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Tipo incompatível na operação += para '%s'           \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Tipo Incompatível",
+                    "Tipo incompatível na operação '+='",
+                    $1.nome
+                );
                 analisador->num_erros++;
             }
         }
@@ -532,9 +572,11 @@ fator
         { 
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $1.nome);
             if (simbolo == NULL) {
-                printf("\n╔════════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Variável Não Declarada",
+                    "Variável não foi declarada antes do uso",
+                    $1.nome
+                );
                 analisador->num_erros++;
                 $$ = criar_no_identificador($1.nome, TIPO_ERRO);
             } else {
@@ -545,15 +587,19 @@ fator
         {
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $1.nome);
             if (simbolo == NULL) {
-                printf("\n╔════════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printar_erro_semantico(
+                    "Variável Não Declarada",
+                    "Variável não foi declarada antes do uso",
+                    $1.nome
+                );
                 analisador->num_erros++;
                 $$ = criar_no_identificador($1.nome, TIPO_ERRO);
             } else if (simbolo->tipo != TIPO_VETOR) {
-                printf("\n╔════════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não é um vetor                         \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printar_erro_semantico(
+                    "Tipo de Variável Inválido",
+                    "Variável não é um vetor",
+                    $1.nome
+                );
                 analisador->num_erros++;
                 $$ = criar_no_identificador($1.nome, TIPO_ERRO);
             } else {
@@ -591,9 +637,11 @@ chamada_funcao
         {
             SimboloEntrada* func = buscar_simbolo(analisador, $1.nome);
             if (func == NULL || func->tipo != TIPO_FUNCAO) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Função '%s' não declarada                             ║\n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printar_erro_semantico(
+                    "Função Não Declarada",
+                    "Função não foi declarada ou não é do tipo função",
+                    $1.nome
+                );
                 analisador->num_erros++;
                 $$ = NULL;
             } else {
@@ -612,9 +660,11 @@ chamada_funcao
             if ($3.tipo == TIPO_INT || $3.tipo == TIPO_FLOAT || $3.tipo == TIPO_CHAR || $3.tipo == TIPO_STRING) {
                 $$ = criar_no_chamada_func("scan", criar_no_identificador($3.nome, $3.tipo));
             } else {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Tipo inválido para scan: '%s'                        ║\n", tipoParaString($3.tipo));
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Tipo Inválido para scan",
+                    "Tipo inválido para scan. Tipos permitidos: int, float, char, string",
+                    tipoParaString($3.tipo)
+                );
                 analisador->num_erros++;
                 $$ = NULL;
             }
@@ -627,9 +677,11 @@ acesso_variavel
             mostrarAnaliseGramatical("Acesso Variável → Identificador");
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $1.nome);
             if (simbolo == NULL) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Variável não declarada",
+                    "A variável não foi declarada antes de ser utilizada.",
+                    $1.nome
+                );
                 analisador->num_erros++;
             }
         }
@@ -638,14 +690,18 @@ acesso_variavel
             mostrarAnaliseGramatical("Acesso Variável → Identificador [ Expressão ]");
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $1.nome);
             if (simbolo == NULL) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não declarada                          \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Variável não declarada",
+                    "A variável não foi declarada antes de ser utilizada.",
+                    $1.nome
+                );
                 analisador->num_erros++;
             } else if (simbolo->tipo != TIPO_VETOR) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Variável '%s' não é um vetor                         \n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n\n");
+                printar_erro_semantico(
+                    "Não é um vetor",
+                    "A variável acessada não é um vetor.",
+                    $1.nome
+                );
                 analisador->num_erros++;
             }
         }
@@ -716,15 +772,15 @@ TipoVariavel verificarTipos(TipoVariavel tipo1, const char* operador, TipoVariav
 }
 
 void yyerror(const char *s) {
-    printf(RED"\n╔══════════════════════ ERRO SINTÁTICO ══════════════════════╗\n");
-    printf("║ Linha: %-51d ║\n", linha);
-    printf("║ Erro:  %-51s ║\n", s);
-    printf("║                                                            ║\n");
-    printf("║ Contexto do Erro:                                          ║\n");
-    printf("║ - Verificar tipos dos operandos                            ║\n");
-    printf("║ - Verificar sintaxe da expressão                           ║\n");
-    printf("║ - Verificar declaração de variáveis                        ║\n");
-    printf("╚════════════════════════════════════════════════════════════╝ \n\n"RESET);
+    printf(RED"\n╔════════════════════════ ERRO SINTÁTICO ════════════════════════╗\n");
+    printf("║ Linha: %-51d     ║\n", linha);
+    printf("║ Erro:  %-51s     ║\n", s);
+    printf("║                                                                ║\n");
+    printf("║ Contexto do Erro:                                              ║\n");
+    printf("║ - Verificar tipos dos operandos                                ║\n");
+    printf("║ - Verificar sintaxe da expressão                               ║\n");
+    printf("║ - Verificar declaração de variáveis                            ║\n");
+    printf("╚════════════════════════════════════════════════════════════════╝ \n\n"RESET);
 }
 
 void exibir_cabecalho() {

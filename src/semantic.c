@@ -50,6 +50,27 @@
 
 #include "semantic.h"
 
+// Definindo códigos ANSI para cores
+#define RESET "\033[0m"
+#define BLUE "\033[34m"
+
+// Função para registrar a operação de print
+void imprimir_erro_semantico(const char *erro_msg, const char *detalhes)
+{
+    printf(BLUE "\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
+    printf("║ %s                                              ║\n", erro_msg);
+    printf("║ Detalhes: %s                                    ║\n", detalhes);
+    printf("╚═══════════════════════════════════════════════════════╝\n" RESET);
+}
+
+void printar_erro_argumentos(const char *nome_funcao, int num_params_esperado, int num_args_recebido)
+{
+    printf(BLUE "\n╔════════════════════════ ERRO SEMÂNTICO ════════════════════════╗\n");
+    printf("║ Número incorreto de argumentos para função '%s'       \n", nome_funcao);
+    printf("║ Esperado: %d, Recebido: %d                           \n", num_params_esperado, num_args_recebido);
+    printf("╚════════════════════════════════════════════════════════════════╝\n\n" RESET);
+}
+
 AnalisadorSemantico *iniciar_analisador_semantico(void)
 {
     AnalisadorSemantico *analisador = (AnalisadorSemantico *)malloc(sizeof(AnalisadorSemantico));
@@ -125,9 +146,7 @@ TipoVariavel verificar_tipos_operacao(AnalisadorSemantico *analisador, TipoVaria
         {
             return TIPO_STRING; // Concatenação de strings
         }
-        printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-        printf("║ Operação '%s' inválida para strings                   ║\n", operador);
-        printf("╚═══════════════════════════════════════════════════════╝\n");
+        imprimir_erro_semantico("Operação inválida com strings", operador);
         analisador->num_erros++;
         return TIPO_ERRO;
     }
@@ -176,9 +195,7 @@ int verificar_chamada_funcao(AnalisadorSemantico *analisador, const char *nome, 
     SimboloEntrada *func = buscar_simbolo(analisador, nome);
     if (func == NULL || func->tipo != TIPO_FUNCAO)
     {
-        printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-        printf("║ Função '%s' não declarada                             ║\n", nome);
-        printf("╚═══════════════════════════════════════════════════════╝\n");
+        imprimir_erro_semantico("Função não declarada", nome);
         analisador->num_erros++;
         return 0;
     }
@@ -186,11 +203,7 @@ int verificar_chamada_funcao(AnalisadorSemantico *analisador, const char *nome, 
     // Verificar número de argumentos
     if (func->info.funcao.num_params != num_args)
     {
-        printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-        printf("║ Número incorreto de argumentos para função '%s'       ║\n", nome);
-        printf("║ Esperado: %d, Recebido: %d                           ║\n",
-               func->info.funcao.num_params, num_args);
-        printf("╚═══════════════════════════════════════════════════════╝\n");
+        printar_erro_argumentos(nome, func->info.funcao.num_params, num_args);
         analisador->num_erros++;
         return 0;
     }
@@ -224,10 +237,7 @@ int inserir_vetor(AnalisadorSemantico *analisador, const char *nome, TipoVariave
     // Verificar se o tamanho é válido
     if (tamanho <= 0)
     {
-        printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-        printf("║ Tamanho inválido para vetor '%s'                      ║\n", nome);
-        printf("║ Tamanho deve ser maior que zero                       ║\n");
-        printf("╚═══════════════════════════════════════════════════════╝\n");
+        imprimir_erro_semantico("Tamanho inválido para vetor", nome);
         analisador->num_erros++;
         return 0;
     }
@@ -235,9 +245,7 @@ int inserir_vetor(AnalisadorSemantico *analisador, const char *nome, TipoVariave
     // Verificar se já existe
     if (buscar_simbolo(analisador, nome) != NULL)
     {
-        printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-        printf("║ Vetor '%s' já declarado                               ║\n", nome);
-        printf("╚═══════════════════════════════════════════════════════╝\n");
+        imprimir_erro_semantico("Vetor já declarado", nome);
         analisador->num_erros++;
         return 0;
     }
@@ -320,10 +328,7 @@ int verificar_compatibilidade_tipos(AnalisadorSemantico *analisador, TipoVariave
     case TIPO_CHAR:
         if (tipo_origem == TIPO_STRING)
         {
-            printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-            printf("║ Não é possível atribuir string para char              ║\n");
-            printf("║ Contexto: %s                                          ║\n", contexto);
-            printf("╚═══════════════════════════════════════════════════════╝\n");
+            imprimir_erro_semantico("Não é possível atribuir string para char", contexto);
             analisador->num_erros++;
             return 0;
         }
@@ -332,10 +337,7 @@ int verificar_compatibilidade_tipos(AnalisadorSemantico *analisador, TipoVariave
     case TIPO_INT:
         if (tipo_origem == TIPO_STRING)
         {
-            printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-            printf("║ Não é possível atribuir string para int               ║\n");
-            printf("║ Contexto: %s                                          ║\n", contexto);
-            printf("╚═══════════════════════════════════════════════════════╝\n");
+            imprimir_erro_semantico("Não é possível atribuir string para int", contexto);
             analisador->num_erros++;
             return 0;
         }
@@ -344,10 +346,7 @@ int verificar_compatibilidade_tipos(AnalisadorSemantico *analisador, TipoVariave
     case TIPO_FLOAT:
         if (tipo_origem == TIPO_STRING)
         {
-            printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-            printf("║ Não é possível atribuir string para float             ║\n");
-            printf("║ Contexto: %s                                          ║\n", contexto);
-            printf("╚═══════════════════════════════════════════════════════╝\n");
+            imprimir_erro_semantico("Não é possível atribuir string para float", contexto);
             analisador->num_erros++;
             return 0;
         }
@@ -357,40 +356,29 @@ int verificar_compatibilidade_tipos(AnalisadorSemantico *analisador, TipoVariave
         // String pode receber apenas string
         if (tipo_origem != TIPO_STRING)
         {
-            printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-            printf("║ Tipo incompatível na atribuição para string           ║\n");
-            printf("║ Contexto: %s                                          ║\n", contexto);
-            printf("╚═══════════════════════════════════════════════════════╝\n");
+            imprimir_erro_semantico("Não é possível atribuir int para string", contexto);
             analisador->num_erros++;
             return 0;
         }
         break;
 
     case TIPO_VOID:
-        printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-        printf("║ Não é possível atribuir valor para tipo void           ║\n");
-        printf("║ Contexto: %s                                           ║\n", contexto);
-        printf("╚═══════════════════════════════════════════════════════╝\n");
+        imprimir_erro_semantico("Não é possível atribuir valor para void", contexto);
         analisador->num_erros++;
         return 0;
 
     case TIPO_FUNCAO:
-        printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-        printf("║ Não é possível atribuir valor para função              ║\n");
-        printf("║ Contexto: %s                                           ║\n", contexto);
-        printf("╚═══════════════════════════════════════════════════════╝\n");
+        imprimir_erro_semantico("Não é possível atribuir valor para função", contexto);
         analisador->num_erros++;
         return 0;
 
     case TIPO_VETOR:
-        printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-        printf("║ Não é possível atribuir valor diretamente para vetor   ║\n");
-        printf("║ Contexto: %s                                           ║\n", contexto);
-        printf("╚═══════════════════════════════════════════════════════╝\n");
+        imprimir_erro_semantico("Não é possível atribuir valor para vetor", contexto);
         analisador->num_erros++;
         return 0;
 
     case TIPO_ERRO:
+        imprimir_erro_semantico("Erro interno: tipos incompatíveis", contexto);
         return 0; // Já houve erro anterior
     }
 
