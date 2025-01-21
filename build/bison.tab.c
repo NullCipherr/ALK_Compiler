@@ -137,7 +137,7 @@ void mostrarAnaliseGramatical(const char* regra) {
         }
 
         // Imprime a regra no arquivo com destaque
-        fprintf(arvore_arquivo, BLUE "└─ %s\n" RESET, regra);
+        fprintf(arvore_arquivo, "└─ %s\n", regra);
     } else {
         // Caso a árvore de arquivo seja nula, exibe uma mensagem de erro
         fprintf(stderr, RED "Erro: árvore de arquivo não inicializada.\n" RESET);
