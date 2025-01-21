@@ -178,7 +178,7 @@ programa
           }
           raiz_ast = criar_no_programa(lista_completa);
           if (arvore_arquivo != NULL) {
-              imprimir_arvore(raiz_ast, arvore_arquivo, 0);
+              // imprimir_arvore(raiz_ast, arvore_arquivo, 0);
           }
       }
     ;

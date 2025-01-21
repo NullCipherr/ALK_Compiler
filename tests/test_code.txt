@@ -11,7 +11,7 @@ create float notas[-1] as array;  // Erro: tamanho negativo
 
 // Função com erros de tipo
 function float calcular_media(float nota1, int nota2) {
-    create int media as nota1 plus nota2;  // Erro: atribuição de float para int (Não Implementado)
+    create int media as nota1 plus nota2;  // Erro: atribuição de float para int
     give back "aprovado";  // Erro: retorno string em função float
 }
 

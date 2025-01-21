@@ -73,9 +73,20 @@ NoArvore *criar_no_while(NoArvore *condicao, NoArvore *bloco)
 
 NoArvore *criar_no_expressao(char *operador, NoArvore *esq, NoArvore *dir)
 {
-    NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
+    NoArvore *no = malloc(sizeof(NoArvore));
+    memset(no, 0, sizeof(NoArvore)); // Zera a struct
     no->tipo = NO_EXPRESSAO;
-    no->info.expressao.operador = strdup(operador);
+
+    // Evita strdup em operador nulo:
+    if (operador)
+    {
+        no->info.expressao.operador = strdup(operador);
+    }
+    else
+    {
+        no->info.expressao.operador = NULL;
+    }
+
     no->info.expressao.esquerda = esq;
     no->info.expressao.direita = dir;
     no->proximo = NULL;
@@ -84,31 +95,52 @@ NoArvore *criar_no_expressao(char *operador, NoArvore *esq, NoArvore *dir)
 
 NoArvore *criar_no_chamada_func(char *nome, NoArvore *args)
 {
-    NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
+    NoArvore *no = malloc(sizeof(NoArvore));
+    memset(no, 0, sizeof(NoArvore));
     no->tipo = NO_CHAMADA_FUNC;
-    no->info.chamada_func.nome = strdup(nome);
+    if (nome)
+    {
+        no->info.chamada_func.nome = strdup(nome);
+    }
+    else
+    {
+        no->info.chamada_func.nome = NULL;
+    }
     no->info.chamada_func.argumentos = args;
-    no->proximo = NULL;
     return no;
 }
 
 NoArvore *criar_no_identificador(char *nome, TipoVariavel tipo)
 {
-    NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
+    NoArvore *no = malloc(sizeof(NoArvore));
+    memset(no, 0, sizeof(NoArvore));
     no->tipo = NO_IDENTIFICADOR;
-    no->info.identificador.nome = strdup(nome);
+    if (nome)
+    {
+        no->info.identificador.nome = strdup(nome);
+    }
+    else
+    {
+        no->info.identificador.nome = NULL;
+    }
     no->info.identificador.tipo = tipo;
-    no->proximo = NULL;
     return no;
 }
 
 NoArvore *criar_no_literal(char *valor, TipoVariavel tipo)
 {
-    NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
+    NoArvore *no = malloc(sizeof(NoArvore));
+    memset(no, 0, sizeof(NoArvore));
     no->tipo = NO_LITERAL;
-    no->info.literal.valor = strdup(valor);
+    if (valor)
+    {
+        no->info.literal.valor = strdup(valor);
+    }
+    else
+    {
+        no->info.literal.valor = NULL;
+    }
     no->info.literal.tipo = tipo;
-    no->proximo = NULL;
     return no;
 }
 
@@ -268,7 +300,10 @@ void liberar_arvore(NoArvore *no)
         break;
 
     case NO_DECLARACAO_FUNC:
-        free(no->info.declaracao_func.nome);
+        if (no->info.declaracao_func.nome != NULL)
+        {
+            free(no->info.declaracao_func.nome);
+        }
         liberar_arvore(no->info.declaracao_func.parametros);
         liberar_arvore(no->info.declaracao_func.corpo);
         break;
@@ -285,22 +320,34 @@ void liberar_arvore(NoArvore *no)
         break;
 
     case NO_EXPRESSAO:
-        free(no->info.expressao.operador);
+        if (no->info.expressao.operador != NULL)
+        {
+            free(no->info.expressao.operador);
+        }
         liberar_arvore(no->info.expressao.esquerda);
         liberar_arvore(no->info.expressao.direita);
         break;
 
     case NO_CHAMADA_FUNC:
-        free(no->info.chamada_func.nome);
+        if (no->info.chamada_func.nome != NULL)
+        {
+            free(no->info.chamada_func.nome);
+        }
         liberar_arvore(no->info.chamada_func.argumentos);
         break;
 
     case NO_IDENTIFICADOR:
-        free(no->info.identificador.nome);
+        if (no->info.identificador.nome != NULL)
+        {
+            free(no->info.identificador.nome);
+        }
         break;
 
     case NO_LITERAL:
-        free(no->info.literal.valor);
+        if (no->info.literal.valor != NULL)
+        {
+            free(no->info.literal.valor);
+        }
         break;
 
     case NO_PROGRAMA:
@@ -316,6 +363,6 @@ void liberar_arvore(NoArvore *no)
         break;
     }
 
+    free(no);                // Libera o nó atual
     liberar_arvore(proximo); // Usa o ponteiro salvo
-    free(no);
 }
