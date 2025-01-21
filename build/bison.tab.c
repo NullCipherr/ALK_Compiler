@@ -2302,9 +2302,9 @@ void exibir_cabecalho() {
 
 void exibir_rodape() {
     printf("\033[1;34m"); // Define a cor do texto para azul brilhante
-    printf("\n╔════════════════════════════════════════════════════════╗\n");
-    printf("║      Obrigado por utilizar o Compilador ALK!           ║\n");
-    printf("╚════════════════════════════════════════════════════════╝\n\n");
+    printf("\n╔══════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
+    printf("║                           Obrigado por utilizar o Compilador ALK!                                ║\n");
+    printf("╚══════════════════════════════════════════════════════════════════════════════════════════════════╝\n\n");
     printf("\033[0m"); // Reseta as cores para o padrão
 }
 
