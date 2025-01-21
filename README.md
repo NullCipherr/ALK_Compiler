@@ -81,33 +81,33 @@ make clean
 
 ### Declaração de Variáveis
 
-        create int x as 10;
-        create float pi as 3.14;
-        create string msg as "Hello";
-        create int vetor[5] as array;
+    create int x as 10;
+    create float pi as 3.14;
+    create string msg as "Hello";
+    create int vetor[5] as array;
 
 ### Estruturas de Controle
 
-        check (x is_greater_than 0) then {
-            print("Positivo");
-        } otherwise {
-            print("Não positivo");
-        }
+    check (x is_greater_than 0) then {
+        print("Positivo");
+    } otherwise {
+        print("Não positivo");
+    }
 
-        repeat while (i is_less_than 10) {
-            print(i);
-            i = i plus 1;
-        }
+    repeat while (i is_less_than 10) {
+        print(i);
+        i = i plus 1;
+    }
 
 ### Funções
 
-        function int soma(int a, int b) {
-            give back a plus b;
-        }
+    function int soma(int a, int b) {
+        give back a plus b;
+    }
 
-        function void imprimir(string msg) {
-            print(msg);
-        }
+    function void imprimir(string msg) {
+        print(msg);
+    }
 
 ## Testes
 
