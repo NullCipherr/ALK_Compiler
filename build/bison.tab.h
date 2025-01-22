@@ -103,7 +103,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 162 "src/bison.y"
+#line 165 "src/bison.y"
 
     struct {
         char* nome;
@@ -114,7 +114,7 @@ union YYSTYPE
         char* valor;
         int num;
     } literal;
-    struct NoArvore* no;  // Novo campo para nós da árvore
+    struct NoArvore* no;
 
 #line 120 "build/bison.tab.h"
 

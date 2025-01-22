@@ -1,3 +1,7 @@
+└─ Chamada Função → print ( Expressão )
 Programa
-Declaração Variável: x (tipo: inteiro)
-Literal: 3 (tipo: inteiro)
+  Declaração Variável: x (tipo: inteiro)
+    Literal: 3 (tipo: inteiro)
+  Chamada Função: print
+    Argumentos:
+      Identificador: x (tipo: inteiro)

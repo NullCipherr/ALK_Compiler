@@ -252,58 +252,41 @@ const char *tipoParaString(TipoVariavel tipo)
 // Função para imprimir a árvore
 void imprimir_arvore(NoArvore *no, FILE *arquivo, int nivel)
 {
-    if (no == NULL)
-    {
-        fprintf(arquivo, "Erro: Nó nulo\n");
-        return;
-    }
-    else if (arquivo == NULL)
-    {
-        fprintf(stderr, "Erro: Arquivo nulo\n");
-        return;
-    }
-    else if (nivel < 0)
-    {
-        fprintf(stderr, "Erro: Nível negativo\n");
+    // Verificação inicial de parâmetros
+    if (no == NULL || arquivo == NULL || nivel < 0) {
         return;
     }
 
     // Imprime a indentação
-    for (int i = 0; i < nivel; i++)
-    {
-        printf("  ");
-    }
+    imprimir_indentacao(arquivo, nivel);
 
-    switch (no->tipo)
-    {
+    switch (no->tipo) {
     case NO_PROGRAMA:
         fprintf(arquivo, "Programa\n");
-        if (no->info.programa.corpo != NULL)
-        {
-            nivel++;
+        if (no->info.programa.corpo != NULL) {
             imprimir_arvore(no->info.programa.corpo, arquivo, nivel + 1);
-            nivel--;
         }
         break;
 
     case NO_DECLARACAO_VAR:
-        fprintf(arquivo, "Declaração Variável: %s (tipo: %s)\n", no->info.declaracao_var.nome, tipoParaString(no->info.declaracao_var.tipo));
-        if (no->info.declaracao_var.valor != NULL)
-        {
+        fprintf(arquivo, "Declaração Variável: %s (tipo: %s)\n", 
+            no->info.declaracao_var.nome ? no->info.declaracao_var.nome : "NULL",
+            tipoParaString(no->info.declaracao_var.tipo));
+        if (no->info.declaracao_var.valor != NULL) {
             imprimir_arvore(no->info.declaracao_var.valor, arquivo, nivel + 1);
         }
         break;
 
     case NO_DECLARACAO_FUNC:
-        fprintf(arquivo, "Declaração Função: %s (retorno: %s)\n", no->info.declaracao_func.nome, tipoParaString(no->info.declaracao_func.tipo_retorno));
-        if (no->info.declaracao_func.parametros != NULL)
-        {
+        fprintf(arquivo, "Declaração Função: %s (retorno: %s)\n",
+            no->info.declaracao_func.nome ? no->info.declaracao_func.nome : "NULL",
+            tipoParaString(no->info.declaracao_func.tipo_retorno));
+        if (no->info.declaracao_func.parametros != NULL) {
             imprimir_indentacao(arquivo, nivel + 1);
             fprintf(arquivo, "Parâmetros:\n");
             imprimir_arvore(no->info.declaracao_func.parametros, arquivo, nivel + 2);
         }
-        if (no->info.declaracao_func.corpo != NULL)
-        {
+        if (no->info.declaracao_func.corpo != NULL) {
             imprimir_indentacao(arquivo, nivel + 1);
             fprintf(arquivo, "Corpo:\n");
             imprimir_arvore(no->info.declaracao_func.corpo, arquivo, nivel + 2);
@@ -312,14 +295,17 @@ void imprimir_arvore(NoArvore *no, FILE *arquivo, int nivel)
 
     case NO_COMANDO_IF:
         fprintf(arquivo, "If\n");
-        imprimir_indentacao(arquivo, nivel + 1);
-        fprintf(arquivo, "Condição:\n");
-        imprimir_arvore(no->info.comando_if.condicao, arquivo, nivel + 2);
-        imprimir_indentacao(arquivo, nivel + 1);
-        fprintf(arquivo, "Then:\n");
-        imprimir_arvore(no->info.comando_if.bloco_then, arquivo, nivel + 2);
-        if (no->info.comando_if.bloco_else)
-        {
+        if (no->info.comando_if.condicao != NULL) {
+            imprimir_indentacao(arquivo, nivel + 1);
+            fprintf(arquivo, "Condição:\n");
+            imprimir_arvore(no->info.comando_if.condicao, arquivo, nivel + 2);
+        }
+        if (no->info.comando_if.bloco_then != NULL) {
+            imprimir_indentacao(arquivo, nivel + 1);
+            fprintf(arquivo, "Then:\n");
+            imprimir_arvore(no->info.comando_if.bloco_then, arquivo, nivel + 2);
+        }
+        if (no->info.comando_if.bloco_else != NULL) {
             imprimir_indentacao(arquivo, nivel + 1);
             fprintf(arquivo, "Else:\n");
             imprimir_arvore(no->info.comando_if.bloco_else, arquivo, nivel + 2);
@@ -328,77 +314,65 @@ void imprimir_arvore(NoArvore *no, FILE *arquivo, int nivel)
 
     case NO_COMANDO_WHILE:
         fprintf(arquivo, "While\n");
-        imprimir_indentacao(arquivo, nivel + 1);
-        fprintf(arquivo, "Condição:\n");
-        imprimir_arvore(no->info.comando_while.condicao, arquivo, nivel + 2);
-        imprimir_indentacao(arquivo, nivel + 1);
-        fprintf(arquivo, "Corpo:\n");
-        imprimir_arvore(no->info.comando_while.bloco, arquivo, nivel + 2);
+        if (no->info.comando_while.condicao != NULL) {
+            imprimir_indentacao(arquivo, nivel + 1);
+            fprintf(arquivo, "Condição:\n");
+            imprimir_arvore(no->info.comando_while.condicao, arquivo, nivel + 2);
+        }
+        if (no->info.comando_while.bloco != NULL) {
+            imprimir_indentacao(arquivo, nivel + 1);
+            fprintf(arquivo, "Corpo:\n");
+            imprimir_arvore(no->info.comando_while.bloco, arquivo, nivel + 2);
+        }
         break;
 
     case NO_EXPRESSAO:
-        fprintf(arquivo, "Expressão: %s\n", no->info.expressao.operador);
-        imprimir_arvore(no->info.expressao.esquerda, arquivo, nivel + 1);
-        imprimir_arvore(no->info.expressao.direita, arquivo, nivel + 1);
+        fprintf(arquivo, "Expressão: %s\n", 
+            no->info.expressao.operador ? no->info.expressao.operador : "NULL");
+        if (no->info.expressao.esquerda != NULL) {
+            imprimir_arvore(no->info.expressao.esquerda, arquivo, nivel + 1);
+        }
+        if (no->info.expressao.direita != NULL) {
+            imprimir_arvore(no->info.expressao.direita, arquivo, nivel + 1);
+        }
         break;
 
     case NO_CHAMADA_FUNC:
-        fprintf(arquivo, "Chamada Função: %s\n", no->info.chamada_func.nome);
-        imprimir_indentacao(arquivo, nivel + 1);
-        fprintf(arquivo, "Argumentos:\n");
-        imprimir_arvore(no->info.chamada_func.argumentos, arquivo, nivel + 2);
+        fprintf(arquivo, "Chamada Função: %s\n",
+            no->info.chamada_func.nome ? no->info.chamada_func.nome : "NULL");
+        if (no->info.chamada_func.argumentos != NULL) {
+            imprimir_indentacao(arquivo, nivel + 1);
+            fprintf(arquivo, "Argumentos:\n");
+            imprimir_arvore(no->info.chamada_func.argumentos, arquivo, nivel + 2);
+        }
         break;
 
     case NO_IDENTIFICADOR:
-        if (no->info.identificador.nome != NULL)
-        {
-            fprintf(arquivo, "Identificador: %s (tipo: %s)\n", no->info.identificador.nome, tipoParaString(no->info.identificador.tipo));
-        }
-        else
-        {
-            fprintf(arquivo, "Identificador: NULL\n");
-        }
+        fprintf(arquivo, "Identificador: %s (tipo: %s)\n",
+            no->info.identificador.nome ? no->info.identificador.nome : "NULL",
+            tipoParaString(no->info.identificador.tipo));
         break;
 
     case NO_LITERAL:
-        if (no->info.literal.valor != NULL)
-        {
-            fprintf(arquivo, "Literal: %s (tipo: %s)\n", no->info.literal.valor, tipoParaString(no->info.literal.tipo));
-        }
-        else
-        {
-            fprintf(arquivo, "Literal: NULL\n");
-        }
+        fprintf(arquivo, "Literal: %s (tipo: %s)\n",
+            no->info.literal.valor ? no->info.literal.valor : "NULL",
+            tipoParaString(no->info.literal.tipo));
         break;
 
     case NO_BLOCO:
-        if (no->info.bloco.declaracoes != NULL)
-        {
-            fprintf(arquivo, "Bloco:\n");
-            nivel++;
-            imprimir_arvore(no->info.bloco.declaracoes, arquivo, nivel + 1); // Imprimir as declarações do bloco
-            nivel--;
-        }
-        else
-        {
-            fprintf(arquivo, "Bloco: NULL\n");
+        fprintf(arquivo, "Bloco:\n");
+        if (no->info.bloco.declaracoes != NULL) {
+            imprimir_arvore(no->info.bloco.declaracoes, arquivo, nivel + 1);
         }
         break;
 
     case NO_ATRIBUICAO:
-        if (no->info.atribuicao.alvo != NULL)
-        {
-            fprintf(arquivo, "Atribuição:\n");
-            nivel++;
-            imprimir_arvore(no->info.atribuicao.alvo, arquivo, nivel + 1); // Imprimir o alvo da atribuição
-            nivel--;
+        fprintf(arquivo, "Atribuição:\n");
+        if (no->info.atribuicao.alvo != NULL) {
+            imprimir_arvore(no->info.atribuicao.alvo, arquivo, nivel + 1);
         }
-        else if (no->info.atribuicao.valor != NULL)
-        {
-            fprintf(arquivo, "Atribuição:\n");
-            nivel++;
-            imprimir_arvore(no->info.atribuicao.valor, arquivo, nivel + 1); // Imprimir o valor da atribuição
-            nivel--;
+        if (no->info.atribuicao.valor != NULL) {
+            imprimir_arvore(no->info.atribuicao.valor, arquivo, nivel + 1);
         }
         break;
 
@@ -408,8 +382,7 @@ void imprimir_arvore(NoArvore *no, FILE *arquivo, int nivel)
     }
 
     // Imprime o próximo nó da lista (se houver)
-    if (no->proximo != NULL)
-    {
+    if (no->proximo != NULL) {
         imprimir_arvore(no->proximo, arquivo, nivel);
     }
 }
@@ -417,125 +390,136 @@ void imprimir_arvore(NoArvore *no, FILE *arquivo, int nivel)
 // Função para liberar a memória da árvore
 void liberar_arvore(NoArvore *no)
 {
-    if (no == NULL)
+    if (no == NULL) {
         return;
+    }
 
-    // Libera recursivamente todos os nós
-    switch (no->tipo)
-    {
+    // Primeiro libera o próximo nó na lista
+    if (no->proximo != NULL) {
+        liberar_arvore(no->proximo);
+        no->proximo = NULL;
+    }
+
+    // Depois libera recursivamente todos os nós filhos
+    switch (no->tipo) {
     case NO_DECLARACAO_VAR:
-        if (no->info.declaracao_var.nome != NULL)
-        {
+        if (no->info.declaracao_var.nome) {
             free(no->info.declaracao_var.nome);
             no->info.declaracao_var.nome = NULL;
         }
-        if (no->info.declaracao_var.valor)
-        {
+        if (no->info.declaracao_var.valor) {
             liberar_arvore(no->info.declaracao_var.valor);
             no->info.declaracao_var.valor = NULL;
         }
         break;
 
     case NO_DECLARACAO_FUNC:
-        if (no->info.declaracao_func.nome)
-        {
+        if (no->info.declaracao_func.nome) {
             free(no->info.declaracao_func.nome);
             no->info.declaracao_func.nome = NULL;
         }
-        if (no->info.declaracao_func.parametros)
-        {
+        if (no->info.declaracao_func.parametros) {
             liberar_arvore(no->info.declaracao_func.parametros);
             no->info.declaracao_func.parametros = NULL;
         }
-        if (no->info.declaracao_func.corpo)
-        {
+        if (no->info.declaracao_func.corpo) {
             liberar_arvore(no->info.declaracao_func.corpo);
             no->info.declaracao_func.corpo = NULL;
         }
         break;
 
     case NO_COMANDO_IF:
-        if (no->info.comando_if.condicao)
-        {
+        if (no->info.comando_if.condicao) {
             liberar_arvore(no->info.comando_if.condicao);
             no->info.comando_if.condicao = NULL;
         }
-        if (no->info.comando_if.bloco_then)
-        {
+        if (no->info.comando_if.bloco_then) {
             liberar_arvore(no->info.comando_if.bloco_then);
             no->info.comando_if.bloco_then = NULL;
         }
-        if (no->info.comando_if.bloco_else)
-        {
+        if (no->info.comando_if.bloco_else) {
             liberar_arvore(no->info.comando_if.bloco_else);
             no->info.comando_if.bloco_else = NULL;
         }
         break;
 
     case NO_COMANDO_WHILE:
-        liberar_arvore(no->info.comando_while.condicao);
-        liberar_arvore(no->info.comando_while.bloco);
+        if (no->info.comando_while.condicao) {
+            liberar_arvore(no->info.comando_while.condicao);
+            no->info.comando_while.condicao = NULL;
+        }
+        if (no->info.comando_while.bloco) {
+            liberar_arvore(no->info.comando_while.bloco);
+            no->info.comando_while.bloco = NULL;
+        }
         break;
 
     case NO_EXPRESSAO:
-        if (no->info.expressao.operador != NULL)
-        {
+        if (no->info.expressao.operador) {
             free(no->info.expressao.operador);
+            no->info.expressao.operador = NULL;
         }
-        liberar_arvore(no->info.expressao.esquerda);
-        liberar_arvore(no->info.expressao.direita);
+        if (no->info.expressao.esquerda) {
+            liberar_arvore(no->info.expressao.esquerda);
+            no->info.expressao.esquerda = NULL;
+        }
+        if (no->info.expressao.direita) {
+            liberar_arvore(no->info.expressao.direita);
+            no->info.expressao.direita = NULL;
+        }
         break;
 
     case NO_CHAMADA_FUNC:
-        if (no->info.chamada_func.nome != NULL)
-        {
+        if (no->info.chamada_func.nome) {
             free(no->info.chamada_func.nome);
+            no->info.chamada_func.nome = NULL;
         }
-        liberar_arvore(no->info.chamada_func.argumentos);
+        if (no->info.chamada_func.argumentos) {
+            liberar_arvore(no->info.chamada_func.argumentos);
+            no->info.chamada_func.argumentos = NULL;
+        }
         break;
 
     case NO_IDENTIFICADOR:
-        if (no->info.identificador.nome != NULL)
-        {
+        if (no->info.identificador.nome) {
             free(no->info.identificador.nome);
+            no->info.identificador.nome = NULL;
         }
         break;
 
     case NO_LITERAL:
-        if (no->info.literal.valor != NULL)
-        {
+        if (no->info.literal.valor) {
             free(no->info.literal.valor);
+            no->info.literal.valor = NULL;
         }
         break;
 
     case NO_PROGRAMA:
-        liberar_arvore(no->info.programa.corpo);
+        if (no->info.programa.corpo) {
+            liberar_arvore(no->info.programa.corpo);
+            no->info.programa.corpo = NULL;
+        }
         break;
 
     case NO_BLOCO:
-        if (no->info.bloco.declaracoes != NULL)
-        {
+        if (no->info.bloco.declaracoes) {
             liberar_arvore(no->info.bloco.declaracoes);
+            no->info.bloco.declaracoes = NULL;
         }
         break;
 
     case NO_ATRIBUICAO:
-        if (no->info.atribuicao.alvo != NULL)
-        {
+        if (no->info.atribuicao.alvo) {
             liberar_arvore(no->info.atribuicao.alvo);
+            no->info.atribuicao.alvo = NULL;
         }
-        if (no->info.atribuicao.valor != NULL)
-        {
+        if (no->info.atribuicao.valor) {
             liberar_arvore(no->info.atribuicao.valor);
+            no->info.atribuicao.valor = NULL;
         }
-        break;
-
-    default:
-        fprintf(stderr, "Warning: Tipo não reconhecido: %d\n", no->tipo);
         break;
     }
 
-    // Libera o próximo nó na lista e o próprio nó
-    liberar_arvore(no->proximo);
+    // Por fim, libera o próprio nó
     free(no);
 }

@@ -1119,26 +1119,38 @@ YY_RULE_SETUP
 #line 159 "src/flex.l"
 { 
     yylval.id.nome = strdup(yytext);
-    yylval.id.tipo = TIPO_ERRO;  // Será definido durante a análise semântica
+    if (!yylval.id.nome) {
+        fprintf(stderr, "Erro de memória ao alocar IDENTIFIER.\n");
+        exit(EXIT_FAILURE);
+    }
+    yylval.id.tipo = TIPO_ERRO;
     emitToken("IDENTIFIER", yytext); 
-    return IDENTIFIER; 
+    return IDENTIFIER;  
 }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 165 "src/flex.l"
+#line 170 "src/flex.l"
 { 
     yylval.literal.valor = strdup(yytext);
+    if (!yylval.literal.valor) {
+        fprintf(stderr, "Erro de memória ao alocar LITERAL_INT.\n");
+        exit(EXIT_FAILURE);
+    }
     yylval.literal.num = atoi(yytext);
     emitToken("LITERAL_INT", yytext); 
-    return LITERAL_INT; 
+    return LITERAL_INT;
 }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 171 "src/flex.l"
+#line 180 "src/flex.l"
 { 
     yylval.literal.valor = strdup(yytext);
+    if (!yylval.literal.valor) {
+        fprintf(stderr, "Erro de memória ao alocar LITERAL_FLT.\n");
+        exit(EXIT_FAILURE);
+    }
     yylval.literal.num = atof(yytext);
     emitToken("LITERAL_FLT", yytext); 
     return LITERAL_FLT; 
@@ -1146,9 +1158,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 177 "src/flex.l"
+#line 190 "src/flex.l"
 { 
     yylval.literal.valor = strdup(yytext);
+    if (!yylval.literal.valor) {
+        fprintf(stderr, "Erro de memória ao alocar LITERAL_CHR.\n");
+        exit(EXIT_FAILURE);
+    }
     emitToken("LITERAL_CHR", yytext); 
     return LITERAL_CHR; 
 }
@@ -1156,16 +1172,20 @@ YY_RULE_SETUP
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 182 "src/flex.l"
+#line 199 "src/flex.l"
 { 
     yylval.literal.valor = strdup(yytext);
+    if (!yylval.literal.valor) {
+        fprintf(stderr, "Erro de memória ao alocar LITERAL_STR.\n");
+        exit(EXIT_FAILURE);
+    }
     emitToken("LITERAL_STR", yytext); 
     return LITERAL_STR; 
 }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 188 "src/flex.l"
+#line 209 "src/flex.l"
 {
     // Definições de cores ANSI
     const char* GREEN = "\033[1;32m"; // Verde brilhante
@@ -1181,10 +1201,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 203 "src/flex.l"
+#line 224 "src/flex.l"
 ECHO;
 	YY_BREAK
-#line 1188 "build/lex.yy.c"
+#line 1208 "build/lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2152,7 +2172,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 203 "src/flex.l"
+#line 224 "src/flex.l"
 
 
 int yywrap(void) {

@@ -1,0 +1,2 @@
+create int x as 3;
+print(x);

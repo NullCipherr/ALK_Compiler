@@ -158,29 +158,50 @@ COMENTARIO  "//".*
 
 {ID}        { 
     yylval.id.nome = strdup(yytext);
-    yylval.id.tipo = TIPO_ERRO;  // Será definido durante a análise semântica
+    if (!yylval.id.nome) {
+        fprintf(stderr, "Erro de memória ao alocar IDENTIFIER.\n");
+        exit(EXIT_FAILURE);
+    }
+    yylval.id.tipo = TIPO_ERRO;
     emitToken("IDENTIFIER", yytext); 
-    return IDENTIFIER; 
+    return IDENTIFIER;  
 }
+
 {INTEIRO}   { 
     yylval.literal.valor = strdup(yytext);
+    if (!yylval.literal.valor) {
+        fprintf(stderr, "Erro de memória ao alocar LITERAL_INT.\n");
+        exit(EXIT_FAILURE);
+    }
     yylval.literal.num = atoi(yytext);
     emitToken("LITERAL_INT", yytext); 
-    return LITERAL_INT; 
+    return LITERAL_INT;
 }
 {FLOAT}     { 
     yylval.literal.valor = strdup(yytext);
+    if (!yylval.literal.valor) {
+        fprintf(stderr, "Erro de memória ao alocar LITERAL_FLT.\n");
+        exit(EXIT_FAILURE);
+    }
     yylval.literal.num = atof(yytext);
     emitToken("LITERAL_FLT", yytext); 
     return LITERAL_FLT; 
 }
 {CHAR}      { 
     yylval.literal.valor = strdup(yytext);
+    if (!yylval.literal.valor) {
+        fprintf(stderr, "Erro de memória ao alocar LITERAL_CHR.\n");
+        exit(EXIT_FAILURE);
+    }
     emitToken("LITERAL_CHR", yytext); 
     return LITERAL_CHR; 
 }
 {STRING}    { 
     yylval.literal.valor = strdup(yytext);
+    if (!yylval.literal.valor) {
+        fprintf(stderr, "Erro de memória ao alocar LITERAL_STR.\n");
+        exit(EXIT_FAILURE);
+    }
     emitToken("LITERAL_STR", yytext); 
     return LITERAL_STR; 
 }

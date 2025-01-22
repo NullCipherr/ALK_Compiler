@@ -57,6 +57,11 @@
 #include "semantic.h"
 #include "ast.h"
 
+// Remover o include do FlexLexer.h e adicionar as declarações necessárias
+extern int yylex(void);
+extern int yylex_destroy(void);
+extern FILE* yyin;
+
 // Protótipos de funções
 void cleanup_resources(void);
 void mostrarAnaliseGramatical(const char* regra);
@@ -66,9 +71,6 @@ extern void analise_lexica(void);
 extern int linha;
 extern int total_tokens;
 void yyerror(const char *s);
-int yylex(void);
-extern void cleanup_resources(void);
-extern int yylex_destroy(void);
 
 FILE* arvore_arquivo = NULL;
 int nivel_arvore = 0;
@@ -156,6 +158,7 @@ void printar_erro_semantico(const char* erro_titulo, const char* mensagem, const
     printf("╚════════════════════════════════════════════════════════════════╝\n\n"RESET);
 }
 
+void liberar_arvore(NoArvore* no);
 
 %}
 
@@ -169,7 +172,7 @@ void printar_erro_semantico(const char* erro_titulo, const char* mensagem, const
         char* valor;
         int num;
     } literal;
-    struct NoArvore* no;  // Novo campo para nós da árvore
+    struct NoArvore* no;
 }
 
 %token <id> IDENTIFIER
@@ -288,15 +291,18 @@ declaracao_variavel
         {
             if (!inserir_simbolo(analisador, $3.nome, $2)) {
                 printar_erro_semantico("Variável já declarada", "A variável já foi declarada anteriormente", $3.nome);
+                free($3.nome);  // Libera diretamente a memória alocada
                 YYERROR;
             }
             // Verificar o tipo da expressão através do analisador semântico
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $3.nome);
             if (!verificar_compatibilidade_tipos(analisador, $2, simbolo->tipo, $3.nome)) {
                 printar_erro_semantico("Tipo incompatível", "Erro ao inicializar a variável com tipo incompatível", $3.nome);
+                free($3.nome);  // Libera a memória em caso de erro
                 YYERROR;
             }
             $$ = criar_no_declaracao_var($3.nome, $2, $5);
+            free($3.nome);  // Libera a memória após o uso
         }
     | DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE 
       DECL_AS DECL_ARRAY DELIM_END_STATEMENT
@@ -804,9 +810,6 @@ void exibir_rodape() {
 }
 
 void cleanup_resources(void) {
-    // Clean Flex resources
-    yylex_destroy();
-    
     // Clean AST if still exists
     if (raiz_ast != NULL) {
         liberar_arvore(raiz_ast);
@@ -832,11 +835,16 @@ void cleanup_resources(void) {
     linha = 1;
     total_tokens = 0;
     
+    // Limpar recursos do scanner
+    yylex_destroy();  // Isso já cuida da limpeza dos buffers internos
+    
     printf("\n[DEBUG] Recursos liberados com sucesso.\n");
 }
 
 int main(void) 
 {
+    int resultado = 0;
+    
     // Register cleanup handler
     atexit(cleanup_resources);
 
@@ -845,12 +853,9 @@ int main(void)
     
     // Inicializa o processo de criação da árvore de sintaxe abstrata 
     iniciar_arquivo_arvore();
-
-    // Realiza a análise léxica primeiro
-    // analise_lexica();
     
     // Realiza a análise sintática do código fonte
-    int resultado = yyparse();
+    resultado = yyparse();
     
     // Se a árvore de sintaxe abstrata foi criada, realiza o processamento
     if (raiz_ast != NULL) {

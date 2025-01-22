@@ -94,24 +94,61 @@ AnalisadorSemantico *iniciar_analisador_semantico(void)
 void finalizar_analisador_semantico(AnalisadorSemantico *analisador)
 {
     if (analisador == NULL)
+    {
+        fprintf(stderr, "[DEBUG] Analisador semântico é NULL. Nada a finalizar.\n");
         return;
+    }
 
     // Liberar tabela de símbolos
     SimboloEntrada *atual = analisador->tabela_simbolos;
     while (atual != NULL)
     {
         SimboloEntrada *proximo = atual->proximo;
-        free(atual->nome);
-        free(atual->escopo);
-        if (atual->tipo == TIPO_STRING)
+        // Logs para verificar detalhes de cada símbolo sendo liberado
+        fprintf(stderr, "[DEBUG] Liberando símbolo: Nome='%s', Escopo='%s', Tipo=%d\n",
+                atual->nome ? atual->nome : "NULL",
+                atual->escopo ? atual->escopo : "NULL",
+                atual->tipo);
+
+        // Liberar strings associadas ao símbolo
+        if (atual->nome)
+        {
+            free(atual->nome);
+            atual->nome = NULL;
+        }
+
+        if (atual->escopo)
+        {
+            free(atual->escopo);
+            atual->escopo = NULL;
+        }
+
+        // Liberar valor adicional, se for do tipo string
+        if (atual->tipo == TIPO_STRING && atual->info.valor_string)
         {
             free(atual->info.valor_string);
+            atual->info.valor_string = NULL;
         }
+
+        // Liberar a entrada atual
         free(atual);
         atual = proximo;
     }
 
-    free(analisador->escopo_atual);
+    // Limpar a tabela de símbolos do analisador
+    analisador->tabela_simbolos = NULL;
+
+    // Liberar o escopo atual, se alocado
+    if (analisador->escopo_atual)
+    {
+        fprintf(stderr, "[DEBUG] Liberando escopo atual: %s\n",
+                analisador->escopo_atual ? analisador->escopo_atual : "NULL");
+        free(analisador->escopo_atual);
+        analisador->escopo_atual = NULL;
+    }
+
+    // Liberar o próprio analisador
+    fprintf(stderr, "[DEBUG] Liberando o analisador semântico.\n");
     free(analisador);
 }
 
