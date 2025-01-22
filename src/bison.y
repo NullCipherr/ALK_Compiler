@@ -58,6 +58,7 @@
 #include "ast.h"
 
 // Protótipos de funções
+void cleanup_resources(void);
 void mostrarAnaliseGramatical(const char* regra);
 void mostrarAnaliseTipos(const char* operacao, TipoVariavel tipo1, TipoVariavel tipo2, TipoVariavel resultado);
 extern void analise_lexica(void);  
@@ -66,6 +67,8 @@ extern int linha;
 extern int total_tokens;
 void yyerror(const char *s);
 int yylex(void);
+extern void cleanup_resources(void);
+extern int yylex_destroy(void);
 
 FILE* arvore_arquivo = NULL;
 int nivel_arvore = 0;
@@ -792,15 +795,51 @@ void exibir_cabecalho() {
 }
 
 void exibir_rodape() {
+    analise_lexica();
     printf("\033[1;34m"); // Define a cor do texto para azul brilhante
-    printf("\n╔══════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
+    printf("╔══════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
     printf("║                           Obrigado por utilizar o Compilador ALK!                                ║\n");
     printf("╚══════════════════════════════════════════════════════════════════════════════════════════════════╝\n\n");
     printf("\033[0m"); // Reseta as cores para o padrão
 }
 
+void cleanup_resources(void) {
+    // Clean Flex resources
+    yylex_destroy();
+    
+    // Clean AST if still exists
+    if (raiz_ast != NULL) {
+        liberar_arvore(raiz_ast);
+        raiz_ast = NULL;
+    }
+    
+    // Clean semantic analyzer
+    if (analisador != NULL) {
+        finalizar_analisador_semantico(analisador);
+        analisador = NULL;
+    }
+    
+    // Close output files
+    if (arvore_arquivo != NULL) {
+        fclose(arvore_arquivo);
+        arvore_arquivo = NULL;
+    }
+    
+    // Reset state variables
+    num_argumentos = 0;
+    num_parametros = 0;
+    nivel_arvore = 0;
+    linha = 1;
+    total_tokens = 0;
+    
+    printf("\n[DEBUG] Recursos liberados com sucesso.\n");
+}
+
 int main(void) 
 {
+    // Register cleanup handler
+    atexit(cleanup_resources);
+
     // Exibe o cabeçalho do compilador
     exibir_cabecalho();
     

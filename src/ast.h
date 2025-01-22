@@ -116,7 +116,6 @@ NoArvore *criar_no_literal(char *valor, TipoVariavel tipo);
 // Funções para manipular a árvore
 void imprimir_arvore(NoArvore *no, FILE *arquivo, int nivel);
 void liberar_arvore(NoArvore *no);
-
 const char *tipoParaString(TipoVariavel tipo);
 
 #endif // AST_H

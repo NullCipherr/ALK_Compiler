@@ -16,11 +16,15 @@ static void imprimir_indentacao(FILE *arquivo, int nivel)
 NoArvore *criar_no_programa(NoArvore *corpo)
 {
     NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
+
     if (no == NULL)
     {
         fprintf(stderr, "Erro: Falha na alocação de memória para nó programa\n");
         exit(1);
     }
+
+    memset(no, 0, sizeof(NoArvore)); // Zera a struct
+
     no->tipo = NO_PROGRAMA;
     no->proximo = NULL;
     no->info.programa.corpo = corpo;
@@ -30,8 +34,23 @@ NoArvore *criar_no_programa(NoArvore *corpo)
 NoArvore *criar_no_declaracao_var(char *nome, TipoVariavel tipo, NoArvore *valor)
 {
     NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
+
+    if (no == NULL)
+    {
+        fprintf(stderr, "Erro: Falha na alocação de memória para nó declaracao var\n");
+        exit(1);
+    }
+
+    memset(no, 0, sizeof(NoArvore)); // Zera a struct
+
     no->tipo = NO_DECLARACAO_VAR;
     no->info.declaracao_var.nome = strdup(nome);
+    if (no->info.declaracao_var.nome == NULL)
+    {
+        fprintf(stderr, "Erro: Falha ao duplicar string.\n");
+        free(no);
+        exit(1);
+    }
     no->info.declaracao_var.tipo = tipo;
     no->info.declaracao_var.valor = valor;
     no->proximo = NULL;
@@ -41,8 +60,23 @@ NoArvore *criar_no_declaracao_var(char *nome, TipoVariavel tipo, NoArvore *valor
 NoArvore *criar_no_declaracao_func(char *nome, TipoVariavel tipo_retorno, NoArvore *params, NoArvore *corpo)
 {
     NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
+
+    if (no == NULL)
+    {
+        fprintf(stderr, "Erro: Falha na alocação de memória para nó declaracao função\n");
+        exit(1);
+    }
+
+    memset(no, 0, sizeof(NoArvore)); // Zera a struct
+
     no->tipo = NO_DECLARACAO_FUNC;
     no->info.declaracao_func.nome = strdup(nome);
+    if (no->info.declaracao_func.nome == NULL)
+    {
+        fprintf(stderr, "Erro: Falha ao duplicar string.\n");
+        free(no);
+        exit(1);
+    }
     no->info.declaracao_func.tipo_retorno = tipo_retorno;
     no->info.declaracao_func.parametros = params;
     no->info.declaracao_func.corpo = corpo;
@@ -53,6 +87,15 @@ NoArvore *criar_no_declaracao_func(char *nome, TipoVariavel tipo_retorno, NoArvo
 NoArvore *criar_no_if(NoArvore *condicao, NoArvore *bloco_then, NoArvore *bloco_else)
 {
     NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
+
+    if (no == NULL)
+    {
+        fprintf(stderr, "Erro: Falha na alocação de memória para nó if\n");
+        exit(1);
+    }
+
+    memset(no, 0, sizeof(NoArvore)); // Zera a struct
+
     no->tipo = NO_COMANDO_IF;
     no->info.comando_if.condicao = condicao;
     no->info.comando_if.bloco_then = bloco_then;
@@ -64,6 +107,15 @@ NoArvore *criar_no_if(NoArvore *condicao, NoArvore *bloco_then, NoArvore *bloco_
 NoArvore *criar_no_while(NoArvore *condicao, NoArvore *bloco)
 {
     NoArvore *no = (NoArvore *)malloc(sizeof(NoArvore));
+
+    if (no == NULL)
+    {
+        fprintf(stderr, "Erro: Falha na alocação de memória para nó while\n");
+        exit(1);
+    }
+
+    memset(no, 0, sizeof(NoArvore)); // Zera a struct
+
     no->tipo = NO_COMANDO_WHILE;
     no->info.comando_while.condicao = condicao;
     no->info.comando_while.bloco = bloco;
@@ -74,6 +126,13 @@ NoArvore *criar_no_while(NoArvore *condicao, NoArvore *bloco)
 NoArvore *criar_no_expressao(char *operador, NoArvore *esq, NoArvore *dir)
 {
     NoArvore *no = malloc(sizeof(NoArvore));
+
+    if (no == NULL)
+    {
+        fprintf(stderr, "Erro: Falha na alocação de memória para nó expressao\n");
+        exit(1);
+    }
+
     memset(no, 0, sizeof(NoArvore)); // Zera a struct
     no->tipo = NO_EXPRESSAO;
 
@@ -96,6 +155,13 @@ NoArvore *criar_no_expressao(char *operador, NoArvore *esq, NoArvore *dir)
 NoArvore *criar_no_chamada_func(char *nome, NoArvore *args)
 {
     NoArvore *no = malloc(sizeof(NoArvore));
+
+    if (no == NULL)
+    {
+        fprintf(stderr, "Erro: Falha na alocação de memória para nó chamada função\n");
+        exit(1);
+    }
+
     memset(no, 0, sizeof(NoArvore));
     no->tipo = NO_CHAMADA_FUNC;
     if (nome)
@@ -113,6 +179,13 @@ NoArvore *criar_no_chamada_func(char *nome, NoArvore *args)
 NoArvore *criar_no_identificador(char *nome, TipoVariavel tipo)
 {
     NoArvore *no = malloc(sizeof(NoArvore));
+
+    if (no == NULL)
+    {
+        fprintf(stderr, "Erro: Falha na alocação de memória para nó identificador\n");
+        exit(1);
+    }
+
     memset(no, 0, sizeof(NoArvore));
     no->tipo = NO_IDENTIFICADOR;
     if (nome)
@@ -130,6 +203,13 @@ NoArvore *criar_no_identificador(char *nome, TipoVariavel tipo)
 NoArvore *criar_no_literal(char *valor, TipoVariavel tipo)
 {
     NoArvore *no = malloc(sizeof(NoArvore));
+
+    if (no == NULL)
+    {
+        fprintf(stderr, "Erro: Falha na alocação de memória para nó literal\n");
+        exit(1);
+    }
+
     memset(no, 0, sizeof(NoArvore));
     no->tipo = NO_LITERAL;
     if (valor)
@@ -173,14 +253,26 @@ const char *tipoParaString(TipoVariavel tipo)
 void imprimir_arvore(NoArvore *no, FILE *arquivo, int nivel)
 {
     if (no == NULL)
-        return;
-    if (arquivo == NULL)
     {
-        fprintf(stderr, "Erro: Arquivo de saída inválido\n");
+        fprintf(arquivo, "Erro: Nó nulo\n");
+        return;
+    }
+    else if (arquivo == NULL)
+    {
+        fprintf(stderr, "Erro: Arquivo nulo\n");
+        return;
+    }
+    else if (nivel < 0)
+    {
+        fprintf(stderr, "Erro: Nível negativo\n");
         return;
     }
 
-    imprimir_indentacao(arquivo, nivel);
+    // Imprime a indentação
+    for (int i = 0; i < nivel; i++)
+    {
+        printf("  ");
+    }
 
     switch (no->tipo)
     {
@@ -188,27 +280,34 @@ void imprimir_arvore(NoArvore *no, FILE *arquivo, int nivel)
         fprintf(arquivo, "Programa\n");
         if (no->info.programa.corpo != NULL)
         {
+            nivel++;
             imprimir_arvore(no->info.programa.corpo, arquivo, nivel + 1);
+            nivel--;
         }
         break;
 
     case NO_DECLARACAO_VAR:
-        fprintf(arquivo, "Declaração Variável: %s (tipo: %s)\n",
-                no->info.declaracao_var.nome,
-                tipoParaString(no->info.declaracao_var.tipo));
-        imprimir_arvore(no->info.declaracao_var.valor, arquivo, nivel + 1);
+        fprintf(arquivo, "Declaração Variável: %s (tipo: %s)\n", no->info.declaracao_var.nome, tipoParaString(no->info.declaracao_var.tipo));
+        if (no->info.declaracao_var.valor != NULL)
+        {
+            imprimir_arvore(no->info.declaracao_var.valor, arquivo, nivel + 1);
+        }
         break;
 
     case NO_DECLARACAO_FUNC:
-        fprintf(arquivo, "Declaração Função: %s (retorno: %s)\n",
-                no->info.declaracao_func.nome,
-                tipoParaString(no->info.declaracao_func.tipo_retorno));
-        imprimir_indentacao(arquivo, nivel + 1);
-        fprintf(arquivo, "Parâmetros:\n");
-        imprimir_arvore(no->info.declaracao_func.parametros, arquivo, nivel + 2);
-        imprimir_indentacao(arquivo, nivel + 1);
-        fprintf(arquivo, "Corpo:\n");
-        imprimir_arvore(no->info.declaracao_func.corpo, arquivo, nivel + 2);
+        fprintf(arquivo, "Declaração Função: %s (retorno: %s)\n", no->info.declaracao_func.nome, tipoParaString(no->info.declaracao_func.tipo_retorno));
+        if (no->info.declaracao_func.parametros != NULL)
+        {
+            imprimir_indentacao(arquivo, nivel + 1);
+            fprintf(arquivo, "Parâmetros:\n");
+            imprimir_arvore(no->info.declaracao_func.parametros, arquivo, nivel + 2);
+        }
+        if (no->info.declaracao_func.corpo != NULL)
+        {
+            imprimir_indentacao(arquivo, nivel + 1);
+            fprintf(arquivo, "Corpo:\n");
+            imprimir_arvore(no->info.declaracao_func.corpo, arquivo, nivel + 2);
+        }
         break;
 
     case NO_COMANDO_IF:
@@ -251,30 +350,65 @@ void imprimir_arvore(NoArvore *no, FILE *arquivo, int nivel)
         break;
 
     case NO_IDENTIFICADOR:
-        fprintf(arquivo, "Identificador: %s (tipo: %s)\n",
-                no->info.identificador.nome,
-                tipoParaString(no->info.identificador.tipo));
+        if (no->info.identificador.nome != NULL)
+        {
+            fprintf(arquivo, "Identificador: %s (tipo: %s)\n", no->info.identificador.nome, tipoParaString(no->info.identificador.tipo));
+        }
+        else
+        {
+            fprintf(arquivo, "Identificador: NULL\n");
+        }
         break;
 
     case NO_LITERAL:
-        fprintf(arquivo, "Literal: %s (tipo: %s)\n",
-                no->info.literal.valor,
-                tipoParaString(no->info.literal.tipo));
+        if (no->info.literal.valor != NULL)
+        {
+            fprintf(arquivo, "Literal: %s (tipo: %s)\n", no->info.literal.valor, tipoParaString(no->info.literal.tipo));
+        }
+        else
+        {
+            fprintf(arquivo, "Literal: NULL\n");
+        }
         break;
 
     case NO_BLOCO:
-        fprintf(arquivo, "Bloco:\n");
-        // Imprimir os filhos do bloco
+        if (no->info.bloco.declaracoes != NULL)
+        {
+            fprintf(arquivo, "Bloco:\n");
+            nivel++;
+            imprimir_arvore(no->info.bloco.declaracoes, arquivo, nivel + 1); // Imprimir as declarações do bloco
+            nivel--;
+        }
+        else
+        {
+            fprintf(arquivo, "Bloco: NULL\n");
+        }
         break;
 
     case NO_ATRIBUICAO:
-        fprintf(arquivo, "Atribuição:\n");
-        // Imprimir os operandos da atribuição
+        if (no->info.atribuicao.alvo != NULL)
+        {
+            fprintf(arquivo, "Atribuição:\n");
+            nivel++;
+            imprimir_arvore(no->info.atribuicao.alvo, arquivo, nivel + 1); // Imprimir o alvo da atribuição
+            nivel--;
+        }
+        else if (no->info.atribuicao.valor != NULL)
+        {
+            fprintf(arquivo, "Atribuição:\n");
+            nivel++;
+            imprimir_arvore(no->info.atribuicao.valor, arquivo, nivel + 1); // Imprimir o valor da atribuição
+            nivel--;
+        }
+        break;
+
+    default:
+        fprintf(arquivo, "Warning: Tipo não reconhecido: %d\n", no->tipo);
         break;
     }
 
     // Imprime o próximo nó da lista (se houver)
-    if (no->proximo)
+    if (no->proximo != NULL)
     {
         imprimir_arvore(no->proximo, arquivo, nivel);
     }
@@ -285,9 +419,6 @@ void liberar_arvore(NoArvore *no)
 {
     if (no == NULL)
         return;
-
-    NoArvore *proximo = no->proximo; // Salva o próximo antes de liberar
-    no->proximo = NULL;              // Previni de ref. circulares
 
     // Libera recursivamente todos os nós
     switch (no->tipo)
@@ -404,6 +535,7 @@ void liberar_arvore(NoArvore *no)
         break;
     }
 
-    free(no);                // Libera o nó atual
-    liberar_arvore(proximo); // Usa o ponteiro salvo
+    // Libera o próximo nó na lista e o próprio nó
+    liberar_arvore(no->proximo);
+    free(no);
 }

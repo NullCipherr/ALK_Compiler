@@ -332,6 +332,18 @@ int verificar_compatibilidade_tipos(AnalisadorSemantico *analisador, TipoVariave
             analisador->num_erros++;
             return 0;
         }
+        else if (tipo_origem == TIPO_FLOAT)
+        {
+            imprimir_erro_semantico("Não é possível atribuir float para char", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_FUNCAO)
+        {
+            imprimir_erro_semantico("Não é possível atribuir função para char", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
         break;
 
     case TIPO_INT:
@@ -341,6 +353,31 @@ int verificar_compatibilidade_tipos(AnalisadorSemantico *analisador, TipoVariave
             analisador->num_erros++;
             return 0;
         }
+        else if (tipo_origem == TIPO_FLOAT)
+        {
+            imprimir_erro_semantico("Não é possível atribuir float para int", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_CHAR)
+        {
+            imprimir_erro_semantico("Não é possível atribuir char para int", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_VETOR)
+        {
+            imprimir_erro_semantico("Não é possível atribuir vetor para int", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_FUNCAO)
+        {
+            imprimir_erro_semantico("Não é possível atribuir função para int", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+
         break;
 
     case TIPO_FLOAT:
@@ -350,24 +387,122 @@ int verificar_compatibilidade_tipos(AnalisadorSemantico *analisador, TipoVariave
             analisador->num_erros++;
             return 0;
         }
+        else if (tipo_origem == TIPO_CHAR)
+        {
+            imprimir_erro_semantico("Não é possível atribuir char para float", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_VETOR)
+        {
+            imprimir_erro_semantico("Não é possível atribuir vetor para float", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_FUNCAO)
+        {
+            imprimir_erro_semantico("Não é possível atribuir função para float", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
         break;
 
     case TIPO_STRING:
         // String pode receber apenas string
-        if (tipo_origem != TIPO_STRING)
+        if (tipo_origem == TIPO_CHAR)
         {
-            imprimir_erro_semantico("Não é possível atribuir int para string", contexto);
+            return 1; // OK
+        }
+        else if (tipo_origem == TIPO_STRING)
+        {
+            return 1; // OK
+        }
+        else if (tipo_origem == TIPO_VETOR)
+        {
+            imprimir_erro_semantico("Não é possível atribuir vetor para string", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_FUNCAO)
+        {
+            imprimir_erro_semantico("Não é possível atribuir função para string", contexto);
             analisador->num_erros++;
             return 0;
         }
         break;
 
     case TIPO_VOID:
+        if (tipo_origem == TIPO_STRING)
+        {
+            imprimir_erro_semantico("Não é possível atribuir string para void", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_CHAR)
+        {
+            imprimir_erro_semantico("Não é possível atribuir char para void", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_INT)
+        {
+            imprimir_erro_semantico("Não é possível atribuir int para void", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_FLOAT)
+        {
+            imprimir_erro_semantico("Não é possível atribuir float para void", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_VETOR)
+        {
+            imprimir_erro_semantico("Não é possível atribuir vetor para void", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_FUNCAO)
+        {
+            imprimir_erro_semantico("Não é possível atribuir função para void", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
         imprimir_erro_semantico("Não é possível atribuir valor para void", contexto);
         analisador->num_erros++;
         return 0;
 
     case TIPO_FUNCAO:
+        if (tipo_origem == TIPO_STRING)
+        {
+            imprimir_erro_semantico("Não é possível atribuir string para função", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_CHAR)
+        {
+            imprimir_erro_semantico("Não é possível atribuir char para função", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_INT)
+        {
+            imprimir_erro_semantico("Não é possível atribuir int para função", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_FLOAT)
+        {
+            imprimir_erro_semantico("Não é possível atribuir float para função", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
+        else if (tipo_origem == TIPO_VETOR)
+        {
+            imprimir_erro_semantico("Não é possível atribuir vetor para função", contexto);
+            analisador->num_erros++;
+            return 0;
+        }
         imprimir_erro_semantico("Não é possível atribuir valor para função", contexto);
         analisador->num_erros++;
         return 0;

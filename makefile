@@ -1,6 +1,6 @@
 # Configurações do compilador
 CC = gcc
-CFLAGS = -Wall -Isrc -pg
+CFLAGS = -Wall -Isrc -pg -g
 FLEX = flex
 BISON = bison
 
@@ -8,10 +8,12 @@ BISON = bison
 SRC_DIR = src
 BUILD_DIR = build
 BIN_DIR = bin
-
-# Diretórios de Testes
 TEST_DIR = tests
 TEST_FILES = $(wildcard $(TEST_DIR)/*.txt)
+
+# Configuração do Valgrind
+VALGRIND = valgrind
+VALGRIND_FLAGS = --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 # Arquivos fonte
 FLEX_SRC = $(SRC_DIR)/flex.l
@@ -93,34 +95,59 @@ run: $(TARGET)
 	@echo "\n$(AZUL)$(ARROW)  Executando o compilador...$(RESET)"
 	./bin/compilador
 
-test: $(TARGET)
+test: $(TARGET) check_dirs
 	@echo "\n$(AZUL)$(ARROW) Iniciando testes...$(RESET)"
-	@mkdir -p $(TEST_DIR)
-	@total=0; passed=0; \
-    for test in $(TEST_FILES); do \
-        total=$$((total + 1)); \
-        echo "\n$(AMARELO)Executando teste: $$test$(RESET)"; \
-        if ./$(TARGET) < $$test; then \
-            echo "$(VERDE)$(CHECK) Teste passou!$(RESET)"; \
-            passed=$$((passed + 1)); \
-        else \
-            echo "$(VERMELHO)$(CROSS) Teste falhou!$(RESET)"; \
-        fi; \
-    done; \
-    echo "\n$(AZUL)Resumo dos Testes:$(RESET)"; \
-    echo "$(VERDE)Testes Passaram: $$passed/$$total$(RESET)"
+	@total=0; passed=0; failed=0; \
+	for test in $(TEST_FILES); do \
+		if [ ! -f $$test ]; then \
+			echo "$(VERMELHO)Arquivo de teste não encontrado: $$test$(RESET)"; \
+			continue; \
+		fi; \
+		total=$$((total + 1)); \
+		echo "\n$(AMARELO)Executando teste: $$test$(RESET)"; \
+		if $(VALGRIND) $(VALGRIND_FLAGS) ./$(TARGET) < $$test 2>$(BUILD_DIR)/valgrind.log; then \
+			if ! grep -q "ERROR SUMMARY: 0 errors" $(BUILD_DIR)/valgrind.log; then \
+				echo "$(VERMELHO)$(CROSS) Teste passou mas possui vazamento de memória!$(RESET)"; \
+				failed=$$((failed + 1)); \
+			else \
+				echo "$(VERDE)$(CHECK) Teste passou!$(RESET)"; \
+				passed=$$((passed + 1)); \
+			fi; \
+		else \
+			echo "$(VERMELHO)$(CROSS) Teste falhou!$(RESET)"; \
+			failed=$$((failed + 1)); \
+		fi; \
+	done; \
+	echo "\n$(AZUL)Resumo dos Testes:$(RESET)"; \
+	echo "$(VERDE)Testes Passaram: $$passed/$$total$(RESET)"; \
+	echo "$(VERMELHO)Testes Falharam: $$failed/$$total$(RESET)"
 
-test_single: $(TARGET)
+test_single: $(TARGET) check_dirs
 	@if [ -z "$(FILE)" ]; then \
-    	echo "$(VERMELHO)Erro: Especifique o arquivo de teste com FILE=<arquivo>$(RESET)"; \
-    	exit 1; \
-    fi
+		echo "$(VERMELHO)Erro: Especifique o arquivo de teste com FILE=<arquivo>$(RESET)"; \
+		exit 1; \
+	fi
+	@if [ ! -f "$(FILE)" ]; then \
+		echo "$(VERMELHO)Erro: Arquivo '$(FILE)' não encontrado$(RESET)"; \
+		exit 1; \
+	fi
 	@echo "\n$(AMARELO)Executando teste: $(FILE)$(RESET)"
-	@if ./$(TARGET) < $(FILE); then \
-        echo "$(VERDE)$(CHECK) Teste passou!$(RESET)"; \
-    else \
-        echo "$(VERMELHO)$(CROSS) Teste falhou!$(RESET)"; \
-    fi
+	@if $(VALGRIND) $(VALGRIND_FLAGS) ./$(TARGET) < $(FILE) 2>$(BUILD_DIR)/valgrind.log; then \
+		if ! grep -q "ERROR SUMMARY: 0 errors" $(BUILD_DIR)/valgrind.log; then \
+			echo "$(VERMELHO)$(CROSS) Teste passou mas possui vazamento de memória!$(RESET)"; \
+			cat $(BUILD_DIR)/valgrind.log; \
+		else \
+			echo "$(VERDE)$(CHECK) Teste passou!$(RESET)"; \
+		fi; \
+	else \
+		echo "$(VERMELHO)$(CROSS) Teste falhou!$(RESET)"; \
+		cat $(BUILD_DIR)/valgrind.log; \
+	fi
+
+check_dirs:
+	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BIN_DIR)
+	@mkdir -p $(TEST_DIR)
 
 clean:
 	@echo "$(VERMELHO)$(CROSS)  Limpando diretórios de build e binários$(RESET)"
@@ -128,4 +155,4 @@ clean:
 	@rm -rf $(BIN_DIR)
 	@echo "$(VERDE)$(CHECK) Limpeza concluída$(RESET)"
 
-.PHONY: all clean guia_uso run test test_single
+.PHONY: all clean guia_uso run test test_single check_dirs

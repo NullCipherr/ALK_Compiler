@@ -1,7 +1,7 @@
 // Teste de declarações básicas e tipos
 create int numero as 42;
 create float pi as 3.14159;
-create char letra as 'A';
+create char letra as 'A'
 create string mensagem as "Olá, mundo!";
 
 // Teste de conversões implícitas
