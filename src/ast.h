@@ -9,14 +9,14 @@ typedef enum
     NO_PROGRAMA,
     NO_DECLARACAO_VAR,
     NO_DECLARACAO_FUNC,
-    NO_BLOCO,
     NO_COMANDO_IF,
     NO_COMANDO_WHILE,
-    NO_ATRIBUICAO,
     NO_EXPRESSAO,
     NO_CHAMADA_FUNC,
     NO_IDENTIFICADOR,
-    NO_LITERAL
+    NO_LITERAL,
+    NO_BLOCO,
+    NO_ATRIBUICAO
 } TipoNo;
 
 // Declaração proxima para permitir recursividade
@@ -112,6 +112,8 @@ NoArvore *criar_no_expressao(char *operador, NoArvore *esq, NoArvore *dir);
 NoArvore *criar_no_chamada_func(char *nome, NoArvore *args);
 NoArvore *criar_no_identificador(char *nome, TipoVariavel tipo);
 NoArvore *criar_no_literal(char *valor, TipoVariavel tipo);
+NoArvore *criar_no_bloco(NoArvore *declaracoes);  // Adicionada esta função
+NoArvore *criar_no_atribuicao(NoArvore *alvo, NoArvore *valor);  // Adicionada esta função
 
 // Funções para manipular a árvore
 void imprimir_arvore(NoArvore *no, FILE *arquivo, int nivel);

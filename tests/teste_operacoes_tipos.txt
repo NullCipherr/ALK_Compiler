@@ -1,0 +1,88 @@
+// Teste de operações entre tipos
+// Este arquivo testa todas as combinações de tipos e operadores
+
+// Declarações de variáveis para teste
+create int num1 as 3;
+create int num2 as 0;
+create int resultado_int as 0;
+resultado_int = num1 plus num2;
+
+create float real1 as 0.0;
+create float real2 as 0.0;
+create char letra1 as 'a';
+create char letra2 as 'b';
+create string texto1 as "Olá ";
+create string texto2 as "Mundo";
+create int[] vetor1[5] as array;
+
+// 1. Testes com tipos inválidos (devem gerar erro)
+num1 = vetor1 plus num2;         // Erro: Operação inválida com vetor
+
+// 2. Testes com strings
+create string resultado_str as "";
+create int resultado_bool as 0;
+
+resultado_str = texto1 plus texto2;      // OK: Concatenação
+resultado_bool = texto1 equals texto2;    // OK: Comparação de igualdade
+resultado_bool = texto1 not_equals texto2;    // OK: Comparação de diferença
+resultado_str = texto1 times texto2;      // Erro: Operação inválida com strings
+resultado_str = texto1 divided_by texto2;      // Erro: Operação inválida com strings
+
+// 3. Testes com char
+create int resultado_char as 0;
+resultado_char = letra1 plus letra2;     // OK: Retorna int
+resultado_char = letra1 plus num1;       // OK: Char + int = int
+resultado_bool = letra1 is_greater_than letra2;     // OK: Comparação retorna booleano
+resultado_bool = letra1 is_less_or_equal num1;      // OK: Comparação char com int
+resultado_char = letra1 times letra2;     // OK: Multiplicação de chars
+resultado_char = letra1 divided_by num1;       // OK: Divisão de char por int
+
+// 4. Testes com números (int e float)
+num1 = 10;
+num2 = 20;
+real1 = 10.5;
+real2 = 20.5;
+
+// 4.1 Operações aritméticas
+create float resultado_float as 0.0;
+create int resultado_int as 0;
+
+resultado_float = real1 plus real2;      // OK: Float + Float = Float
+resultado_float = real1 plus num1;       // OK: Float + Int = Float
+resultado_int = num1 plus num2;          // OK: Int + Int = Int
+resultado_float = num1 divided_by real1;       // OK: Int / Float = Float
+
+// 4.2 Operações relacionais
+resultado_bool = num1 is_less_than num2;         // OK: Retorna int (booleano)
+resultado_bool = real1 is_greater_or_equal real2;      // OK: Retorna int (booleano)
+resultado_bool = num1 equals real1;       // OK: Retorna int (booleano)
+resultado_bool = real1 not_equals num2;       // OK: Retorna int (booleano)
+
+// 4.3 Operações lógicas
+resultado_bool = (num1 is_less_than num2) and (real1 is_less_than real2);    // OK: Retorna int
+resultado_bool = (num1 is_greater_than num2) or (real1 is_greater_than real2);     // OK: Retorna int
+
+// 5. Testes de precedência e combinações
+resultado_float = (real1 plus num1) times (real2 divided_by num2);     // OK: Expressão complexa
+resultado_bool = (letra1 is_greater_than letra2) and (num1 is_less_than real1); // OK: Combinação de tipos
+resultado_str = texto1 plus (letra1 plus letra2);            // Erro: Não pode concatenar com resultado numérico
+
+// 6. Testes de coerção de tipos
+resultado_float = num1 plus real1;       // OK: Coerção implícita de int para float
+resultado_int = letra1 plus num1;        // OK: Coerção de char para int
+resultado_str = texto1 plus letra1;      // OK: Char pode ser convertido para string
+resultado_str = letra1 plus texto1;      // OK: Char pode ser convertido para string
+
+// 7. Testes de operações inválidas (devem gerar erro)
+resultado_int = texto1 plus num1;        // Erro: String com número
+resultado_float = letra1 plus real1;     // Erro: Char com float
+resultado_str = texto1 times texto2;      // Erro: Multiplicação de strings
+resultado_bool = texto1 is_less_than texto2;     // Erro: Comparação < com strings
+
+// Impressão dos resultados para verificação
+print("=== Resultados dos Testes ===");
+print(resultado_str);
+print(resultado_bool);
+print(resultado_char);
+print(resultado_float);
+print(resultado_int); 

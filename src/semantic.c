@@ -104,51 +104,34 @@ void finalizar_analisador_semantico(AnalisadorSemantico *analisador)
     while (atual != NULL)
     {
         SimboloEntrada *proximo = atual->proximo;
-        // Logs para verificar detalhes de cada símbolo sendo liberado
-        fprintf(stderr, "[DEBUG] Liberando símbolo: Nome='%s', Escopo='%s', Tipo=%d\n",
-                atual->nome ? atual->nome : "NULL",
-                atual->escopo ? atual->escopo : "NULL",
-                atual->tipo);
-
-        // Liberar strings associadas ao símbolo
+        
+        // Libera strings
         if (atual->nome)
         {
             free(atual->nome);
-            atual->nome = NULL;
         }
-
         if (atual->escopo)
         {
             free(atual->escopo);
-            atual->escopo = NULL;
         }
-
-        // Liberar valor adicional, se for do tipo string
+        
+        // Libera valor string se aplicável
         if (atual->tipo == TIPO_STRING && atual->info.valor_string)
         {
             free(atual->info.valor_string);
-            atual->info.valor_string = NULL;
         }
-
-        // Liberar a entrada atual
+        
         free(atual);
         atual = proximo;
     }
 
-    // Limpar a tabela de símbolos do analisador
-    analisador->tabela_simbolos = NULL;
-
-    // Liberar o escopo atual, se alocado
+    // Libera escopo atual
     if (analisador->escopo_atual)
     {
-        fprintf(stderr, "[DEBUG] Liberando escopo atual: %s\n",
-                analisador->escopo_atual ? analisador->escopo_atual : "NULL");
         free(analisador->escopo_atual);
-        analisador->escopo_atual = NULL;
     }
 
-    // Liberar o próprio analisador
-    fprintf(stderr, "[DEBUG] Liberando o analisador semântico.\n");
+    // Libera o próprio analisador
     free(analisador);
 }
 
@@ -176,25 +159,87 @@ int inserir_simbolo(AnalisadorSemantico *analisador, const char *nome, TipoVaria
 
 TipoVariavel verificar_tipos_operacao(AnalisadorSemantico *analisador, TipoVariavel tipo1, TipoVariavel tipo2, const char *operador)
 {
-    // Verificação de compatibilidade de tipos
-    if (tipo1 == TIPO_STRING || tipo2 == TIPO_STRING)
-    {
-        if (strcmp(operador, "plus") == 0)
-        {
+    // Verificação para operações inválidas com void, função ou vetor
+    if (tipo1 == TIPO_VOID || tipo2 == TIPO_VOID) {
+        imprimir_erro_semantico("Operação inválida com tipo void", operador);
+        analisador->num_erros++;
+        return TIPO_ERRO;
+    }
+    
+    if (tipo1 == TIPO_FUNCAO || tipo2 == TIPO_FUNCAO) {
+        imprimir_erro_semantico("Operação inválida com função", operador);
+        analisador->num_erros++;
+        return TIPO_ERRO;
+    }
+    
+    if (tipo1 == TIPO_VETOR || tipo2 == TIPO_VETOR) {
+        imprimir_erro_semantico("Operação inválida com vetor", operador);
+        analisador->num_erros++;
+        return TIPO_ERRO;
+    }
+
+    // Operações com strings
+    if (tipo1 == TIPO_STRING || tipo2 == TIPO_STRING) {
+        if (strcmp(operador, "plus") == 0) {
             return TIPO_STRING; // Concatenação de strings
+        } else if (strcmp(operador, "equals") == 0 || strcmp(operador, "not_equals") == 0) {
+            return TIPO_INT; // Comparação de strings retorna booleano (int)
         }
         imprimir_erro_semantico("Operação inválida com strings", operador);
         analisador->num_erros++;
         return TIPO_ERRO;
     }
 
-    // Regras de coerção de tipos
-    if (tipo1 == TIPO_FLOAT || tipo2 == TIPO_FLOAT)
-    {
-        return TIPO_FLOAT;
+    // Operações com char
+    if ((tipo1 == TIPO_CHAR && tipo2 == TIPO_CHAR) || 
+        (tipo1 == TIPO_CHAR && tipo2 == TIPO_INT) || 
+        (tipo2 == TIPO_CHAR && tipo1 == TIPO_INT)) {
+        if (strcmp(operador, "plus") == 0 || 
+            strcmp(operador, "minus") == 0 || 
+            strcmp(operador, "times") == 0 || 
+            strcmp(operador, "divide") == 0) {
+            return TIPO_INT;
+        } else if (strcmp(operador, "equals") == 0 || 
+                   strcmp(operador, "not_equals") == 0 ||
+                   strcmp(operador, "less") == 0 || 
+                   strcmp(operador, "less_equal") == 0 ||
+                   strcmp(operador, "greater") == 0 || 
+                   strcmp(operador, "greater_equal") == 0) {
+            return TIPO_INT; // Operações relacionais retornam booleano (int)
+        }
     }
 
-    return TIPO_INT;
+    // Operações numéricas (int e float)
+    if ((tipo1 == TIPO_INT || tipo1 == TIPO_FLOAT) && 
+        (tipo2 == TIPO_INT || tipo2 == TIPO_FLOAT)) {
+        // Operadores aritméticos
+        if (strcmp(operador, "plus") == 0 || 
+            strcmp(operador, "minus") == 0 || 
+            strcmp(operador, "times") == 0 || 
+            strcmp(operador, "divide") == 0) {
+            // Se qualquer operando for float, o resultado é float
+            return (tipo1 == TIPO_FLOAT || tipo2 == TIPO_FLOAT) ? TIPO_FLOAT : TIPO_INT;
+        }
+        // Operadores relacionais
+        else if (strcmp(operador, "equals") == 0 || 
+                 strcmp(operador, "not_equals") == 0 ||
+                 strcmp(operador, "less") == 0 || 
+                 strcmp(operador, "less_equal") == 0 ||
+                 strcmp(operador, "greater") == 0 || 
+                 strcmp(operador, "greater_equal") == 0) {
+            return TIPO_INT; // Operações relacionais retornam booleano (int)
+        }
+        // Operadores lógicos
+        else if (strcmp(operador, "and") == 0 || 
+                 strcmp(operador, "or") == 0) {
+            return TIPO_INT; // Operações lógicas retornam booleano (int)
+        }
+    }
+
+    // Se chegou aqui, a operação é inválida
+    imprimir_erro_semantico("Operação inválida entre os tipos dados", operador);
+    analisador->num_erros++;
+    return TIPO_ERRO;
 }
 
 SimboloEntrada *buscar_simbolo(AnalisadorSemantico *analisador, const char *nome)

@@ -1,7 +1,15 @@
+└─ Expressão → Expressão is_greater_than Termo
 └─ Chamada Função → print ( Expressão )
-Programa
-  Declaração Variável: x (tipo: inteiro)
-    Literal: 3 (tipo: inteiro)
-  Chamada Função: print
-    Argumentos:
-      Identificador: x (tipo: inteiro)
+└─ Bloco → { Lista Comandos }
+└─ Chamada Função → print ( Expressão )
+└─ Bloco → { Lista Comandos }
+└─ Expressão → Expressão is_less_than Termo
+└─ Chamada Função → print ( Expressão )
+└─ Atribuição → Identificador = Expressão
+└─ Bloco → { Lista Comandos }
+└─ Expressão → Expressão is_greater_than Termo
+└─ Expressão → Expressão is_less_than Termo
+└─ Chamada Função → print ( Expressão )
+└─ Bloco → { Lista Comandos }
+└─ Bloco → { Lista Comandos }
+Tipo de nó desconhecido: 0

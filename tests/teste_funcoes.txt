@@ -1,23 +1,4 @@
-// Declaração de funções
-function int soma(int a, int b) {
-    give back a plus b;
+// Função para calcular média
+function float calcular_media(float n1, float n2) {
+    give back (n1 plus n2) divided_by 2.0;
 }
-
-function float media(float x, float y) {
-    give back (x plus y) divided_by 2.0;
-}
-
-function void imprimir(string msg) {
-    print(msg);
-    give back;
-}
-
-// Teste de chamadas de função
-create int resultado1 as soma(10, 20);
-create float resultado2 as media(3.5, 7.5);
-imprimir("Teste de função void");
-
-// Teste de erros em funções
-create int erro1 as soma(1);          // Deve gerar erro: poucos argumentos
-create int erro2 as soma(1, 2, 3);    // Deve gerar erro: muitos argumentos
-create float erro3 as soma(1.5, 2.5); // Deve gerar erro: tipo incorreto

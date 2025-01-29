@@ -156,54 +156,59 @@ COMENTARIO  "//".*
 "print"     { emitToken("BUILT_IN_PRINT", yytext); return BUILT_IN_PRINT; }
 "scan"      { emitToken("BUILT_IN_SCAN", yytext); return BUILT_IN_SCAN; }
 
-{ID}        { 
-    yylval.id.nome = strdup(yytext);
-    if (!yylval.id.nome) {
-        fprintf(stderr, "Erro de memória ao alocar IDENTIFIER.\n");
-        exit(EXIT_FAILURE);
+{ID}        {
+    yylval.id.nome = malloc(strlen(yytext) + 1);  // +1 para o caractere '\0'
+    if (yylval.id.nome == NULL) {
+        fprintf(stderr, "Erro: falha na alocação de memória\n");
+        exit(1);
     }
+    strcpy(yylval.id.nome, yytext);
     yylval.id.tipo = TIPO_ERRO;
     emitToken("IDENTIFIER", yytext); 
     return IDENTIFIER;  
 }
 
-{INTEIRO}   { 
-    yylval.literal.valor = strdup(yytext);
-    if (!yylval.literal.valor) {
-        fprintf(stderr, "Erro de memória ao alocar LITERAL_INT.\n");
+{INTEIRO}   {
+   yylval.literal.valor = malloc(strlen(yytext) + 1);  // Aloca memória
+    if (yylval.literal.valor == NULL) {
+        fprintf(stderr, "Erro: falha na alocação de memória\n");
         exit(EXIT_FAILURE);
     }
+    strcpy(yylval.literal.valor, yytext);  // Copia a string para o valor
     yylval.literal.num = atoi(yytext);
     emitToken("LITERAL_INT", yytext); 
     return LITERAL_INT;
 }
 {FLOAT}     { 
-    yylval.literal.valor = strdup(yytext);
-    if (!yylval.literal.valor) {
+    yylval.literal.valor = malloc(strlen(yytext) + 1);
+    if (yylval.literal.valor == NULL) {
         fprintf(stderr, "Erro de memória ao alocar LITERAL_FLT.\n");
         exit(EXIT_FAILURE);
     }
+    strcpy(yylval.literal.valor, yytext);
     yylval.literal.num = atof(yytext);
     emitToken("LITERAL_FLT", yytext); 
     return LITERAL_FLT; 
 }
 {CHAR}      { 
-    yylval.literal.valor = strdup(yytext);
-    if (!yylval.literal.valor) {
+    yylval.literal.valor = malloc(strlen(yytext) + 1);
+    if (yylval.literal.valor == NULL) {
         fprintf(stderr, "Erro de memória ao alocar LITERAL_CHR.\n");
         exit(EXIT_FAILURE);
     }
+    strcpy(yylval.literal.valor, yytext);
     emitToken("LITERAL_CHR", yytext); 
     return LITERAL_CHR; 
 }
 {STRING}    { 
-    yylval.literal.valor = strdup(yytext);
-    if (!yylval.literal.valor) {
+    yylval.literal.valor = malloc(strlen(yytext) + 1);
+    if (yylval.literal.valor == NULL) {
         fprintf(stderr, "Erro de memória ao alocar LITERAL_STR.\n");
         exit(EXIT_FAILURE);
     }
+    strcpy(yylval.literal.valor, yytext);
     emitToken("LITERAL_STR", yytext); 
-    return LITERAL_STR; 
+    return LITERAL_STR;  
 }
 
 .           {
@@ -224,6 +229,7 @@ COMENTARIO  "//".*
 %%
 
 int yywrap(void) {
+    // Limpar quaisquer recursos pendentes do flex
     return 1;
 }
 

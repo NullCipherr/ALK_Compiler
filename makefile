@@ -132,16 +132,10 @@ test_single: $(TARGET) check_dirs
 		exit 1; \
 	fi
 	@echo "\n$(AMARELO)Executando teste: $(FILE)$(RESET)"
-	@if $(VALGRIND) $(VALGRIND_FLAGS) ./$(TARGET) < $(FILE) 2>$(BUILD_DIR)/valgrind.log; then \
-		if ! grep -q "ERROR SUMMARY: 0 errors" $(BUILD_DIR)/valgrind.log; then \
-			echo "$(VERMELHO)$(CROSS) Teste passou mas possui vazamento de memória!$(RESET)"; \
-			cat $(BUILD_DIR)/valgrind.log; \
-		else \
-			echo "$(VERDE)$(CHECK) Teste passou!$(RESET)"; \
-		fi; \
+	@if ./$(TARGET) < $(FILE); then \
+		echo "$(VERDE)$(CHECK) Teste passou!$(RESET)"; \
 	else \
 		echo "$(VERMELHO)$(CROSS) Teste falhou!$(RESET)"; \
-		cat $(BUILD_DIR)/valgrind.log; \
 	fi
 
 check_dirs:

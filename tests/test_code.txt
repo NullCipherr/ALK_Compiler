@@ -39,6 +39,7 @@ calcular_media("7", 8);  // Erro: tipo incorreto de argumento
 {
     create int temp as 0;
 }
+
 print(temp);  // Erro: variável fora de escopo
 
 // Erro em estrutura de controle

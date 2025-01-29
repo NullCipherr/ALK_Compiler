@@ -291,18 +291,17 @@ declaracao_variavel
         {
             if (!inserir_simbolo(analisador, $3.nome, $2)) {
                 printar_erro_semantico("Variável já declarada", "A variável já foi declarada anteriormente", $3.nome);
-                free($3.nome);  // Libera diretamente a memória alocada
+                free($3.nome);
                 YYERROR;
             }
-            // Verificar o tipo da expressão através do analisador semântico
             SimboloEntrada* simbolo = buscar_simbolo(analisador, $3.nome);
             if (!verificar_compatibilidade_tipos(analisador, $2, simbolo->tipo, $3.nome)) {
                 printar_erro_semantico("Tipo incompatível", "Erro ao inicializar a variável com tipo incompatível", $3.nome);
-                free($3.nome);  // Libera a memória em caso de erro
+                free($3.nome);
                 YYERROR;
             }
             $$ = criar_no_declaracao_var($3.nome, $2, $5);
-            free($3.nome);  // Libera a memória após o uso
+            free($3.nome);
         }
     | DECL_CREATE tipo IDENTIFIER DELIM_BRACKET_OPEN LITERAL_INT DELIM_BRACKET_CLOSE 
       DECL_AS DECL_ARRAY DELIM_END_STATEMENT
@@ -310,14 +309,20 @@ declaracao_variavel
             int tamanho = atoi($5.valor);
             if (tamanho <= 0) {
                 printar_erro_semantico("Tamanho inválido", "O tamanho do vetor deve ser maior que zero.",$3.nome);
+                free($3.nome);
+                free($5.valor);
                 YYERROR;
             }
             if (!inserir_vetor(analisador, $3.nome, $2, tamanho)) {
                 printar_erro_semantico("Variável já declarada","A variável já foi declarada anteriormente.",$3.nome);
+                free($3.nome);
+                free($5.valor);
                 YYERROR;
             }
             NoArvore* literal = criar_no_literal($5.valor, TIPO_INT);
             $$ = criar_no_declaracao_var($3.nome, TIPO_VETOR, literal);
+            free($3.nome);
+            free($5.valor);
         }
     ;
 
@@ -457,6 +462,7 @@ bloco
     : DELIM_BLOCK_OPEN lista_comandos DELIM_BLOCK_CLOSE
         {
             mostrarAnaliseGramatical("Bloco → { Lista Comandos }");
+            $$ = criar_no_bloco($2);
         }
     ;
 
@@ -480,6 +486,8 @@ atribuicao
                 );
                 analisador->num_erros++;
             }
+            NoArvore* alvo = criar_no_identificador($1.nome, simbolo->tipo);
+            $$ = criar_no_atribuicao(alvo, $3);
         }
     | IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE OP_ASSIGN expressao
         {
@@ -507,6 +515,8 @@ atribuicao
                 );
                 analisador->num_erros++;
             }
+            NoArvore* alvo = criar_no_identificador($1.nome, simbolo->info.vetor.tipo_base);
+            $$ = criar_no_atribuicao(alvo, $6);
         }
     | IDENTIFIER OP_ADD_ASSIGN expressao
         {
@@ -591,6 +601,7 @@ fator
             } else {
                 $$ = criar_no_identificador($1.nome, simbolo->tipo);
             }
+            free($1.nome);
         }
     | IDENTIFIER DELIM_BRACKET_OPEN expressao DELIM_BRACKET_CLOSE
         {
@@ -629,14 +640,19 @@ fator
         {
             SimboloEntrada* func = buscar_simbolo(analisador, $1.nome);
             if (func == NULL || func->tipo != TIPO_FUNCAO) {
-                printf("\n╔═══════════════════ ERRO SEMÂNTICO ═══════════════════╗\n");
-                printf("║ Função '%s' não declarada                             ║\n", $1.nome);
-                printf("╚═══════════════════════════════════════════════════════╝\n");
+                printar_erro_semantico(
+                    "Função Não Declarada",
+                    "Função não foi declarada ou não é do tipo função",
+                    $1.nome
+                );
                 analisador->num_erros++;
-                $$ = NULL;
+                $$ = criar_no_chamada_func($1.nome, NULL);
             } else {
                 verificar_chamada_funcao(analisador, $1.nome, num_argumentos);
                 $$ = criar_no_chamada_func($1.nome, $3);
+            }
+            if ($1.nome) {
+                free($1.nome);
             }
         }
     ;
@@ -652,22 +668,35 @@ chamada_funcao
                     $1.nome
                 );
                 analisador->num_erros++;
-                $$ = NULL;
+                $$ = criar_no_chamada_func($1.nome, NULL);
             } else {
                 verificar_chamada_funcao(analisador, $1.nome, num_argumentos);
                 $$ = criar_no_chamada_func($1.nome, $3);
+            }
+            if ($1.nome) {
+                free($1.nome);
             }
         }
     | BUILT_IN_PRINT DELIM_PAREN_OPEN expressao DELIM_PAREN_CLOSE
         {
             mostrarAnaliseGramatical("Chamada Função → print ( Expressão )");
-            $$ = criar_no_chamada_func("print", $3);
+            if ($3 == NULL) {
+                $$ = criar_no_chamada_func("print", NULL);
+            } else {
+                $$ = criar_no_chamada_func("print", $3);
+            }
         }
     | BUILT_IN_SCAN DELIM_PAREN_OPEN acesso_variavel DELIM_PAREN_CLOSE
         {
             mostrarAnaliseGramatical("Chamada Função → scan ( Acesso Variável )");
-            if ($3.tipo == TIPO_INT || $3.tipo == TIPO_FLOAT || $3.tipo == TIPO_CHAR || $3.tipo == TIPO_STRING) {
-                $$ = criar_no_chamada_func("scan", criar_no_identificador($3.nome, $3.tipo));
+            if ($3.tipo == TIPO_INT || $3.tipo == TIPO_FLOAT || 
+                $3.tipo == TIPO_CHAR || $3.tipo == TIPO_STRING) {
+                NoArvore* id_node = criar_no_identificador($3.nome, $3.tipo);
+                if (id_node == NULL) {
+                    $$ = criar_no_chamada_func("scan", NULL);
+                } else {
+                    $$ = criar_no_chamada_func("scan", id_node);
+                }
             } else {
                 printar_erro_semantico(
                     "Tipo Inválido para scan",
@@ -675,7 +704,10 @@ chamada_funcao
                     tipoParaString($3.tipo)
                 );
                 analisador->num_erros++;
-                $$ = NULL;
+                $$ = criar_no_chamada_func("scan", NULL);
+            }
+            if ($3.nome) {
+                free($3.nome);
             }
         }
     ;
@@ -721,10 +753,12 @@ argumentos
         { 
             mostrarAnaliseGramatical("Argumentos → vazio");
             num_argumentos = 0;
+            $$ = NULL;
         }
     | lista_argumentos
         { 
             mostrarAnaliseGramatical("Argumentos → Lista Argumentos");
+            $$ = $1;
         }
     ;
 
@@ -733,11 +767,28 @@ lista_argumentos
         { 
             mostrarAnaliseGramatical("Lista Argumentos → Expressão");
             num_argumentos = 1;
+            if ($1 == NULL) {
+                $$ = NULL;
+            } else {
+                $$ = $1;
+            }
         }
     | lista_argumentos DELIM_SEPARATOR expressao
         { 
             mostrarAnaliseGramatical("Lista Argumentos → Lista Argumentos , Expressão");
             num_argumentos++;
+            if ($1 == NULL) {
+                $$ = $3;
+            } else if ($3 == NULL) {
+                $$ = $1;
+            } else {
+                NoArvore* ultimo = $1;
+                while (ultimo->proximo != NULL) {
+                    ultimo = ultimo->proximo;
+                }
+                ultimo->proximo = $3;
+                $$ = $1;
+            }
         }
     ;
 
@@ -809,74 +860,92 @@ void exibir_rodape() {
     printf("\033[0m"); // Reseta as cores para o padrão
 }
 
+// 
 void cleanup_resources(void) {
-    // Clean AST if still exists
+    // Limpar a árvore AST
     if (raiz_ast != NULL) {
         liberar_arvore(raiz_ast);
         raiz_ast = NULL;
+        printf("[DEBUG] Memória da árvore AST liberada.\n");
     }
     
-    // Clean semantic analyzer
+    // Limpar o analisador semântico
     if (analisador != NULL) {
         finalizar_analisador_semantico(analisador);
         analisador = NULL;
+        printf("[DEBUG] Recursos do analisador semântico liberados.\n");
     }
     
-    // Close output files
+    // Fechar o arquivo da árvore
     if (arvore_arquivo != NULL) {
         fclose(arvore_arquivo);
         arvore_arquivo = NULL;
+        printf("[DEBUG] Arquivo da árvore fechado.\n");
     }
     
-    // Reset state variables
+    // Fechar o arquivo de entrada, se necessário
+    if (yyin != NULL && yyin != stdin) {
+        fclose(yyin);
+        yyin = NULL;
+        printf("[DEBUG] Arquivo de entrada fechado.\n");
+    }
+    
+    // Liberar recursos do Flex
+    yylex_destroy();
+    printf("[DEBUG] Recursos do Flex liberados.\n");
+    
+    // Resetar variáveis globais
     num_argumentos = 0;
     num_parametros = 0;
     nivel_arvore = 0;
     linha = 1;
     total_tokens = 0;
-    
-    // Limpar recursos do scanner
-    yylex_destroy();  // Isso já cuida da limpeza dos buffers internos
-    
-    printf("\n[DEBUG] Recursos liberados com sucesso.\n");
+    printf("[DEBUG] Variáveis globais resetadas.\n");
 }
 
 int main(void) 
 {
     int resultado = 0;
     
-    // Register cleanup handler
-    atexit(cleanup_resources);
-
+    // Registrar cleanup_resources para ser chamado na saída
+    if (atexit(cleanup_resources) != 0) {
+        fprintf(stderr, "[ERRO] Falha ao registrar cleanup_resources.\n");
+        return EXIT_FAILURE;
+    }
+    
     // Exibe o cabeçalho do compilador
     exibir_cabecalho();
     
-    // Inicializa o processo de criação da árvore de sintaxe abstrata 
+    // Inicializa o arquivo da árvore com proteção contra erros
     iniciar_arquivo_arvore();
+    if (arvore_arquivo == NULL) {
+        fprintf(stderr, "[ERRO] Falha ao abrir o arquivo da árvore.\n");
+        return EXIT_FAILURE;
+    }
     
-    // Realiza a análise sintática do código fonte
+    // Realiza a análise sintática
     resultado = yyparse();
     
-    // Se a árvore de sintaxe abstrata foi criada, realiza o processamento
-    if (raiz_ast != NULL) {
-        if (arvore_arquivo != NULL) {
-            imprimir_arvore(raiz_ast, arvore_arquivo, 0);
-        }
-        liberar_arvore(raiz_ast);
-        raiz_ast = NULL;
+    // Verifica e imprime a árvore se ela foi criada com sucesso
+    if (raiz_ast != NULL && arvore_arquivo != NULL) {
+        // printf("[AVISO] Árvore abstrata gerada com sucesso!!.\n");
+        imprimir_arvore(raiz_ast, arvore_arquivo, 0);
+    } else {
+        fprintf(stderr, "[AVISO] Árvore abstrata não gerada ou arquivo inválido.\n");
     }
     
-    // Se o analisador semântico foi inicializado, finaliza o processo
-    if (analisador != NULL) {
-        finalizar_analisador_semantico(analisador);
-        analisador = NULL;
-    }
-    
-    // Fecha o arquivo de saída da árvore
+    // Fecha o arquivo da árvore
     fechar_arquivo_arvore();
     
-    // Exibe o rodapé
+    // Exibe o rodapé antes de finalizar
     exibir_rodape();
     
+    if (resultado == 0) {
+        printf("[DEBUG] Compilação realizada com sucesso.\n");
+    } else {
+        printf("[DEBUG] Compilação realizada com erros.\n");
+    }
+
+    // cleanup_resources será chamado automaticamente na saída
     return resultado;
 }

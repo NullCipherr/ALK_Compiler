@@ -1117,12 +1117,13 @@ YY_RULE_SETUP
 case 40:
 YY_RULE_SETUP
 #line 159 "src/flex.l"
-{ 
-    yylval.id.nome = strdup(yytext);
-    if (!yylval.id.nome) {
-        fprintf(stderr, "Erro de memória ao alocar IDENTIFIER.\n");
-        exit(EXIT_FAILURE);
+{
+    yylval.id.nome = malloc(strlen(yytext) + 1);  // +1 para o caractere '\0'
+    if (yylval.id.nome == NULL) {
+        fprintf(stderr, "Erro: falha na alocação de memória\n");
+        exit(1);
     }
+    strcpy(yylval.id.nome, yytext);
     yylval.id.tipo = TIPO_ERRO;
     emitToken("IDENTIFIER", yytext); 
     return IDENTIFIER;  
@@ -1130,13 +1131,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 170 "src/flex.l"
-{ 
-    yylval.literal.valor = strdup(yytext);
-    if (!yylval.literal.valor) {
-        fprintf(stderr, "Erro de memória ao alocar LITERAL_INT.\n");
+#line 171 "src/flex.l"
+{
+   yylval.literal.valor = malloc(strlen(yytext) + 1);  // Aloca memória
+    if (yylval.literal.valor == NULL) {
+        fprintf(stderr, "Erro: falha na alocação de memória\n");
         exit(EXIT_FAILURE);
     }
+    strcpy(yylval.literal.valor, yytext);  // Copia a string para o valor
     yylval.literal.num = atoi(yytext);
     emitToken("LITERAL_INT", yytext); 
     return LITERAL_INT;
@@ -1144,13 +1146,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 180 "src/flex.l"
+#line 182 "src/flex.l"
 { 
-    yylval.literal.valor = strdup(yytext);
-    if (!yylval.literal.valor) {
+    yylval.literal.valor = malloc(strlen(yytext) + 1);
+    if (yylval.literal.valor == NULL) {
         fprintf(stderr, "Erro de memória ao alocar LITERAL_FLT.\n");
         exit(EXIT_FAILURE);
     }
+    strcpy(yylval.literal.valor, yytext);
     yylval.literal.num = atof(yytext);
     emitToken("LITERAL_FLT", yytext); 
     return LITERAL_FLT; 
@@ -1158,13 +1161,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 190 "src/flex.l"
+#line 193 "src/flex.l"
 { 
-    yylval.literal.valor = strdup(yytext);
-    if (!yylval.literal.valor) {
+    yylval.literal.valor = malloc(strlen(yytext) + 1);
+    if (yylval.literal.valor == NULL) {
         fprintf(stderr, "Erro de memória ao alocar LITERAL_CHR.\n");
         exit(EXIT_FAILURE);
     }
+    strcpy(yylval.literal.valor, yytext);
     emitToken("LITERAL_CHR", yytext); 
     return LITERAL_CHR; 
 }
@@ -1172,20 +1176,21 @@ YY_RULE_SETUP
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 199 "src/flex.l"
+#line 203 "src/flex.l"
 { 
-    yylval.literal.valor = strdup(yytext);
-    if (!yylval.literal.valor) {
+    yylval.literal.valor = malloc(strlen(yytext) + 1);
+    if (yylval.literal.valor == NULL) {
         fprintf(stderr, "Erro de memória ao alocar LITERAL_STR.\n");
         exit(EXIT_FAILURE);
     }
+    strcpy(yylval.literal.valor, yytext);
     emitToken("LITERAL_STR", yytext); 
-    return LITERAL_STR; 
+    return LITERAL_STR;  
 }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 209 "src/flex.l"
+#line 214 "src/flex.l"
 {
     // Definições de cores ANSI
     const char* GREEN = "\033[1;32m"; // Verde brilhante
@@ -1201,10 +1206,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 224 "src/flex.l"
+#line 229 "src/flex.l"
 ECHO;
 	YY_BREAK
-#line 1208 "build/lex.yy.c"
+#line 1213 "build/lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2172,10 +2177,11 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 224 "src/flex.l"
+#line 229 "src/flex.l"
 
 
 int yywrap(void) {
+    // Limpar quaisquer recursos pendentes do flex
     return 1;
 }
 
