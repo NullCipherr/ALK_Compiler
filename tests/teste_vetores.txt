@@ -13,5 +13,4 @@ nomes[0] = "Teste";
 
 // Teste de erros com vetores
 numeros[-1] = 10;          // Deve gerar erro: índice negativo
-numeros[5] = 20;           // Deve gerar erro: índice fora do limite
-notas[numeros[0]] = 8.5;   // Deve gerar erro: índice muito grande
+notas[numerox[0]] = 8.5;   // Deve gerar erro: Variavel não declarada

@@ -1,4 +1,4 @@
 // Função para calcular média
 function float calcular_media(float n1, float n2) {
-    give back (n1 plus n2) divided_by 2.0;
+    give back (n1 plus n2) divided_by -5; // Gerar erro de retorno : tipo incompativel
 }
